@@ -2,7 +2,7 @@
 
 typedef struct {   
 	
-	// //input data
+	//input data
 	int nnodes; 	
 	double *demand;   
 	double *xcoord;
@@ -11,7 +11,7 @@ typedef struct {
 	double capacity; 
 	int nveh;
 
-	// // parameters 
+	// parameters 
 	int model_type; 
 	int old_benders;
 	int randomseed;
@@ -24,7 +24,7 @@ typedef struct {
 	double cutoff; 							// cutoff (upper bound) for master
 	int integer_costs;
 
-	// //global data
+	//global data
 	// double	tstart;								
 	// double zbest;							// best sol. available  
 	// double tbest;							// time for the best sol. available  
@@ -33,7 +33,7 @@ typedef struct {
 	// double *load_min;						// minimum load when leaving a node
 	// double *load_max;						// maximum load when leaving a node
 	
-	// // model;     
+	// model;     
 	// int xstart;
 	// int qstart;
 	// int bigqstart;  						
@@ -44,6 +44,19 @@ typedef struct {
 	// int zstart;
 } instance;
 
-int apply_algorithm(instance* inst);
+/**
+ * @brief Prints the solution to the standard output or generates a plot using Gnuplot, 
+ * depending on the specified flag.
+ * 
+ * @param inst A pointer to the instance structure containing the solution data.
+ * @param useGnuplot A boolean flag indicating whether to generate a plot 
+ * using Gnuplot (true) or print the solution to the standard output (false).
+ */
 void print_solution(instance* inst, bool useGnuplot);
+
+/**
+ * @brief Frees the memory allocated for the instance structure.
+ * 
+ * @param inst A pointer to the instance structure to be freed.
+ */
 void free_instance(instance* inst);

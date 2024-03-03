@@ -1,13 +1,9 @@
 #include "parser.h"
 
-void print_error(const char *err) {
-    printf("\n\n ERROR: %s \n\n", err);
-    fflush(NULL);
-    exit(1);
-}
+void print_error(const char *err);
 
-int parse_args(int argc, char** argv, instance* inst){
-	
+int parse_args(int argc, char** argv, instance* inst)
+{
 	if ( VERBOSE >= 100 ) printf(" running %s with %d parameters \n", argv[0], argc-1); 
 		
 	// default   
@@ -24,6 +20,7 @@ int parse_args(int argc, char** argv, instance* inst){
 	inst->max_nodes = -1; 						// max n. of branching nodes in the final run (-1 unlimited)        
 
     int help = 0; if ( argc < 1 ) help = 1;	
+
 	for ( int i = 1; i < argc; i++ ) 
 	{ 
 		if ( strcmp(argv[i],"-file") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 			// input file
@@ -45,7 +42,7 @@ int parse_args(int argc, char** argv, instance* inst){
 		// if ( strcmp(argv[i],"-max_nodes") == 0 ) { inst->max_nodes = atoi(argv[++i]); continue; } 		// max n. of nodes
 		// if ( strcmp(argv[i],"-cutoff") == 0 ) { inst->cutoff = atof(argv[++i]); continue; }				// master cutoff
 		// if ( strcmp(argv[i],"-int") == 0 ) { inst->integer_costs = 1; continue; } 						// inteher costs
-		// if ( strcmp(argv[i],"-help") == 0 ) { help = 1; continue; } 									// help
+		// if ( strcmp(argv[i],"-help") == 0 ) { help = 1; continue; } 										// help
 		// if ( strcmp(argv[i],"--help") == 0 ) { help = 1; continue; } 									// help
 		help = 1;
     }      
@@ -70,12 +67,11 @@ int parse_args(int argc, char** argv, instance* inst){
 	}        
 	
 	if ( help ) exit(1);
-
     return 0;
 }
 
-int read_input(instance* inst){
-                            
+int read_input(instance* inst)
+{              
 	FILE *fin = fopen(inst->input_file, "r");
 	if ( fin == NULL ) print_error(" input file not found!");
 	
@@ -94,10 +90,12 @@ int read_input(instance* inst){
 
 	while ( fgets(line, sizeof(line), fin) != NULL ) 
 	{
-		if ( VERBOSE >= 2000 ) { printf("%s",line); fflush(NULL); }
+		if ( VERBOSE >= 2000 ) printf("%s",line); fflush(NULL);
 		if ( strlen(line) <= 1 ) continue; // skip empty lines
+
 	    par_name = strtok(line, " :");
-		if ( VERBOSE >= 3000 ) { printf("parameter \"%s\" ",par_name); fflush(NULL); }
+
+		if ( VERBOSE >= 3000 ) printf("parameter \"%s\" ",par_name); fflush(NULL);
 
 		if ( strncmp(par_name, "NAME", 4) == 0 ) 
 		{
@@ -191,7 +189,6 @@ int read_input(instance* inst){
 			break;
 		}
 		
-			
 		if ( active_section == 1 ) // within NODE_COORD_SECTION
 		{
 			int i = atoi(par_name) - 1; 
@@ -225,10 +222,21 @@ int read_input(instance* inst){
 		}  
 		
 		printf(" final active section %d\n", active_section);
-		print_error(" ... wrong format for the current simplified parser!!!!!!!!!");     
-		    
+		print_error(" ... wrong format for the current simplified parser!!!!!!!!!");     	    
 	}                
 
 	fclose(fin); 
     return 0;
+}
+
+/**
+ * @brief Prints an error message to the standard output and exits the program.
+ * 
+ * @param err The error message to be printed.
+ */
+void print_error(const char *err)
+{
+    printf("\n\n ERROR: %s \n\n", err);
+    fflush(NULL);
+    exit(1);
 }

@@ -1,31 +1,44 @@
 #include "vrp.h"
 #include <stdio.h>
 
-void generateDataFile(const char* filename, instance* inst) {
+/**
+ * @brief Generates a data file with node coordinates for 
+ * the specified instance and saves it to the given filename.
+ * 
+ * @param filename The name of the file to write the data to.
+ * @param inst A pointer to the instance structure containing node coordinates.
+ */
+void generateDataFile(const char* filename, instance* inst)
+{
     FILE* file = fopen(filename, "w");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         perror("Error opening file");
         exit(1);
     }
 
     // Write data to the file
-    for(int i=0; i<inst->nnodes; i++){
+    for(int i=0; i<inst->nnodes; i++)
+    {
         fprintf(file, "%d %d\n", inst->xcoord[i], inst->ycoord[i]);
     }
 
     fclose(file);
 }
 
-void print_solution(instance* inst, bool useGnuplot){
-    
-    if(useGnuplot){
+void print_solution(instance* inst, bool useGnuplot)
+{
+    if(useGnuplot)
+    {
         // Generate data file
         const char* dataFilename = "data.txt";
         generateDataFile(dataFilename, inst);
 
         // Create Gnuplot script file
         FILE* scriptFile = fopen("plot_script.plt", "w");
-        if (scriptFile == NULL) {
+
+        if (scriptFile == NULL)
+        {
             perror("Error opening script file");
             exit(1);
         }
@@ -45,8 +58,10 @@ void print_solution(instance* inst, bool useGnuplot){
         // Optionally, remove generated files
         remove(dataFilename);
         remove("plot_script.plt");
-    }else{
-        for(int i=0; i<inst->nnodes; i++){
+    } else
+    {
+        for(int i=0; i<inst->nnodes; i++)
+        {
             printf("#%d x=%d y=%d\n", i, inst->xcoord[i], inst->ycoord[i]);
         }
     }
