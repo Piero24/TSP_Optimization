@@ -5,7 +5,7 @@ typedef struct {
 	//input data
 	int nnodes; 	
 	double *demand;   
-	double *xcoord;
+	double *xcoord; //TODO a struct point{x, y} would be more efficient
 	double *ycoord;
 	int depot;
 	double capacity; 

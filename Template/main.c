@@ -12,13 +12,17 @@ int main(int argc, char** argv)
     }
 
     instance inst;
+
     parse_args(argc, argv, &inst);
+
     read_input(&inst);
 
     apply_algorithm(&inst);
+
     print_solution(&inst, true);
 
     free_instance(&inst);
+
     return 0;
 }
 

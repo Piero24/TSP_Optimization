@@ -11,8 +11,7 @@
 void generateDataFile(const char* filename, instance* inst)
 {
     FILE* file = fopen(filename, "w");
-    if (file == NULL)
-    {
+    if (file == NULL) {
         perror("Error opening file");
         exit(1);
     }
@@ -28,6 +27,7 @@ void generateDataFile(const char* filename, instance* inst)
 
 void print_solution(instance* inst, bool useGnuplot)
 {
+    
     if(useGnuplot)
     {
         // Generate data file
@@ -36,8 +36,7 @@ void print_solution(instance* inst, bool useGnuplot)
 
         // Create Gnuplot script file
         FILE* scriptFile = fopen("plot_script.plt", "w");
-
-        if (scriptFile == NULL)
+        if (scriptFile == NULL) 
         {
             perror("Error opening script file");
             exit(1);
@@ -48,17 +47,17 @@ void print_solution(instance* inst, bool useGnuplot)
         fprintf(scriptFile, "set xlabel \"X Axis\"\n");
         fprintf(scriptFile, "set ylabel \"Y Axis\"\n");
         fprintf(scriptFile, "set grid\n");
-        fprintf(scriptFile, "plot 'data.txt' with linespoints title \"Nodes\"\n");
+        fprintf(scriptFile, "plot 'data.txt' with linespoints title \"Nodes\"\n"); //TODO it's better "with points"
 
         fclose(scriptFile);
 
         // Execute Gnuplot script
-        system("gnuplot plot_script.plt");
+        system("gnuplot plot_script.plt"); //TODO it's better to use pipe file (file popen("gnuplot --persist", "w") )
 
         // Optionally, remove generated files
         remove(dataFilename);
         remove("plot_script.plt");
-    } else
+    } else 
     {
         for(int i=0; i<inst->nnodes; i++)
         {
@@ -67,4 +66,7 @@ void print_solution(instance* inst, bool useGnuplot)
     }
 }
 
-void free_instance(instance* inst){}
+void free_instance(instance* inst)
+{
+    return;
+}

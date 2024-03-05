@@ -4,7 +4,9 @@ void print_error(const char *err);
 
 int parse_args(int argc, char** argv, instance* inst)
 {
-	if ( VERBOSE >= 100 ) printf(" running %s with %d parameters \n", argv[0], argc-1); 
+	
+	if ( VERBOSE >= 100 ) 
+		printf(" running %s with %d parameters \n", argv[0], argc-1); 
 		
 	// default   
 	inst->model_type = 0;
@@ -20,7 +22,6 @@ int parse_args(int argc, char** argv, instance* inst)
 	inst->max_nodes = -1; 						// max n. of branching nodes in the final run (-1 unlimited)        
 
     int help = 0; if ( argc < 1 ) help = 1;	
-
 	for ( int i = 1; i < argc; i++ ) 
 	{ 
 		if ( strcmp(argv[i],"-file") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 			// input file
@@ -35,7 +36,7 @@ int parse_args(int argc, char** argv, instance* inst)
 		if ( strcmp(argv[i],"-alg") == 0 ) { inst->model_type = atoi(argv[++i]); continue; } 			// model type
 
 		// if ( strcmp(argv[i],"-old_benders") == 0 ) { inst->old_benders = atoi(argv[++i]); continue; } 	// old benders
-		// if ( strcmp(argv[i],"-seed") == 0 ) { inst->randomseed = abs(atoi(argv[++i])); continue; } 		// random seed
+		// if ( strcmp(argv[i],"-seed") == 0 ) { inst->randomseed = abs(atoi(argv[++i])); continue; } 		// random seed TODO add this argument
 		// if ( strcmp(argv[i],"-threads") == 0 ) { inst->num_threads = atoi(argv[++i]); continue; } 		// n. threads
 		// if ( strcmp(argv[i],"-memory") == 0 ) { inst->available_memory = atoi(argv[++i]); continue; }	// available memory (in MB)
 		// if ( strcmp(argv[i],"-node_file") == 0 ) { strcpy(inst->node_file,argv[++i]); continue; }		// cplex's node file
@@ -67,13 +68,16 @@ int parse_args(int argc, char** argv, instance* inst)
 	}        
 	
 	if ( help ) exit(1);
+
     return 0;
 }
 
 int read_input(instance* inst)
-{              
+{
+                            
 	FILE *fin = fopen(inst->input_file, "r");
-	if ( fin == NULL ) print_error(" input file not found!");
+	if ( fin == NULL ) 
+		print_error(" input file not found!");
 	
 	inst->nnodes = -1;
 	inst->depot = -1;  
@@ -90,12 +94,10 @@ int read_input(instance* inst)
 
 	while ( fgets(line, sizeof(line), fin) != NULL ) 
 	{
-		if ( VERBOSE >= 2000 ) printf("%s",line); fflush(NULL);
+		if ( VERBOSE >= 2000 ) { printf("%s",line); fflush(NULL); }
 		if ( strlen(line) <= 1 ) continue; // skip empty lines
-
 	    par_name = strtok(line, " :");
-
-		if ( VERBOSE >= 3000 ) printf("parameter \"%s\" ",par_name); fflush(NULL);
+		if ( VERBOSE >= 3000 ) { printf("parameter \"%s\" ",par_name); fflush(NULL); }
 
 		if ( strncmp(par_name, "NAME", 4) == 0 ) 
 		{
@@ -189,6 +191,7 @@ int read_input(instance* inst)
 			break;
 		}
 		
+			
 		if ( active_section == 1 ) // within NODE_COORD_SECTION
 		{
 			int i = atoi(par_name) - 1; 
@@ -197,6 +200,7 @@ int read_input(instance* inst)
 			token2 = strtok(NULL, " :,");
 			inst->xcoord[i] = atof(token1);
 			inst->ycoord[i] = atof(token2);
+			//TODO save distance in a matrix
 			if ( do_print ) printf(" ... node %4d at coordinates ( %15.7lf , %15.7lf )\n", i+1, inst->xcoord[i], inst->ycoord[i]); 
 			continue;
 		}    
@@ -222,7 +226,8 @@ int read_input(instance* inst)
 		}  
 		
 		printf(" final active section %d\n", active_section);
-		print_error(" ... wrong format for the current simplified parser!!!!!!!!!");     	    
+		print_error(" ... wrong format for the current simplified parser!!!!!!!!!");     
+		    
 	}                
 
 	fclose(fin); 
