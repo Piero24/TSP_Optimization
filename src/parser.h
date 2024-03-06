@@ -6,8 +6,6 @@
 #include "vrp.h"
 //#include <cplex.h> //CPX_INFBOUND
 
-#define VERBOSE 5000
-
 /**
  * @brief Parses command-line arguments to initialize the instance structure.
  * 

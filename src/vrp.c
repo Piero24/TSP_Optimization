@@ -1,5 +1,6 @@
 #include "vrp.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 /**
  * @brief Generates a data file with node coordinates for 
@@ -19,15 +20,14 @@ void generateDataFile(const char* filename, instance* inst)
     // Write data to the file
     for(int i=0; i<inst->nnodes; i++)
     {
-        fprintf(file, "%d %d\n", inst->xcoord[i], inst->ycoord[i]);
+        fprintf(file, "%f %f\n", inst->coord[i].x, inst->coord[i].y);
     }
 
     fclose(file);
 }
 
 void print_solution(instance* inst, bool useGnuplot)
-{
-    
+{    
     if(useGnuplot)
     {
         // Generate data file
@@ -35,7 +35,7 @@ void print_solution(instance* inst, bool useGnuplot)
         generateDataFile(dataFilename, inst);
 
         // Create Gnuplot script file
-        FILE* scriptFile = fopen("plot_script.plt", "w");
+        FILE* scriptFile = popen("gnuplot --persist", "w");
         if (scriptFile == NULL) 
         {
             perror("Error opening script file");
@@ -47,12 +47,12 @@ void print_solution(instance* inst, bool useGnuplot)
         fprintf(scriptFile, "set xlabel \"X Axis\"\n");
         fprintf(scriptFile, "set ylabel \"Y Axis\"\n");
         fprintf(scriptFile, "set grid\n");
-        fprintf(scriptFile, "plot 'data.txt' with linespoints title \"Nodes\"\n"); //TODO it's better "with points"
+        fprintf(scriptFile, "plot 'data.txt' with point title \"Nodes\"\n");
 
         fclose(scriptFile);
 
         // Execute Gnuplot script
-        system("gnuplot plot_script.plt"); //TODO it's better to use pipe file (file popen("gnuplot --persist", "w") )
+        system("gnuplot plot_script.plt");
 
         // Optionally, remove generated files
         remove(dataFilename);
@@ -61,12 +61,18 @@ void print_solution(instance* inst, bool useGnuplot)
     {
         for(int i=0; i<inst->nnodes; i++)
         {
-            printf("#%d x=%d y=%d\n", i, inst->xcoord[i], inst->ycoord[i]);
+            printf("#%d x=%f y=%f\n", i, inst->coord[i].x, inst->coord[i].y);
         }
     }
 }
 
 void free_instance(instance* inst)
 {
-    return;
+    free(inst->demand);
+    free(inst->coord);
+
+    for(int i=0; i<inst->nnodes; i++)
+        free(inst->distances[i]);
+
+    free(inst->distances);
 }

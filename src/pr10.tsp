@@ -1,0 +1,16 @@
+NAME : pr100
+COMMENT : 100-city problem (Padberg/Rinaldi)
+TYPE : TSP
+DIMENSION : 10
+EDGE_WEIGHT_TYPE : EUC_2D
+NODE_COORD_SECTION
+1 10 10
+2 1 1
+3 8 8
+4 2 2
+5 6 6
+6 3 3
+7 4 4
+8 9 9
+9 2 2
+10 7 7

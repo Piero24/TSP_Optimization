@@ -1,4 +1,5 @@
 #include "parser.h"
+#include <math.h>
 
 void print_error(const char *err);
 
@@ -12,7 +13,7 @@ int parse_args(int argc, char** argv, instance* inst)
 	inst->model_type = 0;
 	inst->old_benders = 0;
 	strcpy(inst->input_file, "NULL");
-	inst->randomseed = 0; 
+	inst->randomseed = 93846529; 
 	inst->num_threads = 0;
 	inst->timelimit = DBL_MAX; //CPX_INFBOUND
 	inst->cutoff = DBL_MAX; //CPX_INFBOUND
@@ -35,8 +36,9 @@ int parse_args(int argc, char** argv, instance* inst)
 		if ( strcmp(argv[i],"-model") == 0 ) { inst->model_type = atoi(argv[++i]); continue; } 			// model type
 		if ( strcmp(argv[i],"-alg") == 0 ) { inst->model_type = atoi(argv[++i]); continue; } 			// model type
 
+		if ( strcmp(argv[i],"-seed") == 0 ) { inst->randomseed += abs(atoi(argv[++i])); continue; } 		// random seed
+
 		// if ( strcmp(argv[i],"-old_benders") == 0 ) { inst->old_benders = atoi(argv[++i]); continue; } 	// old benders
-		// if ( strcmp(argv[i],"-seed") == 0 ) { inst->randomseed = abs(atoi(argv[++i])); continue; } 		// random seed TODO add this argument
 		// if ( strcmp(argv[i],"-threads") == 0 ) { inst->num_threads = atoi(argv[++i]); continue; } 		// n. threads
 		// if ( strcmp(argv[i],"-memory") == 0 ) { inst->available_memory = atoi(argv[++i]); continue; }	// available memory (in MB)
 		// if ( strcmp(argv[i],"-node_file") == 0 ) { strcpy(inst->node_file,argv[++i]); continue; }		// cplex's node file
@@ -55,8 +57,8 @@ int parse_args(int argc, char** argv, instance* inst)
 		printf("-time_limit %lf\n", inst->timelimit); 
 		printf("-model_type %d\n", inst->model_type); 
 
-		// printf("-old_benders %d\n", inst->old_benders); 
-		// printf("-seed %d\n", inst->randomseed); 
+		printf("-seed %d\n", inst->randomseed);
+		// printf("-old_benders %d\n", inst->old_benders);  
 		// printf("-threads %d\n", inst->num_threads);  
 		// printf("-max_nodes %d\n", inst->max_nodes); 
 		// printf("-memory %d\n", inst->available_memory); 
@@ -116,7 +118,7 @@ int read_input(instance* inst)
 		if ( strncmp(par_name, "TYPE", 4) == 0 ) 
 		{
 			token1 = strtok(NULL, " :");  
-			if ( strncmp(token1, "CVRP",4) != 0 ) print_error(" format error:  only TYPE == CVRP implemented so far!!!!!!"); 
+			if ( strncmp(token1, "TSP", 3) != 0 ) print_error(" format error:  only TYPE == TSP implemented so far!!!!!!"); 
 			active_section = 0;
 			continue;
 		}
@@ -129,8 +131,12 @@ int read_input(instance* inst)
 			inst->nnodes = atoi(token1);
 			if ( do_print ) printf(" ... nnodes %d\n", inst->nnodes); 
 			inst->demand = (double *) calloc(inst->nnodes, sizeof(double)); 	 
-			inst->xcoord = (double *) calloc(inst->nnodes, sizeof(double)); 	 
-			inst->ycoord = (double *) calloc(inst->nnodes, sizeof(double));    
+			inst->coord = (point *) calloc(inst->nnodes, sizeof(point));
+
+			inst->distances = (double **)malloc(inst->nnodes * sizeof(double *));
+			for (int i = 0; i < inst->nnodes; i++)
+				inst->distances[i] = (double *)malloc(inst->nnodes * sizeof(double));
+
 			active_section = 0;  
 			continue;
 		}
@@ -191,17 +197,21 @@ int read_input(instance* inst)
 			break;
 		}
 		
-			
 		if ( active_section == 1 ) // within NODE_COORD_SECTION
 		{
 			int i = atoi(par_name) - 1; 
 			if ( i < 0 || i >= inst->nnodes ) print_error(" ... unknown node in NODE_COORD_SECTION section");     
 			token1 = strtok(NULL, " :,");
 			token2 = strtok(NULL, " :,");
-			inst->xcoord[i] = atof(token1);
-			inst->ycoord[i] = atof(token2);
-			//TODO save distance in a matrix
-			if ( do_print ) printf(" ... node %4d at coordinates ( %15.7lf , %15.7lf )\n", i+1, inst->xcoord[i], inst->ycoord[i]); 
+			inst->coord[i].x = atof(token1);
+			inst->coord[i].y = atof(token2);
+
+			for(int j=i;j>=0;j--){
+				inst->distances[i][j] = sqrt( pow((inst->coord[i].x - inst->coord[j].x), 2) + pow(inst->coord[i].y - inst->coord[j].y, 2) );
+				inst->distances[j][i] = inst->distances[i][j];
+			}
+			
+			if ( do_print ) printf(" ... node %4d at coordinates ( %15.7lf , %15.7lf )\n", i+1, inst->coord[i].x, inst->coord[i].y); 
 			continue;
 		}    
 		  

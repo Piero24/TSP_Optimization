@@ -1,5 +1,5 @@
 Next homework: heuristic
-Greedy paradigm: Nearest neighbor
+Greedy paradigm: Nearest Neighbor
 
 I have to visit all the vertex, starting from the node (x,y) I move to the node with smaller distance that was not already visited.
 After all the nodes have been visited, I go back to the first one.
@@ -10,7 +10,7 @@ swapped with the next element and the next element will become the current one.
 The elements before the current one are the visited one and are ordered.
 The initialization can be an array of numbers between 0 and nnodes-1 that are the indexes of the nodes. 
 Then the starting node must be swapped with the node 0.
-There should be a separated fuction to make the swap (can be nice to have a timestamp print in it, can also be nice to 
+There should be a separated function to make the swap (can be nice to have a timestamp print in it, can also be nice to 
 have a debug checker function called here) and maybe also one to compute the best next node.
 It better to have a temporary array to do all the operation and then an official best_solution array that can be updated only by
 one function and that will always contain the current best solution.
@@ -22,6 +22,44 @@ one function and that will always contain the current best solution.
  We can try to start from all the nodes to find the best combination.
 
 
+//
+// ERROR: When the code start it order the weight but not in the correct order.
+//        For example if the input file have these nodes: (index, x coord, ycoord)
+          1 10 10
+          2 1 1
+          3 8 8
+          4 2 2
+          5 6 6
+          6 3 3
+          7 4 4
+          8 9 9
+          9 2 2
+          10 7 7
+
+//        The correct output should be: 0 7 2 9 4 6 5 3 1 
+//        (The nodes start from 1 so: 1 8 3 10 5 7 6 4 9 2)
+//
+//
+//        Instead the returned output is: 0 2 3 8 5 6 4 9 7 1
+          1 10 10
+          3 8 8
+          4 2 2
+          9 2 2
+          6 3 3
+          7 4 4
+          5 6 6
+          10 7 7
+          8 9 9
+          2 1 1
+
+//
+//
+//
+//
+//
+//
+
+
 Doubts: 
     double *xcoord;
     double *ycoord;
@@ -30,7 +68,7 @@ Doubts:
     Or it's better to let each algorithm build, use and return its own structure?
 
 Optimization 2:
-    If in the plot there are nodes, the solution is probably not good. We can add a follow-up opnimization to remove 
+    If in the plot there are nodes, the solution is probably not good. We can add a follow-up optimization to remove 
     them after the greedy algorithm has finished. (see immagine.png)
     new cost should be ex cost - cost of removed edges + cost of added edges
     added edges < removed edges => new cost < old cost

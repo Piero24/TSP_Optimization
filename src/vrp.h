@@ -1,12 +1,21 @@
+#ifndef VRP_H
+#define VRP_H
+
 #include <stdbool.h>
+
+#define VERBOSE 5000
+
+typedef struct {
+	double x, y;
+} point;
 
 typedef struct {   
 	
 	//input data
 	int nnodes; 	
 	double *demand;   
-	double *xcoord; //TODO a struct point{x, y} would be more efficient
-	double *ycoord;
+	point *coord;
+	double **distances;
 	int depot;
 	double capacity; 
 	int nveh;
@@ -60,3 +69,5 @@ void print_solution(instance* inst, bool useGnuplot);
  * @param inst A pointer to the instance structure to be freed.
  */
 void free_instance(instance* inst);
+
+#endif /* VRP_H */
