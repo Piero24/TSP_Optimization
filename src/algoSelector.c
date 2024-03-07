@@ -6,7 +6,7 @@
 #include "../include/parser.h"
 #include "../include/algoSelector.h"
 
-int apply_algorithm(instance* inst, bool onlyBestSolution)
+int apply_algorithm(instance* inst, bool onlyBestSolution, char *AlgorithmName)
 {
     int bestFirst = 0;
     double bestCost = -1;
@@ -21,14 +21,14 @@ int apply_algorithm(instance* inst, bool onlyBestSolution)
         double time;
         start = clock();
         
-        algorithmSelector(result, &cost, inst, firstNode);
+        algorithmSelector(result, &cost, inst, firstNode, AlgorithmName);
 
         end = clock();
         time = ((double) (end - start)) / CLOCKS_PER_SEC;
 
         if (!onlyBestSolution)
         {
-            printf("\nStarting Node: %d\tTime: %f sec.\tCost: %f\n", firstNode, time, cost);
+            printf("\nSelected Algorithm: %s\tStarting Node: %d\tTime: %f sec.\tCost: %f\n", AlgorithmName, firstNode, time, cost);
             printf("Output Path -> [");
             for(int i=0; i<inst->nnodes; i++)
             {
@@ -57,19 +57,20 @@ int apply_algorithm(instance* inst, bool onlyBestSolution)
         }
     }
 
-    printf("\n\n\n************************ BEST SOLUTION ************************\n");
-    printf("\nStarting Node: %d\tTime: %f sec.\tCost: %f\n", bestFirst, inst->tbest, bestCost);
-    printf("\n***************************************************************\n\n\n");
+    printf("\n\n\n********************************************* BEST SOLUTION *********************************************\n");
+    printf("\nSelected Algorithm: %s\tStarting Node: %d\tTime: %f sec.\tCost: %f\n", AlgorithmName, bestFirst, inst->tbest, bestCost);
+    printf("\n*********************************************************************************************************\n\n\n");
 
     inst->zbest = bestCost;
     return 0;
 }
 
-int algorithmSelector(int* result, double* cost, instance* inst, int firstNode)
+int algorithmSelector(int* result, double* cost, instance* inst, int firstNode, char *AlgorithmName)
 {
 
     if (inst->model_type == 1)
     {
+        strcpy(AlgorithmName, "Nearest Neighbor");
         nearestNeighbor(result, cost, inst, firstNode);
 
     } else if (inst->model_type == 2)

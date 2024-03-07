@@ -117,7 +117,6 @@ void save_solution(instance* inst, const char* outputFileName)
     fprintf(plotPNG, "set xlabel \"X Axis\"\n");
     fprintf(plotPNG, "set ylabel \"Y Axis\"\n");
     fprintf(plotPNG, "set grid\n");
-    fprintf(plotPNG, "set term qt font \"Arial\"\n");
     fprintf(plotPNG, "plot '-' with linespoints\n");
 
     // Send Gnuplot commands directly for SVG
@@ -127,7 +126,6 @@ void save_solution(instance* inst, const char* outputFileName)
     fprintf(plotSVG, "set xlabel \"X Axis\"\n");
     fprintf(plotSVG, "set ylabel \"Y Axis\"\n");
     fprintf(plotSVG, "set grid\n");
-    fprintf(plotSVG, "set term qt font \"Arial\"\n");
     fprintf(plotSVG, "plot '-' with linespoints\n");
 
     for(int i = 0; i < inst->nnodes; i++) {

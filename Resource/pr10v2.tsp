@@ -1,0 +1,16 @@
+NAME : pr10 V2
+COMMENT : 10-city problem (by GeoGebra)
+TYPE : TSP
+DIMENSION : 10
+EDGE_WEIGHT_TYPE : EUC_2D
+NODE_COORD_SECTION
+1 10 7
+2 11 5
+3 10 3
+4 8 3
+5 6 7
+6 4 7
+7 3 5
+8 4 3
+9 6 3
+10 8 7

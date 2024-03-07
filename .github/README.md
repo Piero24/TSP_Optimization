@@ -9,5 +9,5 @@ rm -r build && mkdir build && cmake -S . -B build
 ```
 To run the project:
 ```bash
-make -C build && clear && ./TSP_Optimization -file Resource/pr10.tsp -model 1
+make -C build && clear && ./TSP_Optimization -file Resource/pr10v1.tsp -model 1
 ```

@@ -1,5 +1,5 @@
-NAME : pr100
-COMMENT : 100-city problem (Padberg/Rinaldi)
+NAME : pr10 V1
+COMMENT : 10-city problem (by ChatGPT)
 TYPE : TSP
 DIMENSION : 10
 EDGE_WEIGHT_TYPE : EUC_2D

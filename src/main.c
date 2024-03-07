@@ -1,5 +1,5 @@
 // rm -r build && mkdir build && cmake -S . -B build
-// make -C build && clear && ./TSP_Optimization -file Resource/pr10.tsp -model 1
+// make -C build && clear && ./TSP_Optimization -file Resource/pr10v1.tsp -model 1
 
 #include <stdio.h>
 #include <time.h>
@@ -19,14 +19,16 @@ int main(int argc, char** argv)
     }
 
     instance inst;
+    char AlgorithmName[100];
+    char *AlgorithmNamePtr = AlgorithmName;
 
     parse_args(argc, argv, &inst);
     read_input(&inst);
 
-    apply_algorithm(&inst, false);
+    apply_algorithm(&inst, false, AlgorithmName);
 
     show_solution(&inst, true);
-    save_solution(&inst, "Solution");
+    save_solution(&inst, AlgorithmName);
 
     free_instance(&inst);
     return 0;
