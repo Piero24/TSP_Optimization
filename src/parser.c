@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "../include/parser.h"
 #include <math.h>
 
 void print_error(const char *err);

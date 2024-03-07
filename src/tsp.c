@@ -1,4 +1,4 @@
-#include "vrp.h"
+#include "../include/tsp.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -31,6 +31,7 @@ void print_solution(instance* inst, bool useGnuplot)
 {    
     if(useGnuplot)
     {
+        /*
         // Generate data file
         const char* dataFilename = "data.txt";
         generateDataFile(dataFilename, inst);
@@ -54,11 +55,27 @@ void print_solution(instance* inst, bool useGnuplot)
 
         // Execute Gnuplot script
         //system("gnuplot plot_script.plt");
-        system("gnuplot plot_script.plt 2> gnuplot_error.log");
+        system("gnuplot --persist plot_script.plt 2> gnuplot_error.log");
 
         // Optionally, remove generated files
         //remove(dataFilename);
         //remove("plot_script.plt");
+        */
+        FILE *plot = popen("gnuplot --persist", "w");
+        
+        fprintf(plot, "set title \"Solution\"\n");
+        fprintf(plot, "set xlabel \"X Axis\"\n");
+        fprintf(plot, "set ylabel \"Y Axis\"\n");
+        fprintf(plot, "set grid\n");
+        fprintf(plot, "plot '-' with linespoints\n");
+
+        for(int i=0; i<inst->nnodes; i++)
+        {
+            fprintf(plot, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
+        }
+        fprintf(plot, "%f %f\n", inst->coord[inst->best_sol[0]].x, inst->coord[inst->best_sol[0]].y);
+        
+        pclose(plot);
     } else 
     {
         for(int i=0; i<inst->nnodes; i++)

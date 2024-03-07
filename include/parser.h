@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "vrp.h"
+#include "../include/tsp.h"
 //#include <cplex.h> //CPX_INFBOUND
 
 /**

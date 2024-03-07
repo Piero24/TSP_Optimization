@@ -1,12 +1,15 @@
-// clear && gcc -o main *.c && ./main -file FILE-NAME-HERE
-// clear && gcc -o main *.c && ./main -file pr1002.tsp
+// rm -r build && mkdir build && cmake -S . -B build
+// make -C build && ./TSP_Optimization -file Resource/pr10.tsp
 
-#include "vrp.h"
-#include "NN.h"
-#include "parser.h"
+// 
 #include <stdio.h>
+#include <time.h>
 
-int apply_algorithm(instance* inst);
+#include "../include/tsp.h"
+#include "../include/Algorithm/NN.h"
+#include "../include/parser.h"
+#include "../include/algoSelector.h"
+
 
 int main(int argc, char** argv)
 {
@@ -31,36 +34,3 @@ int main(int argc, char** argv)
     return 0;
 }
 
-int apply_algorithm(instance* inst)
-{
-    int bestFirst = 0;
-    double bestCost = -1;
-
-    for(int firstNode=0; firstNode<inst->nnodes; firstNode++){
-        int* result;
-        double cost;
-        result = (int *) calloc(inst->nnodes, sizeof(int));
-
-        nearestNeighbor(result, &cost, inst, firstNode);
-        
-        printf("\nfirstNode:%d cost: %f\n", firstNode, cost);
-        for(int i=0; i<inst->nnodes; i++){
-            printf("%d ", result[i]);
-        }
-
-        if(bestCost == -1 || bestCost > cost){
-            bestCost = cost;
-            bestFirst = firstNode;
-
-            free(inst->best_sol);
-            inst->best_sol = result;
-        }else{
-            free(result);
-        }
-    }
-
-    printf("\nbestNode:%d bestCost: %f\n", bestFirst, bestCost);
-    inst->zbest = bestCost;
-    
-    return 0;
-}

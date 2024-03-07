@@ -1,5 +1,5 @@
-#ifndef VRP_H
-#define VRP_H
+#ifndef TSP_H
+#define TSP_H
 
 #include <stdbool.h>
 
@@ -70,4 +70,4 @@ void print_solution(instance* inst, bool useGnuplot);
  */
 void free_instance(instance* inst);
 
-#endif /* VRP_H */
+#endif /* TSP_H */

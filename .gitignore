@@ -54,5 +54,6 @@ dkms.conf
 # Other
 .DS_Store
 .vscode/
-
+build/
+TSP_Optimization
 
