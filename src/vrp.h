@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#define VERBOSE 5000
+#define VERBOSE 500
 
 typedef struct {
 	double x, y;
@@ -13,7 +13,7 @@ typedef struct {
 	
 	//input data
 	int nnodes; 	
-	double *demand;   
+	//double *demand;   
 	point *coord;
 	double **distances;
 	int depot;
@@ -35,12 +35,12 @@ typedef struct {
 
 	//global data
 	// double	tstart;								
-	// double zbest;							// best sol. available  
-	// double tbest;							// time for the best sol. available  
-	// double *best_sol;						// best sol. available    
-	// double	best_lb;						// best lower bound available  
-	// double *load_min;						// minimum load when leaving a node
-	// double *load_max;						// maximum load when leaving a node
+	double zbest;							// best sol. available  
+	double tbest;							// time for the best sol. available  
+	int *best_sol;							// best sol. available (WARNING: was double)
+	// double	best_lb;					// best lower bound available  
+	// double *load_min;					// minimum load when leaving a node
+	// double *load_max;					// maximum load when leaving a node
 	
 	// model;     
 	// int xstart;

@@ -1,3 +1,3 @@
 #include "vrp.h"
 
-int nearestNeighbor(int* result, instance* inst, int firstNode);
+int nearestNeighbor(int* result, double* cost, instance* inst, int firstNode);

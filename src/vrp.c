@@ -11,7 +11,7 @@
  */
 void generateDataFile(const char* filename, instance* inst)
 {
-    FILE* file = fopen(filename, "w");
+    FILE* file = fopen("data.txt", "w");
     if (file == NULL) {
         perror("Error opening file");
         exit(1);
@@ -20,8 +20,9 @@ void generateDataFile(const char* filename, instance* inst)
     // Write data to the file
     for(int i=0; i<inst->nnodes; i++)
     {
-        fprintf(file, "%f %f\n", inst->coord[i].x, inst->coord[i].y);
+        fprintf(file, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
     }
+    fprintf(file, "%f %f\n", inst->coord[0].x, inst->coord[0].y);
 
     fclose(file);
 }
@@ -35,7 +36,7 @@ void print_solution(instance* inst, bool useGnuplot)
         generateDataFile(dataFilename, inst);
 
         // Create Gnuplot script file
-        FILE* scriptFile = popen("gnuplot --persist", "w");
+        FILE* scriptFile = fopen("plot_script.plt", "w");
         if (scriptFile == NULL) 
         {
             perror("Error opening script file");
@@ -47,32 +48,34 @@ void print_solution(instance* inst, bool useGnuplot)
         fprintf(scriptFile, "set xlabel \"X Axis\"\n");
         fprintf(scriptFile, "set ylabel \"Y Axis\"\n");
         fprintf(scriptFile, "set grid\n");
-        fprintf(scriptFile, "plot 'data.txt' with point title \"Nodes\"\n");
+        fprintf(scriptFile, "plot 'data.txt' with linespoints title \"Nodes\"\n");
 
         fclose(scriptFile);
 
         // Execute Gnuplot script
-        system("gnuplot plot_script.plt");
+        //system("gnuplot plot_script.plt");
+        system("gnuplot plot_script.plt 2> gnuplot_error.log");
 
         // Optionally, remove generated files
-        remove(dataFilename);
-        remove("plot_script.plt");
+        //remove(dataFilename);
+        //remove("plot_script.plt");
     } else 
     {
         for(int i=0; i<inst->nnodes; i++)
         {
-            printf("#%d x=%f y=%f\n", i, inst->coord[i].x, inst->coord[i].y);
+            printf("%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
         }
     }
 }
 
 void free_instance(instance* inst)
 {
-    free(inst->demand);
+    //free(inst->demand);
     free(inst->coord);
 
     for(int i=0; i<inst->nnodes; i++)
         free(inst->distances[i]);
 
     free(inst->distances);
+    free(inst->best_sol);
 }

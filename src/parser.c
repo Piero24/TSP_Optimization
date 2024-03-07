@@ -52,7 +52,7 @@ int parse_args(int argc, char** argv, instance* inst)
 
 	if ( help || (VERBOSE >= 10) )		// print current parameters
 	{
-		printf("\n\navailable parameters (vers. 16-may-2015) --------------------------------------------------\n");
+		printf("\n\navailable parameters (vers. A.Y. 2023/2024 Course:Operation Research 2) --------------------------------------------------\n");
 		printf("-file %s\n", inst->input_file); 
 		printf("-time_limit %lf\n", inst->timelimit); 
 		printf("-model_type %d\n", inst->model_type); 
@@ -66,7 +66,7 @@ int parse_args(int argc, char** argv, instance* inst)
 		// printf("-node_file %s\n", inst->node_file);
 		// printf("-cutoff %lf\n", inst->cutoff); 
 		// printf("\nenter -help or --help for help\n");
-		printf("----------------------------------------------------------------------------------------------\n\n");
+		printf("---------------------------------------------------------------------------------------------------------------------------\n\n");
 	}        
 	
 	if ( help ) exit(1);
@@ -130,12 +130,14 @@ int read_input(instance* inst)
 			token1 = strtok(NULL, " :");
 			inst->nnodes = atoi(token1);
 			if ( do_print ) printf(" ... nnodes %d\n", inst->nnodes); 
-			inst->demand = (double *) calloc(inst->nnodes, sizeof(double)); 	 
+			//inst->demand = (double *) calloc(inst->nnodes, sizeof(double));
 			inst->coord = (point *) calloc(inst->nnodes, sizeof(point));
 
 			inst->distances = (double **)malloc(inst->nnodes * sizeof(double *));
 			for (int i = 0; i < inst->nnodes; i++)
 				inst->distances[i] = (double *)malloc(inst->nnodes * sizeof(double));
+				
+			inst->best_sol = (int *) calloc(inst->nnodes, sizeof(int));
 
 			active_section = 0;  
 			continue;
@@ -176,12 +178,14 @@ int read_input(instance* inst)
 			continue;
 		}
 		
+		/*
 		if ( strncmp(par_name, "DEMAND_SECTION", 14) == 0 ) 
 		{
 			if ( inst->nnodes <= 0 ) print_error(" ... DIMENSION section should appear before DEMAND_SECTION section");
 			active_section = 2;
 			continue;
-		}  
+		}
+		*/
 
 		if ( strncmp(par_name, "DEPOT_SECTION", 13) == 0 )  
 		{
@@ -215,15 +219,15 @@ int read_input(instance* inst)
 			continue;
 		}    
 		  
-		if ( active_section == 2 ) // within DEMAND_SECTION
-		{
-			int i = atoi(par_name) - 1; 
-			if ( i < 0 || i >= inst->nnodes ) print_error(" ... unknown node in NODE_COORD_SECTION section");     
-			token1 = strtok(NULL, " :,");
-			inst->demand[i] = atof(token1);
-			if ( do_print ) printf(" ... node %4d has demand %10.5lf\n", i+1, inst->demand[i]); 
-			continue;
-		}  
+		// if ( active_section == 2 ) // within DEMAND_SECTION
+		// {
+		// 	int i = atoi(par_name) - 1; 
+		// 	if ( i < 0 || i >= inst->nnodes ) print_error(" ... unknown node in NODE_COORD_SECTION section");     
+		// 	token1 = strtok(NULL, " :,");
+		// 	inst->demand[i] = atof(token1);
+		// 	if ( do_print ) printf(" ... node %4d has demand %10.5lf\n", i+1, inst->demand[i]); 
+		// 	continue;
+		// }  
 
 		if ( active_section == 3 ) // within DEPOT_SECTION
 		{

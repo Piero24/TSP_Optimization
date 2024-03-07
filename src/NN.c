@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 //firstNode index of starting node (from 0 to nnodes-1)
-int nearestNeighbor(int* result, instance* inst, int firstNode){
+int nearestNeighbor(int* result, double* cost, instance* inst, int firstNode){
     if(firstNode < 0 || firstNode > inst->nnodes){
         printf("fristNode must be between 0 and %d", inst->nnodes);
         return 1;
@@ -11,6 +11,7 @@ int nearestNeighbor(int* result, instance* inst, int firstNode){
 
     if(VERBOSE > 100) printf("Initialize result.\n");
 
+    *cost = 0;
     for(int i=0; i<inst->nnodes; i++){
         result[i] = i;
     }
@@ -37,7 +38,11 @@ int nearestNeighbor(int* result, instance* inst, int firstNode){
         int tmp = result[current+1];
         result[current+1] = result[nearest];
         result[nearest] = tmp;
+
+        *cost += inst->distances[result[current]][result[nearest]];
     }
+
+    *cost += inst->distances[result[0]][result[inst->nnodes-1]];
 
     return 0;
 }

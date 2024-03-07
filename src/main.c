@@ -22,16 +22,9 @@ int main(int argc, char** argv)
 
     read_input(&inst);
 
-    for(int i=0; i<inst.nnodes; i++){
-        for(int j=0; j<inst.nnodes; j++){
-            printf("%f ", inst.distances[i][j]);
-        }
-        printf("\n");
-    }
-
     apply_algorithm(&inst);
 
-    //print_solution(&inst, true);
+    print_solution(&inst, true);
 
     free_instance(&inst);
 
@@ -40,15 +33,34 @@ int main(int argc, char** argv)
 
 int apply_algorithm(instance* inst)
 {
-    int* result;
-    result = (int *) calloc(inst->nnodes, sizeof(int));
+    int bestFirst = 0;
+    double bestCost = -1;
 
-    nearestNeighbor(result, inst, 0);
-    
-    for(int i=0; i<inst->nnodes; i++){
-        printf("%d ", result[i]);
+    for(int firstNode=0; firstNode<inst->nnodes; firstNode++){
+        int* result;
+        double cost;
+        result = (int *) calloc(inst->nnodes, sizeof(int));
+
+        nearestNeighbor(result, &cost, inst, firstNode);
+        
+        printf("\nfirstNode:%d cost: %f\n", firstNode, cost);
+        for(int i=0; i<inst->nnodes; i++){
+            printf("%d ", result[i]);
+        }
+
+        if(bestCost == -1 || bestCost > cost){
+            bestCost = cost;
+            bestFirst = firstNode;
+
+            free(inst->best_sol);
+            inst->best_sol = result;
+        }else{
+            free(result);
+        }
     }
 
-    free(result);
+    printf("\nbestNode:%d bestCost: %f\n", bestFirst, bestCost);
+    inst->zbest = bestCost;
+    
     return 0;
 }
