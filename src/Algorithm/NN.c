@@ -1,6 +1,7 @@
-#include "../include/Algorithm/NN.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "../include/Algorithm/NN.h"
 
 //firstNode index of starting node (from 0 to nnodes-1)
 int nearestNeighbor(int* result, double* cost, instance* inst, int firstNode)
@@ -11,7 +12,7 @@ int nearestNeighbor(int* result, double* cost, instance* inst, int firstNode)
         return 1;
     }
 
-    if(VERBOSE > 100) printf("Initialize result.\n");
+    // if(VERBOSE > 100) printf("Initialize result.\n");
 
     *cost = 0;
     for(int i=0; i<inst->nnodes; i++)
@@ -22,11 +23,11 @@ int nearestNeighbor(int* result, double* cost, instance* inst, int firstNode)
     result[0] = firstNode;
     result[firstNode] = 0;
 
-    if(VERBOSE > 500) printf("Result vector initialized.\n");
+    // if(VERBOSE > 500) printf("Result vector initialized.\n");
 
     for(int current=0; current<inst->nnodes-1; current++)
     {
-        if(VERBOSE > 1000) printf("[NN] Current node: %d\n", current);
+        // if(VERBOSE > 1000) printf("[NN] Current node: %d\n", current);
 
         double minDist = inst->distances[result[current]][result[current+1]];
         int nearest = current+1;

@@ -61,7 +61,15 @@ typedef struct {
  * @param useGnuplot A boolean flag indicating whether to generate a plot 
  * using Gnuplot (true) or print the solution to the standard output (false).
  */
-void print_solution(instance* inst, bool useGnuplot);
+void show_solution(instance* inst, bool useGnuplot);
+
+/**
+ * @brief Save the solution in a file ....
+ * 
+ * @param inst A pointer to the instance structure containing the solution data.
+ * @param outputFileName The name of the file to write the solution to.
+ */
+void save_solution(instance* inst, const char* outputFileName);
 
 /**
  * @brief Frees the memory allocated for the instance structure.

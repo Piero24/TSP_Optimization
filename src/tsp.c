@@ -1,6 +1,8 @@
-#include "../include/tsp.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+
+#include "../include/tsp.h"
 
 /**
  * @brief Generates a data file with node coordinates for 
@@ -27,7 +29,7 @@ void generateDataFile(const char* filename, instance* inst)
     fclose(file);
 }
 
-void print_solution(instance* inst, bool useGnuplot)
+void show_solution(instance* inst, bool useGnuplot)
 {    
     if(useGnuplot)
     {
@@ -67,6 +69,7 @@ void print_solution(instance* inst, bool useGnuplot)
         fprintf(plot, "set xlabel \"X Axis\"\n");
         fprintf(plot, "set ylabel \"Y Axis\"\n");
         fprintf(plot, "set grid\n");
+        fprintf(plot, "set term qt font \"Arial\"\n"); // Set font to Arial
         fprintf(plot, "plot '-' with linespoints\n");
 
         for(int i=0; i<inst->nnodes; i++)
@@ -83,6 +86,65 @@ void print_solution(instance* inst, bool useGnuplot)
             printf("%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
         }
     }
+}
+
+void save_solution(instance* inst, const char* outputFileName)
+{    
+    // Create the "solution" directory
+    #ifdef _WIN32
+         _mkdir("Archive");
+        _mkdir("Archive/Image");
+        _mkdir("Archive/Svg");
+    #else
+        mkdir("Archive", 0777);
+        mkdir("Archive/Image", 0777);
+        mkdir("Archive/Svg", 0777);
+    #endif
+
+    // Modify the output file paths to include the "Archive/Image" and the "Archive/Svg" directories
+    char pngPath[100]; // Adjust the size as needed
+    char svgPath[100]; // Adjust the size as needed
+    sprintf(pngPath, "Archive/Image/%s.png", outputFileName);
+    sprintf(svgPath, "Archive/Svg/%s.svg", outputFileName);
+
+    FILE *plotPNG = popen("gnuplot", "w");
+    FILE *plotSVG = popen("gnuplot", "w");
+
+    // Send Gnuplot commands directly for PNG
+    fprintf(plotPNG, "set terminal png\n");
+    fprintf(plotPNG, "set output \"%s\"\n", pngPath);
+    fprintf(plotPNG, "set title \"Solution\"\n");
+    fprintf(plotPNG, "set xlabel \"X Axis\"\n");
+    fprintf(plotPNG, "set ylabel \"Y Axis\"\n");
+    fprintf(plotPNG, "set grid\n");
+    fprintf(plotPNG, "set term qt font \"Arial\"\n");
+    fprintf(plotPNG, "plot '-' with linespoints\n");
+
+    // Send Gnuplot commands directly for SVG
+    fprintf(plotSVG, "set terminal svg\n");
+    fprintf(plotSVG, "set output \"%s\"\n", svgPath);
+    fprintf(plotSVG, "set title \"Solution\"\n");
+    fprintf(plotSVG, "set xlabel \"X Axis\"\n");
+    fprintf(plotSVG, "set ylabel \"Y Axis\"\n");
+    fprintf(plotSVG, "set grid\n");
+    fprintf(plotSVG, "set term qt font \"Arial\"\n");
+    fprintf(plotSVG, "plot '-' with linespoints\n");
+
+    for(int i = 0; i < inst->nnodes; i++) {
+        fprintf(plotPNG, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
+        fprintf(plotSVG, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
+    }
+
+    fprintf(plotPNG, "%f %f\n", inst->coord[inst->best_sol[0]].x, inst->coord[inst->best_sol[0]].y);
+    fprintf(plotSVG, "%f %f\n", inst->coord[inst->best_sol[0]].x, inst->coord[inst->best_sol[0]].y);
+
+    fprintf(plotPNG, "e\n");
+    fflush(plotPNG);
+    pclose(plotPNG);
+
+    fprintf(plotSVG, "e\n");
+    fflush(plotSVG);
+    pclose(plotSVG);
 }
 
 void free_instance(instance* inst)

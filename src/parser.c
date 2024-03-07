@@ -1,7 +1,11 @@
 #include "../include/parser.h"
+
 #include <math.h>
 
+
 void print_error(const char *err);
+char *getFileName(const char *filePath);
+const char* getTimeLimitString(double timeLimit);
 
 int parse_args(int argc, char** argv, instance* inst)
 {
@@ -52,12 +56,20 @@ int parse_args(int argc, char** argv, instance* inst)
 
 	if ( help || (VERBOSE >= 10) )		// print current parameters
 	{
-		printf("\n\navailable parameters (vers. A.Y. 2023/2024 Course:Operation Research 2) --------------------------------------------------\n");
-		printf("-file %s\n", inst->input_file); 
-		printf("-time_limit %lf\n", inst->timelimit); 
-		printf("-model_type %d\n", inst->model_type); 
+		printf("\n\n\n\n");
+		printf("------------------------------ Selected Parameters (Course: Operation Research 2, A.Y. 2023/2024) ------------------------------\n");
+		
+		char *fileName = getFileName(inst->input_file);
+    	printf("- File Name:   %s\n", fileName);
+		// printf("-file %s\n", inst->input_file); 
 
-		printf("-seed %d\n", inst->randomseed);
+		const char* timeLimitString = getTimeLimitString(inst->timelimit);
+		printf("- Time Limit:  %s\n", timeLimitString);
+		//printf("- time_limit %lf\n", inst->timelimit); 
+
+		printf("- Model Type:  %d\n", inst->model_type); 
+
+		printf("- Seed:        %d\n", inst->randomseed);
 		// printf("-old_benders %d\n", inst->old_benders);  
 		// printf("-threads %d\n", inst->num_threads);  
 		// printf("-max_nodes %d\n", inst->max_nodes); 
@@ -66,7 +78,7 @@ int parse_args(int argc, char** argv, instance* inst)
 		// printf("-node_file %s\n", inst->node_file);
 		// printf("-cutoff %lf\n", inst->cutoff); 
 		// printf("\nenter -help or --help for help\n");
-		printf("---------------------------------------------------------------------------------------------------------------------------\n\n");
+		printf("--------------------------------------------------------------------------------------------------------------------------------\n\n");
 	}        
 	
 	if ( help ) exit(1);
@@ -258,4 +270,36 @@ void print_error(const char *err)
     printf("\n\n ERROR: %s \n\n", err);
     fflush(NULL);
     exit(1);
+}
+
+char *getFileName(const char *filePath) {
+    const char *fileName = strrchr(filePath, '/');
+
+    if (fileName != NULL) {
+        fileName++;
+    } else {
+        fileName = filePath;
+    }
+
+    char *result = strdup(fileName);
+    if (result == NULL) {
+        // Error handling: Memory allocation failed
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    return result;
+}
+
+const char* getTimeLimitString(double timeLimit) {
+
+    if (timeLimit == DBL_MAX ) //|| timeLimit == CPX_INFBOUND) 
+	{
+        return "Inf";
+
+    } else
+	{
+        static char buffer[100];
+        snprintf(buffer, sizeof(buffer), "%lf", timeLimit);
+        return buffer;
+    }
 }

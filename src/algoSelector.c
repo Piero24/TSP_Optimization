@@ -4,8 +4,9 @@
 #include "../include/tsp.h"
 #include "../include/Algorithm/NN.h"
 #include "../include/parser.h"
+#include "../include/algoSelector.h"
 
-int apply_algorithm(instance* inst)
+int apply_algorithm(instance* inst, bool onlyBestSolution)
 {
     int bestFirst = 0;
     double bestCost = -1;
@@ -20,15 +21,26 @@ int apply_algorithm(instance* inst)
         double time;
         start = clock();
         
-        nearestNeighbor(result, &cost, inst, firstNode);
+        algorithmSelector(result, &cost, inst, firstNode);
 
         end = clock();
         time = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-        printf("\nfirstNode: %d\ttime: %f\tcost: %f\n", firstNode, time, cost);
-        for(int i=0; i<inst->nnodes; i++)
+        if (!onlyBestSolution)
         {
-            printf("%d ", result[i]);
+            printf("\nStarting Node: %d\tTime: %f sec.\tCost: %f\n", firstNode, time, cost);
+            printf("Output Path -> [");
+            for(int i=0; i<inst->nnodes; i++)
+            {
+                if (i<inst->nnodes-1) 
+                {
+                    printf("%d, ", result[i]);
+                } else
+                {
+                    printf("%d", result[i]);
+                }
+            }
+            printf("]\n\n");
         }
 
         if(bestCost == -1 || bestCost > cost)
@@ -45,8 +57,46 @@ int apply_algorithm(instance* inst)
         }
     }
 
-    printf("\nBest:\tfistNode: %d\ttime: %f\tcost: %f\n", bestFirst, inst->tbest, bestCost);
+    printf("\n\n\n************************ BEST SOLUTION ************************\n");
+    printf("\nStarting Node: %d\tTime: %f sec.\tCost: %f\n", bestFirst, inst->tbest, bestCost);
+    printf("\n***************************************************************\n\n\n");
+
     inst->zbest = bestCost;
-    
+    return 0;
+}
+
+int algorithmSelector(int* result, double* cost, instance* inst, int firstNode)
+{
+
+    if (inst->model_type == 1)
+    {
+        nearestNeighbor(result, cost, inst, firstNode);
+
+    } else if (inst->model_type == 2)
+    {
+        printf("Model type not implemented\n");
+        exit(0);
+
+    } else if (inst->model_type == 3)
+    {
+        printf("Model type not implemented\n");
+        exit(0);
+
+    } else if (inst->model_type == 4)
+    {
+        printf("Model type not implemented\n");
+        exit(0);
+
+    } else if (inst->model_type == 5)
+    {
+        printf("Model type not implemented\n");
+        exit(0);
+
+    } else 
+    {
+        printf("Model type not implemented\n");
+        exit(0);
+
+    } 
     return 0;
 }
