@@ -1,7 +1,7 @@
 #ifndef NN_H
 #define NN_H
 
-#include "../include/tsp.h"
+#include "../tsp.h"
 
 /**
  * @brief Applies the nearest neighbor algorithm to find the solution for the given instance.
