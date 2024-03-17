@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "../include/tsp.h"
 //#include <cplex.h> //CPX_INFBOUND

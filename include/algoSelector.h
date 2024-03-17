@@ -28,4 +28,15 @@ int apply_algorithm(instance* inst, bool onlyBestSolution, char *AlgorithmName);
  */
 int algorithmSelector(int* result, double* cost, instance* inst, int firstNode, char *AlgorithmName);
 
+/**
+ * @brief Substitute the path of the old best solution with the path of 
+ * new solution.
+ * 
+ * @param result Pointer to the array that store the best solution.
+ * @param cost Cost of the best solution.
+ * @param inst Pointer to the instance structure that contain the information
+ * of the new best solution.
+ */
+void bestSolution(int* result, double cost, instance* inst);
+
 #endif /* ALGOSELECTOR_H */

@@ -20,6 +20,7 @@ add_executable(TSP_Optimization
     src/Algorithm/NN.c
     src/parser.c
     src/tsp.c
+    src/Algorithm/optimizations.c
 )
 
 # target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} ${Boost_FILESYSTEM_LIBRARY})

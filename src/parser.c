@@ -254,7 +254,9 @@ int read_input(instance* inst)
 		printf(" final active section %d\n", active_section);
 		print_error(" ... wrong format for the current simplified parser!!!!!!!!!");     
 		    
-	}                
+	}  
+
+	inst->tstart = clock();
 
 	fclose(fin); 
     return 0;

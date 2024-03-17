@@ -34,8 +34,8 @@ typedef struct {
 	int integer_costs;
 
 	//global data
-	// double	tstart;								
-	double zbest;							// best sol. available  
+	double tstart;							// starting time		
+	double zbest;							// cost best sol. available  
 	double tbest;							// time for the best sol. available  
 	int *best_sol;							// best sol. available (WARNING: was double)
 	// double	best_lb;					// best lower bound available  

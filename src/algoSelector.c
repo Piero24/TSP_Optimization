@@ -101,3 +101,15 @@ int algorithmSelector(int* result, double* cost, instance* inst, int firstNode, 
     } 
     return 0;
 }
+
+void bestSolution(int* result, double cost, instance* inst)
+{
+    for (int i = 0; i < inst->nnodes; i++)
+    {
+        inst->best_sol[i] = result[i];
+    }
+    inst->zbest = cost;
+    inst->tbest = clock() - inst->tstart;
+    double time = ((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC;
+    //print(time);
+}
