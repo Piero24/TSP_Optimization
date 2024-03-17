@@ -1,0 +1,25 @@
+CONSTRUCTIVE HEURISTICS
+
+Extra milage
+
+
+For each vertex h that doesn't belong to V(C) we calculate the extra milage (Allungamento di percorso)
+Il costo EM(h, (i,j)) Cih + Chj - Cij 
+
+initialization
+Take  2 (better and convinient 3) vertex with as distant as possible and expand by addng the other vetex to the path
+
+
+
+GRASP - Gready Randomize Adaptive Search Probabilistic
+You must define a probability like 1% or 1/1000 For selecting the vertex.
+(So letext the not shortes path with that probability only 1 time out of 100 for example)
+
+
+
+META HEURISTICS
+
+Check how many lati are different between T1 and T2 (T1\T2) so the remaning lati are the 
+one that are diffent... IF no difference the T1 and T2 are the same
+
+
