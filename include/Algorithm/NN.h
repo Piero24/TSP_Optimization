@@ -1,32 +1,28 @@
 #ifndef NN_H
 #define NN_H
+#include <stdio.h>
+#include <stdlib.h>
 
+#include "../algoSelector.h"
 #include "../tsp.h"
+
+/**
+ * @brief Applies the nearest neighbor algorithm for every possible starting node.
+ * 
+ * @param inst Pointer to the instance structure.
+ * @return 0 if the algorithm runs successfully, 1 if an error occurs.
+ */
+int NNFromEachNode(instance* inst);
 
 /**
  * @brief Applies the nearest neighbor algorithm to find the solution for the given instance.
  * 
- * @param result Pointer to the array to store the resulting solution.
- * @param cost Pointer to the variable to store the cost of the solution.
  * @param inst Pointer to the instance structure.
  * @param firstNode The starting node for the algorithm.
+ * @param result Pointer to the result vector.
+ * @param cost Cost of the solution founded.
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
-int nearestNeighbor(int* result, double* cost, instance* inst, int firstNode);
-
-/**
- * @brief Optimizes a solution by searching in the neighborhood of solutions (in terms of
- *  different edges). Uses tabu search to overcome local minimums
- * 
- * @param result Pointer to the array with the inizial solution that will be optimized. 
- *  Will contain the optimized solution after the function ends.
- * @param cost Pointer to the variable to store the cost of the solution.
- * @param inst Pointer to the instance structure.
- * @return 0 if the algorithm runs successfully, 1 if an error occurs.
- */
-int tabuSearch(int* result, double* cost, instance* inst);
+int nearestNeighbor(instance* inst, int firstNode, int* result, double* cost);
 
 #endif /* NN_H */
-
-
-

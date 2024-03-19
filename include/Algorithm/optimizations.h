@@ -3,7 +3,9 @@
 #include <time.h>
 #include <float.h>
 
-#include "../include/Algorithm/NN.h"
+#include "NN.h"
+#include "../algoSelector.h"
+#include "../tsp.h"
 
 /**
  * @brief Optimizes a solution by removing intersections
@@ -31,7 +33,7 @@
  * @param inst Pointer to the instance structure.
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
-int optimization(int* result, double* cost, instance* inst);
+int optimization(instance* inst);
 
 /**
  * @brief Optimizes a solution by searching in the neighborhood of solutions (in terms of
@@ -43,4 +45,4 @@ int optimization(int* result, double* cost, instance* inst);
  * @param inst Pointer to the instance structure.
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
-int tabuSearch(int* result, double* cost, instance* inst);
+int tabuSearch(instance* inst);

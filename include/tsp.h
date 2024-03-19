@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 
-#define VERBOSE 500
-
 typedef struct {
 	double x, y;
 } point;
@@ -22,6 +20,7 @@ typedef struct {
 
 	// parameters 
 	int model_type; 
+	int opt_type;
 	int old_benders;
 	int randomseed;
 	int num_threads;
@@ -32,6 +31,7 @@ typedef struct {
 	int max_nodes; 							// max n. of branching nodes in the final run (-1 unlimited)
 	double cutoff; 							// cutoff (upper bound) for master
 	int integer_costs;
+	int verbose;							// range 0-100
 
 	//global data
 	double tstart;							// starting time		
@@ -43,12 +43,11 @@ typedef struct {
 	// double *load_max;					// maximum load when leaving a node
 	
 	// model;     
-	// int xstart;
+	int start;
 	// int qstart;
 	// int bigqstart;  						
 	// int sstart;
 	// int bigsstart;
-	// int ystart;
 	// int fstart;
 	// int zstart;
 } instance;

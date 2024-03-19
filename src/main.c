@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     parse_args(argc, argv, &inst);
     read_input(&inst);
 
-    apply_algorithm(&inst, false, AlgorithmName);
+    apply_algorithm(&inst, AlgorithmName);
 
     show_solution(&inst, true);
     save_solution(&inst, AlgorithmName);

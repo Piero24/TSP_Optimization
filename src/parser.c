@@ -1,30 +1,25 @@
 #include "../include/parser.h"
 
-#include <math.h>
-
-
 void print_error(const char *err);
 char *getFileName(const char *filePath);
 const char* getTimeLimitString(double timeLimit);
 
 int parse_args(int argc, char** argv, instance* inst)
 {
-	
-	if ( VERBOSE >= 100 ) 
-		printf(" running %s with %d parameters \n", argv[0], argc-1); 
-		
 	// default   
 	inst->model_type = 0;
+	inst->opt_type = 0;
 	inst->old_benders = 0;
 	strcpy(inst->input_file, "NULL");
 	inst->randomseed = 93846529; 
 	inst->num_threads = 0;
-	inst->timelimit = DBL_MAX; //CPX_INFBOUND
-	inst->cutoff = DBL_MAX; //CPX_INFBOUND
+	inst->timelimit = DBL_MAX; 	//CPX_INFBOUND
+	inst->cutoff = DBL_MAX; 	//CPX_INFBOUND
 	inst->integer_costs = 0;
+	inst->verbose = 0;
 
-	inst->available_memory = 12000;   			// available memory, in MB, for Cplex execution (e.g., 12000)
-	inst->max_nodes = -1; 						// max n. of branching nodes in the final run (-1 unlimited)        
+	inst->available_memory = 12000;   	// available memory, in MB, for Cplex execution (e.g., 12000)
+	inst->max_nodes = -1; 				// max n. of branching nodes in the final run (-1 unlimited)        
 
     int help = 0; if ( argc < 1 ) help = 1;	
 	for ( int i = 1; i < argc; i++ ) 
@@ -38,9 +33,16 @@ int parse_args(int argc, char** argv, instance* inst)
 
         if ( strcmp(argv[i],"-model_type") == 0 ) { inst->model_type = atoi(argv[++i]); continue; } 	// model type
 		if ( strcmp(argv[i],"-model") == 0 ) { inst->model_type = atoi(argv[++i]); continue; } 			// model type
-		if ( strcmp(argv[i],"-alg") == 0 ) { inst->model_type = atoi(argv[++i]); continue; } 			// model type
+		if ( strcmp(argv[i],"-alg") == 0 ) { inst->model_type = atoi(argv[++i]); continue; }			// model type
+		
+		if ( strcmp(argv[i],"-opt") == 0 ) { inst->opt_type = atoi(argv[++i]); continue; }				// optimization type
+		if ( strcmp(argv[i],"-2opt") == 0 ) { inst->opt_type = atoi(argv[++i]); continue; }				// optimization type
+		if ( strcmp(argv[i],"-optimization") == 0 ) { inst->opt_type = atoi(argv[++i]); continue; }		// optimization type
 
-		if ( strcmp(argv[i],"-seed") == 0 ) { inst->randomseed += abs(atoi(argv[++i])); continue; } 		// random seed
+		if ( strcmp(argv[i],"-seed") == 0 ) { inst->randomseed += abs(atoi(argv[++i])); continue; } 	// random seed
+
+		if ( strcmp(argv[i],"-verbose") == 0 ) { inst->verbose = abs(atoi(argv[++i])); continue; } 	// verbose
+		if ( strcmp(argv[i],"-v") == 0 ) { inst->verbose = abs(atoi(argv[++i])); continue; } 			// verbose
 
 		// if ( strcmp(argv[i],"-old_benders") == 0 ) { inst->old_benders = atoi(argv[++i]); continue; } 	// old benders
 		// if ( strcmp(argv[i],"-threads") == 0 ) { inst->num_threads = atoi(argv[++i]); continue; } 		// n. threads
@@ -54,7 +56,7 @@ int parse_args(int argc, char** argv, instance* inst)
 		help = 1;
     }      
 
-	if ( help || (VERBOSE >= 10) )		// print current parameters
+	if ( help || (inst->verbose >= 10) )		// print current parameters
 	{
 		printf("\n\n\n\n");
 		printf("------------------------------ Selected Parameters (Course: Operation Research 2, A.Y. 2023/2024) ------------------------------\n");
@@ -68,6 +70,8 @@ int parse_args(int argc, char** argv, instance* inst)
 		//printf("- time_limit %lf\n", inst->timelimit); 
 
 		printf("- Model Type:  %d\n", inst->model_type); 
+		printf("- Optimization Method:  %d\n", inst->model_type); 
+
 
 		printf("- Seed:        %d\n", inst->randomseed);
 		// printf("-old_benders %d\n", inst->old_benders);  
@@ -104,14 +108,14 @@ int read_input(instance* inst)
 	
 	int active_section = 0; // =1 NODE_COORD_SECTION, =2 DEMAND_SECTION, =3 DEPOT_SECTION 
 	
-	int do_print = ( VERBOSE >= 1000 );
+	int do_print = ( inst->verbose >= 1000 );
 
 	while ( fgets(line, sizeof(line), fin) != NULL ) 
 	{
-		if ( VERBOSE >= 2000 ) { printf("%s",line); fflush(NULL); }
+		if ( inst->verbose >= 2000 ) { printf("%s",line); fflush(NULL); }
 		if ( strlen(line) <= 1 ) continue; // skip empty lines
 	    par_name = strtok(line, " :");
-		if ( VERBOSE >= 3000 ) { printf("parameter \"%s\" ",par_name); fflush(NULL); }
+		if ( inst->verbose >= 3000 ) { printf("parameter \"%s\" ",par_name); fflush(NULL); }
 
 		if ( strncmp(par_name, "NAME", 4) == 0 ) 
 		{
@@ -123,7 +127,7 @@ int read_input(instance* inst)
 		{
 			active_section = 0;   
 			token1 = strtok(NULL, "");  
-			if ( VERBOSE >= 10 ) printf(" ... solving instance %s with model %d\n\n", token1, inst->model_type);
+			if ( inst->verbose >= 10 ) printf(" ... solving instance %s with model %d\n\n", token1, inst->model_type);
 			continue;
 		}   
 		
