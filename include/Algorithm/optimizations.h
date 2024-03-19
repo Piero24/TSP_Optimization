@@ -33,7 +33,7 @@
  * @param inst Pointer to the instance structure.
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
-int optimization(instance* inst);
+int twoOpt(instance* inst);
 
 /**
  * @brief Optimizes a solution by searching in the neighborhood of solutions (in terms of

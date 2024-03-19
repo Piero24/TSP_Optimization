@@ -18,55 +18,46 @@ int apply_algorithm(instance* inst, char *AlgorithmName)
 
 int algorithmSelector(instance* inst, char *AlgorithmName)
 {
-    // // If statement for selecting the algorithm 
-    // if (inst->model_type == 1)
-    // {
-    //     strcpy(AlgorithmName, "Nearest Neighbor");
-    //     NNFromEachNode(inst);
-
-    // } else if (inst->model_type == 2)
-    // {
-    //     printf("Model type not implemented\n");
-    //     exit(0);
-
-    // } else if (inst->model_type == 3)
-    // {
-    //     printf("Model type not implemented\n");
-    //     exit(0);
-
-    // } else if (inst->model_type == 4)
-    // {
-    //     printf("Model type not implemented\n");
-    //     exit(0);
-
-    // } else if (inst->model_type == 5)
-    // {
-    //     printf("Model type not implemented\n");
-    //     exit(0);
-
-    // } else 
-    // {
-    //     printf("Model type not implemented\n");
-    //     exit(0);
-
-    // } 
-
-    inst->best_sol[0] = 0;
-    for (int i = 1; i < inst->nnodes; i++)
+    // If statement for selecting the algorithm 
+    if (inst->model_type == 1)
     {
-        inst->best_sol[i] = i;
-        inst->zbest += inst->distances[i-1][i];
-    }
+        strcpy(AlgorithmName, "Nearest Neighbor");
+        NNFromEachNode(inst);
+
+    } else if (inst->model_type == 2)
+    {
+        printf("Model type not implemented\n");
+        exit(0);
+
+    } else if (inst->model_type == 3)
+    {
+        printf("Model type not implemented\n");
+        exit(0);
+
+    } else if (inst->model_type == 4)
+    {
+        printf("Model type not implemented\n");
+        exit(0);
+
+    } else if (inst->model_type == 5)
+    {
+        printf("Model type not implemented\n");
+        exit(0);
+
+    } else 
+    {
+        printf("Model type not implemented\n");
+        exit(0);
+
+    } 
 
     show_solution(inst, true);
 
     // If statement for start 2opt 
     if (inst->opt_type > 0)
     {
-        optimization(inst);
+        twoOpt(inst);
     }
-
-    show_solution(inst, true);
     
     // If statement for selecting the optimization method
     if (inst->opt_type == 2) 

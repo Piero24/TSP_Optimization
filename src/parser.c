@@ -108,14 +108,14 @@ int read_input(instance* inst)
 	
 	int active_section = 0; // =1 NODE_COORD_SECTION, =2 DEMAND_SECTION, =3 DEPOT_SECTION 
 	
-	int do_print = ( inst->verbose >= 1000 );
+	int do_print = ( inst->verbose >= 100 );
 
 	while ( fgets(line, sizeof(line), fin) != NULL ) 
 	{
-		if ( inst->verbose >= 2000 ) { printf("%s",line); fflush(NULL); }
+		if ( inst->verbose >= 100 ) { printf("%s",line); fflush(NULL); }
 		if ( strlen(line) <= 1 ) continue; // skip empty lines
 	    par_name = strtok(line, " :");
-		if ( inst->verbose >= 3000 ) { printf("parameter \"%s\" ",par_name); fflush(NULL); }
+		if ( inst->verbose >= 100 ) { printf("parameter \"%s\" ",par_name); fflush(NULL); }
 
 		if ( strncmp(par_name, "NAME", 4) == 0 ) 
 		{

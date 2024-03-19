@@ -30,6 +30,10 @@ int main(int argc, char** argv)
     parse_args(argc, argv, &inst);
     read_input(&inst);
 
+    for(int i=0;i<inst.nnodes;i++){
+        printf("Coord of %d: %f-%f", i, inst.coord[i].x, inst.coord[i].y);
+    }
+
     apply_algorithm(&inst, AlgorithmName);
 
     show_solution(&inst, true);

@@ -70,7 +70,8 @@ void show_solution(instance* inst, bool useGnuplot)
         fprintf(plot, "set ylabel \"Y Axis\"\n");
         fprintf(plot, "set grid\n");
         fprintf(plot, "set term qt font \"Arial\"\n"); // Set font to Arial
-        fprintf(plot, "plot '-' with linespoints\n");
+        fprintf(plot, "set pointsize 0.1\n"); // Set font to Arial
+        fprintf(plot, "plot '-' with linespoints pointtype 7\n");
 
         for(int i=0; i<inst->nnodes; i++)
         {
