@@ -1,9 +1,23 @@
 #include "../../include/Algorithm/optimizations.h"
 
+void reverseSubvector(int* from, int* to){
+    // Reverse the sub-array from A to B
+    int* i = from;
+    int* j = to;
+
+    while (i < j)
+    {
+        int tmp = *i;
+        *i = *j;
+        *j = tmp;
+        i++;
+        j--;
+    }
+}
 
 int twoOpt(instance* inst)
 {
-    if (inst->verbose > 80) printf("[2opt] Starting initialization.\n");
+    if (inst->verbose >= 80) printf("[2opt] Starting initialization.\n");
 
     int* result = (int*) calloc(inst->nnodes, sizeof(int));
     double cost = inst->zbest;
@@ -14,7 +28,7 @@ int twoOpt(instance* inst)
         result[i] = inst->best_sol[i];
     }
     
-    if (inst->verbose > 80) printf("[2opt] Initialization completed, starting optimization.\n");
+    if (inst->verbose >= 80) printf("[2opt] Initialization completed, starting optimization.\n");
 
     do 
     {
@@ -34,7 +48,7 @@ int twoOpt(instance* inst)
             double distAA1 = inst->distances[*A][*A1];
             double distBB1 = inst->distances[*B][*B1];
 
-            if (inst->verbose > 95){
+            if (inst->verbose >= 95){
                 printf("[2opt] A: %f - %f\n", inst->coord[*A].x, inst->coord[*A].y);
                 printf("[2opt] A1: %f - %f\n", inst->coord[*A1].x, inst->coord[*A1].y);
                 printf("[2opt] B: %f - %f\n", inst->coord[*B].x, inst->coord[*B].y);
@@ -53,21 +67,11 @@ int twoOpt(instance* inst)
 
             if (distAB + distA1B1 < distAA1 + distBB1)
             {
-                if (inst->verbose > 95) 
+                if (inst->verbose >= 95) 
                     printf("[2opt] Swapping edges %d-%d and %d-%d with %d-%d and %d-%d\n", *A, *A1, *B, *B1, *A1, *B1, *B, *A);
 
                 // Reverse the sub-array from A to B
-                int* i = A1;
-                int* j = B;
-
-                while (i < j)
-                {
-                    int tmp = *i;
-                    *i = *j;
-                    *j = tmp;
-                    i++;
-                    j--;
-                }
+                reverseSubvector(A1, B);
 
                 cost = cost - (distAA1 + distBB1) + (distAB + distA1B1);
                 counter = 0;
@@ -87,16 +91,33 @@ int twoOpt(instance* inst)
 
     } while (counter < inst->nnodes);
 
-    if (inst->verbose > 80) printf("[2opt] Optimization completed.\n\n");
+    if (inst->verbose >= 80) printf("[2opt] Optimization completed.\n\n");
 
     bestSolution(result, cost, inst);
     
     return 0;
 }
 
+bool nodeInList(int* node, int* list, int listLength){
+    for(int i = 0; i < listLength; i++)
+        if(*node == list[i])
+            return true;
+    return false;
+}
+
+void copyArray(int* from, int* to, int length){
+    free(to);
+    to = (int*) calloc(length, sizeof(int));
+
+    for(int i = 0; i < length; i++)
+    {
+        to[i] = from[i];
+    }
+}
+
 int tabuSearch(instance* inst)
 {
-    if (inst->verbose > 80) printf("[Tabu' Search] Starting initialization.\n");
+    if (inst->verbose >= 80) printf("[Tabu' Search] Starting initialization.\n");
 
     // Copying result vector
     int* result = (int*) calloc(inst->nnodes, sizeof(int));
@@ -108,26 +129,28 @@ int tabuSearch(instance* inst)
     }
 
     // tabù list, tenure and tabuList current size
-    int* tabuList = (int *) calloc(inst->nnodes, sizeof(int));
-    int tenure = inst->nnodes / 10;
+    int tenure = (inst->nnodes / 10 > 10) ? inst->nnodes / 10 : inst->nnodes / 2;
+    int* tabuList = (int *) calloc(tenure + 1, sizeof(int));
     int tabuPos = 0;
+
+
 
     // time checkers
     clock_t end;
     double time;
     
-    if (inst->verbose > 80) printf("[Tabu' Search] Initialization completed, starting optimization.\n");
+    if (inst->verbose >= 80) printf("[Tabu' Search] Initialization completed, starting optimization.\n");
 
     do
     {
         // INITIALIZATION:
         /*
         * We will search the best path among a neighborhood of the current solution (result[]).
-        * At the beginning we put an infinite cost path as best path candidate, it will be updated
+        * At the beginning we put a negative cost path as best path candidate, it will be updated
         * as soon as the HEURISTIC SEARCH will find the first feasible solution.
         */
 
-        // best candidate and best candidate
+        // best candidate and best candidate cost
         int* bestSol = (int *) calloc(inst->nnodes, sizeof(int));
         double bestCost = -1;
         int swappedNode = -1;
@@ -140,96 +163,61 @@ int tabuSearch(instance* inst)
         */
 
         // swap two nodes A and B
-        for(int A = 0; A < inst->nnodes-1; A++)
+        for(int* A = &result[0]; A <= &result[inst->nnodes-1]; A++)
         {
 
             // if node A is in tabù list, skip it
-            for(int i = 0; i < tabuPos; i++)
-                if(result[A] == tabuList[i])
-                    continue;
+            if(nodeInList(A, tabuList, tabuPos))
+                continue;
             
             // choose node B to swap
-            for(int B = A+1; B < inst->nnodes; B++)
+            for(int* B = A+1; B <= &result[inst->nnodes-1]; B++)
             {
-                
+
                 // if node B is in tabù list, skip it
-                for(int i = 0; i < tabuPos; i++)
-                    if(result[B] == tabuList[i])
-                        continue;
+                if(nodeInList(B, tabuList, tabuPos))
+                    continue;
                 
-                // save indexes
-                int prevA = (A==0) ? inst->nnodes-1 : A-1;
-                int succA = A + 1;
-                int prevB = B - 1;
-                int succB = (B==inst->nnodes-1) ? 0 : B+1;
+                // save indexes of node neighbors
+                int* prevA = (A==&result[0]) ? &result[inst->nnodes-1] : A-1;
+                int* succB = (A==&result[inst->nnodes-1]) ? &result[0] : B+1;
+
+                //compute costs
+                int old = inst->distances[*prevA][*A] + inst->distances[*succB][*B];
+                int new = inst->distances[*prevA][*B] + inst->distances[*succB][*A];
                 
                 // if is the first non-tabù solution, save it as current candidate
                 if(bestCost == -1)
                 {
-                    if (inst->verbose > 95) 
+                    if (inst->verbose >= 95) 
                         printf("[Tabu' Search] First feasible solution found, saving it\n");
                     
-                    // reset best solution cost to 0
+                    // copy current solution
+                    copyArray(result, bestSol, inst->nnodes);
+
+                    // compute costs
                     bestCost = 0;
-
-                    // copy current solution and its cost
-                    for(int i = 0; i < inst->nnodes; i++)
-                    {
-                        bestSol[i] = result[i];
-                        if(i > 0)
-                            bestCost += inst->distances[result[i]][result[i-1]];
-                    }
-
-                    // add final cost
+                    for(int* i = &bestSol[1]; i <= &bestSol[inst->nnodes-1]; i++)
+                        bestCost += inst->distances[*i][*(i-1)];
                     bestCost += inst->distances[bestSol[0]][bestSol[inst->nnodes-1]];
 
-                    // do swap
-                    int tmp = bestSol[A];
-                    bestSol[A] = bestSol[B];
-                    bestSol[B] = tmp;
-
-                    // add cost of swapped nodes
-                    bestCost -= inst->distances[bestSol[prevA]][bestSol[B]];
-                    bestCost -= inst->distances[bestSol[succA]][bestSol[B]];
-                    bestCost -= inst->distances[bestSol[prevB]][bestSol[A]];
-                    bestCost -= inst->distances[bestSol[succB]][bestSol[A]];
-
-                    bestCost += inst->distances[bestSol[prevA]][bestSol[A]];
-                    bestCost += inst->distances[bestSol[succA]][bestSol[A]];
-                    bestCost += inst->distances[bestSol[prevB]][bestSol[B]];
-                    bestCost += inst->distances[bestSol[succB]][bestSol[B]];
+                    // do swap and update costs
+                    reverseSubvector(A, B);
+                    bestCost = bestCost - old + new;
+                } 
                 
-                } else 
+                // if it's not the first but is still better, update current candidate
+                else if(new < old)
                 {
-                    // check if cost is better than best candidate
-                    int old = inst->distances[bestSol[prevA]][bestSol[A]];
-                    old += inst->distances[bestSol[succA]][bestSol[A]];
-                    old += inst->distances[bestSol[prevB]][bestSol[B]];
-                    old += inst->distances[bestSol[succB]][bestSol[B]];
+                    // do swap and update costs
+                    reverseSubvector(A, B);
+                    bestCost = bestCost - old + new;
 
-                    int new = inst->distances[bestSol[prevA]][bestSol[B]];
-                    new += inst->distances[bestSol[succA]][bestSol[B]];
-                    new += inst->distances[bestSol[prevB]][bestSol[A]];
-                    new += inst->distances[bestSol[succB]][bestSol[A]];
-                    
-                    if(new < old)
-                    {
-                        
-                    
-                        // update cost
-                        bestCost = bestCost - old + new;
+                    // save swapped node
+                    swappedNode = *A;
 
-                        // do swap
-                        int tmp = bestSol[A];
-                        bestSol[A] = bestSol[B];
-                        bestSol[B] = tmp;
-
-                        // save swapped node
-                        swappedNode = bestSol[A];
-
-                        if (inst->verbose > 95) 
-                            printf("[Tabu' Search] Swapping nodes %d and %d. New cost is %f\n", bestSol[A], bestSol[B], bestCost);
-                    }
+                    if (inst->verbose >= 95) 
+                        printf("[Tabu' Search] Swapping nodes %d and %d. New cost is %f\n", *A, *B, bestCost);
                 }
             }
         }
@@ -249,16 +237,14 @@ int tabuSearch(instance* inst)
             // if tabù list is full do FIFO
             if(tabuPos > tenure)
             {
-                for(int i=1;i<tabuPos;i++)
-                    tabuList[i-1] = tabuList[i];
-                tabuPos--;
+                tabuPos = 0;
             }
 
-            if (inst->verbose > 95) 
+            if (inst->verbose >= 95) 
                 printf("[Tabu' Search] The new solution is worse, adding it to tabu' list\n");
         }
 
-        if (inst->verbose > 95) 
+        if (inst->verbose >= 95) 
             printf("[Tabu' Search] Updating new 'current' solution. Old cost: %f, New cost: %f\n", cost, bestCost);
         
         for(int i = 0; i < inst->nnodes; i++)
@@ -282,9 +268,9 @@ int tabuSearch(instance* inst)
         end = clock();
         time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
-    }while(time < inst->timelimit);
+    }while(time < inst->time_limit);
 
-    if (inst->verbose > 80) printf("[Tabu' Search] Optimization completed.\n\n");
+    if (inst->verbose >= 80) printf("[Tabu' Search] Optimization completed.\n\n");
 
     return 0;
 }

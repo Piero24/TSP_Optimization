@@ -2,93 +2,155 @@
 
 void print_error(const char *err);
 char *getFileName(const char *filePath);
-const char* getTimeLimitString(double timeLimit);
 
 int parse_args(int argc, char** argv, instance* inst)
 {
+	int n = 0;
+	int help = 0;
+
 	// default   
+	strcpy(inst->algorithm_name, "NULL");
+    strcpy(inst->opt_name, "NULL");
+	inst->show_gnuplot = 0;
+
 	inst->model_type = 0;
 	inst->opt_type = 0;
 	inst->old_benders = 0;
 	strcpy(inst->input_file, "NULL");
-	inst->randomseed = 93846529; 
+	inst->random_seed = 93846529; 
 	inst->num_threads = 0;
-	inst->timelimit = DBL_MAX; 	//CPX_INFBOUND
-	inst->cutoff = DBL_MAX; 	//CPX_INFBOUND
+	inst->time_limit = DBL_MAX; 	//CPX_INFBOUND
+	inst->cutoff = DBL_MAX; 		//CPX_INFBOUND
 	inst->integer_costs = 0;
 	inst->verbose = 0;
 
 	inst->available_memory = 12000;   	// available memory, in MB, for Cplex execution (e.g., 12000)
 	inst->max_nodes = -1; 				// max n. of branching nodes in the final run (-1 unlimited)        
 
-    int help = 0; if ( argc < 1 ) help = 1;	
 	for ( int i = 1; i < argc; i++ ) 
 	{ 
-		if ( strcmp(argv[i],"-file") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 			// input file
-		if ( strcmp(argv[i],"-input") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 			// input file
-		if ( strcmp(argv[i],"-f") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 				// input file
+		if ( strcmp(argv[i],"-file") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 					// input file
+		if ( strcmp(argv[i],"-input") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 					// input file
+		if ( strcmp(argv[i],"-f") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 						// input file
 		
-        if ( strcmp(argv[i],"-time_limit") == 0 ) { inst->timelimit = atof(argv[++i]); continue; }		// total time limit
-		if ( strcmp(argv[i],"-tl") == 0 ) { inst->timelimit = atof(argv[++i]); continue; }		        // total time limit
+        if ( strcmp(argv[i],"-time_limit") == 0 ) { inst->time_limit = atof(argv[++i]); continue; }				// total time limit
+		if ( strcmp(argv[i],"-tl") == 0 ) { inst->time_limit = atof(argv[++i]); continue; }		        		// total time limit
+		if ( strcmp(argv[i],"-t") == 0 ) { inst->time_limit = atof(argv[++i]); continue; }		        		// total time limit
 
-        if ( strcmp(argv[i],"-model_type") == 0 ) { inst->model_type = atoi(argv[++i]); continue; } 	// model type
-		if ( strcmp(argv[i],"-model") == 0 ) { inst->model_type = atoi(argv[++i]); continue; } 			// model type
-		if ( strcmp(argv[i],"-alg") == 0 ) { inst->model_type = atoi(argv[++i]); continue; }			// model type
+        if ( strcmp(argv[i],"-model_type") == 0 ) { inst->model_type = atoi(argv[++i]); continue; } 			// model type
+		if ( strcmp(argv[i],"-model") == 0 ) { inst->model_type = atoi(argv[++i]); continue; } 					// model type
+		if ( strcmp(argv[i],"-alg") == 0 ) { inst->model_type = atoi(argv[++i]); continue; }					// model type
 		
-		if ( strcmp(argv[i],"-opt") == 0 ) { inst->opt_type = atoi(argv[++i]); continue; }				// optimization type
-		if ( strcmp(argv[i],"-2opt") == 0 ) { inst->opt_type = atoi(argv[++i]); continue; }				// optimization type
-		if ( strcmp(argv[i],"-optimization") == 0 ) { inst->opt_type = atoi(argv[++i]); continue; }		// optimization type
+		if ( strcmp(argv[i],"-opt") == 0 ) { inst->opt_type = atoi(argv[++i]); continue; }						// optimization type
+		if ( strcmp(argv[i],"-2opt") == 0 ) { inst->opt_type = atoi(argv[++i]); continue; }						// optimization type
+		if ( strcmp(argv[i],"-optimization") == 0 ) { inst->opt_type = atoi(argv[++i]); continue; }				// optimization type
 
-		if ( strcmp(argv[i],"-seed") == 0 ) { inst->randomseed += abs(atoi(argv[++i])); continue; } 	// random seed
+		if ( strcmp(argv[i],"-seed") == 0 ) { inst->random_seed += abs(atoi(argv[++i])); continue; } 			// random seed
+		if ( strcmp(argv[i],"-r") == 0 ) { inst->random_seed += abs(atoi(argv[++i])); continue; } 				// random seed
 
-		if ( strcmp(argv[i],"-verbose") == 0 ) { inst->verbose = abs(atoi(argv[++i])); continue; } 	// verbose
-		if ( strcmp(argv[i],"-v") == 0 ) { inst->verbose = abs(atoi(argv[++i])); continue; } 			// verbose
+		if ( strcmp(argv[i],"-verbose") == 0 ) { inst->verbose = abs(atoi(argv[++i])); continue; } 				// verbose
+		if ( strcmp(argv[i],"-v") == 0 ) { inst->verbose = abs(atoi(argv[++i])); continue; } 					// verbose
+		
+		if ( strcmp(argv[i],"-generate") == 0 ) { n = abs(atoi(argv[++i])); continue; } 						// generated file
+		if ( strcmp(argv[i],"-g") == 0 ) { n = abs(atoi(argv[++i])); continue; } 								// generated file
+		if (n > 0) {char* name = fileGenerator(n); strcpy(inst->input_file, name); free(name); continue;}
+		
+		if ( strcmp(argv[i],"-show") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 			// generated file
+		if ( strcmp(argv[i],"-plot") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 			// generated file
+		if ( strcmp(argv[i],"-gnuplot") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 		// generated file
+		if ( strcmp(argv[i],"-s") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 				// generated file
 
-		// if ( strcmp(argv[i],"-old_benders") == 0 ) { inst->old_benders = atoi(argv[++i]); continue; } 	// old benders
-		// if ( strcmp(argv[i],"-threads") == 0 ) { inst->num_threads = atoi(argv[++i]); continue; } 		// n. threads
-		// if ( strcmp(argv[i],"-memory") == 0 ) { inst->available_memory = atoi(argv[++i]); continue; }	// available memory (in MB)
-		// if ( strcmp(argv[i],"-node_file") == 0 ) { strcpy(inst->node_file,argv[++i]); continue; }		// cplex's node file
-		// if ( strcmp(argv[i],"-max_nodes") == 0 ) { inst->max_nodes = atoi(argv[++i]); continue; } 		// max n. of nodes
-		// if ( strcmp(argv[i],"-cutoff") == 0 ) { inst->cutoff = atof(argv[++i]); continue; }				// master cutoff
-		// if ( strcmp(argv[i],"-int") == 0 ) { inst->integer_costs = 1; continue; } 						// inteher costs
-		// if ( strcmp(argv[i],"-help") == 0 ) { help = 1; continue; } 										// help
-		// if ( strcmp(argv[i],"--help") == 0 ) { help = 1; continue; } 									// help
-		help = 1;
-    }      
+		// if ( strcmp(argv[i],"-old_benders") == 0 ) { inst->old_benders = atoi(argv[++i]); continue; } 		// old benders
+		// if ( strcmp(argv[i],"-threads") == 0 ) { inst->num_threads = atoi(argv[++i]); continue; } 			// n. threads
+		// if ( strcmp(argv[i],"-memory") == 0 ) { inst->available_memory = atoi(argv[++i]); continue; }		// available memory (in MB)
+		// if ( strcmp(argv[i],"-node_file") == 0 ) { strcpy(inst->node_file,argv[++i]); continue; }			// cplex's node file
+		// if ( strcmp(argv[i],"-max_nodes") == 0 ) { inst->max_nodes = atoi(argv[++i]); continue; } 			// max n. of nodes
+		// if ( strcmp(argv[i],"-cutoff") == 0 ) { inst->cutoff = atof(argv[++i]); continue; }					// master cutoff
+		// if ( strcmp(argv[i],"-int") == 0 ) { inst->integer_costs = 1; continue; } 							// inteher costs
+		
+		if ( strcmp(argv[i],"-help") == 0 ) { help = 1; continue; } 											// help
+		if ( strcmp(argv[i],"--help") == 0 ) { help = 1; continue; }  											// help
+		if ( strcmp(argv[i],"-h") == 0 ) { help = 1; continue; } 												// help
+    }  
 
-	if ( help || (inst->verbose >= 10) )		// print current parameters
+	if (help)
 	{
-		printf("\n\n\n\n");
-		printf("------------------------------ Selected Parameters (Course: Operation Research 2, A.Y. 2023/2024) ------------------------------\n");
-		
-		char *fileName = getFileName(inst->input_file);
-    	printf("- File Name:   %s\n", fileName);
-		// printf("-file %s\n", inst->input_file); 
+		showHelpMenu(5);
+	}
 
-		const char* timeLimitString = getTimeLimitString(inst->timelimit);
-		printf("- Time Limit:  %s\n", timeLimitString);
-		//printf("- time_limit %lf\n", inst->timelimit); 
-
-		printf("- Model Type:  %d\n", inst->model_type); 
-		printf("- Optimization Method:  %d\n", inst->model_type); 
-
-
-		printf("- Seed:        %d\n", inst->randomseed);
-		// printf("-old_benders %d\n", inst->old_benders);  
-		// printf("-threads %d\n", inst->num_threads);  
-		// printf("-max_nodes %d\n", inst->max_nodes); 
-		// printf("-memory %d\n", inst->available_memory); 
-		// printf("-int %d\n", inst->integer_costs); 
-		// printf("-node_file %s\n", inst->node_file);
-		// printf("-cutoff %lf\n", inst->cutoff); 
-		// printf("\nenter -help or --help for help\n");
-		printf("--------------------------------------------------------------------------------------------------------------------------------\n\n");
-	}        
-	
-	if ( help ) exit(1);
-
+	parameterPrint(inst);
     return 0;
 }
+
+void parameterPrint(instance* inst)
+{
+	clearScreen();
+	welcomeMessage();
+	printf("\n");
+
+	char info[] = "      SELECTED PARAMETERS      ";
+    printCentered(info);
+	printf("\n");
+
+	char info_2[] = "*******************************";
+	printCentered(info_2);
+	printf("\n");
+
+	char *file_name = getFileName(inst->input_file);
+	printf("- File Name:           %s\n", file_name);
+
+	printf("- Algorithm Name:      %s\n", inst->algorithm_name);
+    printf("- Optimization Name:   %s\n", inst->opt_name);
+
+	const char* time_limit_string = getTimeLimitString(inst->time_limit);
+	printf("- Time Limit:          %s\n", time_limit_string);
+
+	// printf("-old_benders %d\n", inst->old_benders);  
+	// printf("-threads %d\n", inst->num_threads);  
+	// printf("-max_nodes %d\n", inst->max_nodes); 
+	// printf("-memory %d\n", inst->available_memory); 
+	// printf("-int %d\n", inst->integer_costs); 
+	// printf("-node_file %s\n", inst->node_file);
+	// printf("-cutoff %lf\n", inst->cutoff); 
+	// printf("\nenter -help or --help for help\n");
+
+	printf("- Seed:                %d\n", inst->random_seed);
+	printf("- Verbose:             %d\n", inst->verbose);
+
+	printf("\n");
+	printHorizontalLine('*');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 int read_input(instance* inst)
 {
@@ -296,16 +358,16 @@ char *getFileName(const char *filePath) {
     return result;
 }
 
-const char* getTimeLimitString(double timeLimit) {
+const char* getTimeLimitString(double time_limit) {
 
-    if (timeLimit == DBL_MAX ) //|| timeLimit == CPX_INFBOUND) 
+    if (time_limit == DBL_MAX ) //|| timeLimit == CPX_INFBOUND) 
 	{
         return "Inf";
 
     } else
 	{
         static char buffer[100];
-        snprintf(buffer, sizeof(buffer), "%lf", timeLimit);
+        snprintf(buffer, sizeof(buffer), "%lf", time_limit);
         return buffer;
     }
 }

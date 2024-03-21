@@ -1,6 +1,7 @@
 #include "../include/Algorithm/NN.h"
 
-int NNFromEachNode(instance* inst){
+int NNFromEachNode(instance* inst)
+{
     int* result = (int*) calloc(inst->nnodes, sizeof(int));
     double cost = 0;
 

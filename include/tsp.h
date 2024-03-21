@@ -2,6 +2,7 @@
 #define TSP_H
 
 #include <stdbool.h>
+#include <string.h> 
 
 typedef struct {
 	double x, y;
@@ -22,9 +23,9 @@ typedef struct {
 	int model_type; 
 	int opt_type;
 	int old_benders;
-	int randomseed;
+	int random_seed;
 	int num_threads;
-	double timelimit;						// overall time limit, in sec.s
+	double time_limit;						// overall time limit, in sec.s
 	char input_file[1000];		  			// input file
 	char node_file[1000];		  			// cplex node file
 	int available_memory;
@@ -50,6 +51,12 @@ typedef struct {
 	// int bigsstart;
 	// int fstart;
 	// int zstart;
+
+	char algorithm_name[50];
+    char opt_name[50];
+    int show_gnuplot;
+	char file_name[50];
+
 } instance;
 
 /**
@@ -76,5 +83,25 @@ void save_solution(instance* inst, const char* outputFileName);
  * @param inst A pointer to the instance structure to be freed.
  */
 void free_instance(instance* inst);
+
+/**
+ * @brief Generate a random double between min and max
+ * 
+ * @param min The minimum value of the random number.
+ * @param max The maximum value of the random number.
+ * 
+ * @return A random double between min and max.
+ */
+double randomDouble(double min, double max);
+
+/**
+ * @brief Generate a .tsp file with n random nodes.
+ * The file it will be saved in the Resource folder.
+ * 
+ * @param n The number of nodes to generate.
+ * 
+ * @return The name of the file generated.
+ */
+char* fileGenerator(int n);
 
 #endif /* TSP_H */

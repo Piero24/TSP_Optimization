@@ -13,26 +13,25 @@
 #include "../include/Algorithm/NN.h"
 #include "../include/parser.h"
 #include "../include/algoSelector.h"
+#include "../include/menu.h"
 
 
 int main(int argc, char** argv)
 {
-    if(argc<2)
-    {
-        printf("Usage: %s -help for help\n", argv[0]);
-        return 1;
-    }
-
     instance inst;
     char AlgorithmName[100];
     char *AlgorithmNamePtr = AlgorithmName;
-
-    parse_args(argc, argv, &inst);
-    read_input(&inst);
-
-    for(int i=0;i<inst.nnodes;i++){
-        printf("Coord of %d: %f-%f", i, inst.coord[i].x, inst.coord[i].y);
+    
+    if(argc<2)
+    {
+        manage_menu(&inst);
+    } else
+    {
+        parse_args(argc, argv, &inst);
     }
+    exit(1);
+
+    read_input(&inst);
 
     apply_algorithm(&inst, AlgorithmName);
 

@@ -6,6 +6,7 @@
 #include <math.h>
 
 #include "tsp.h"
+#include "menu.h"
 //#include <cplex.h> //CPX_INFBOUND
 
 /**
@@ -28,3 +29,19 @@ int parse_args(int argc, char** argv, instance* inst);
  * @return 0 on success, non-zero on failure.
  */
 int read_input(instance* inst);
+
+/**
+ * @brief Return the time limit in string format.
+ * 
+ * @param time_limit The time limit in seconds.
+ * 
+ * @return The time limit in string format (inf if is equal to DBL_MAX or CPX_INFBOUND).
+ */
+const char* getTimeLimitString(double time_limit);
+
+/**
+ * @brief 
+ * 
+ * @param inst
+ */
+void parameterPrint(instance* inst);
