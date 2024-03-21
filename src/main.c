@@ -33,6 +33,9 @@ int main(int argc, char** argv)
 
     read_input(&inst);
 
+    // -----------------------------------------------------
+    // Fix all the previous function befor continue with the refactor
+
     apply_algorithm(&inst, AlgorithmName);
 
     show_solution(&inst, true);
