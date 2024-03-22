@@ -7,8 +7,8 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include "tsp.h"
-#include "parser.h"
+#include "../include/tsp.h"
+#include "../include/parser.h"
 
 /**
  * @brief Manages the main menu for initializing instance parameters.

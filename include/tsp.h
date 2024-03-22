@@ -3,12 +3,6 @@
 
 #include <stdbool.h>
 #include <string.h> 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <time.h>
-
-#include "parser.h"
 
 typedef struct {
 	double x, y;

@@ -1,15 +1,16 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <float.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <time.h>
 #include <math.h>
 
 #include "tsp.h"
 #include "menu.h"
+
 //#include <cplex.h> //CPX_INFBOUND
 
 /**

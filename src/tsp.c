@@ -1,4 +1,10 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <time.h>
+
 #include "../include/tsp.h"
+#include "../include/parser.h"
 
 void generateDataFile(const char* filename, instance* inst)
 {

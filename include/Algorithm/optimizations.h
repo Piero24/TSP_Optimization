@@ -6,9 +6,9 @@
 #include <time.h>
 #include <float.h>
 
-#include "../tsp.h"
 #include "NN.h"
 #include "../algoSelector.h"
+#include "../tsp.h"
 
 /**
  * @brief Reverses the elements in a sub-array defined by the pointers from and to.
