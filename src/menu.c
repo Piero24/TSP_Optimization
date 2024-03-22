@@ -80,7 +80,7 @@ int file_menu(char *file_name, int *n)
         {
             printf("\n");
             char error_info[] = "ERROR: Invalid input. Add a valid input.";
-            printCentered(error_info);
+            printCentered(error_info, ' ');
             printf("\n");
             err_flag = 0;
         }
@@ -146,7 +146,7 @@ int algorithm_menu(char *algorithm_name)
         {
             printf("\n");
             char error_info[] = "ERROR: Invalid input. Add a valid input.";
-            printCentered(error_info);
+            printCentered(error_info, ' ');
             printf("\n");
             err_flag = 0;
         }
@@ -201,8 +201,8 @@ int optimization_menu(char *opt_name)
         printf("\nCHOOSE THE OPTIMIZATION METHOD\n");
         printf("Select the optimizer you want to apply to the solution found by the algorithm.\n\n");
         printf("1 - None\n");
-        printf("2 - 2opt\n");
-        printf("3 - Tabù (+ 2opt)\n");
+        printf("2 - 2-Opt\n");
+        printf("3 - Tabu Search (+ 2opt)\n");
         printf("\n9 - Show help menu\n");
         printf("0 - Exit\n");
 
@@ -210,7 +210,7 @@ int optimization_menu(char *opt_name)
         {
             printf("\n");
             char error_info[] = "ERROR: Invalid input. Add a valid input.";
-            printCentered(error_info);
+            printCentered(error_info, ' ');
             printf("\n");
             err_flag = 0;
         }
@@ -231,11 +231,11 @@ int optimization_menu(char *opt_name)
                 return 0;
 
             case 2:
-                strcpy(opt_name, "2opt");
+                strcpy(opt_name, "2-Opt");
                 return 0;
 
             case 3:
-                strcpy(opt_name, "Tabù (+ 2opt)");
+                strcpy(opt_name, "Tabu Search");
                 return 0;
 
             case 9:
@@ -272,7 +272,7 @@ int options_menu(int *verbose, double *timeLimit, int *randomSeed, int *showGnup
         clearScreen();
         welcomeMessage();
         printf("\nCHOOSE ONE OR MORE OPTIONS\n");
-         printf("WARNING: you have to put one or all the options (e.g., -v 60 -t 25000 -r 5432 -s 3), the algorithm will start after you press ENTER\n\n");
+        printf("WARNING: you have to put one or all the options (e.g., -v 60 -t 25000 -r 5432 -s 3), the algorithm will start after you press ENTER\n\n");
         printf("-> (-v) Verbose from 0 to 100\n");
         printf("-> (-t) Time limit\n");
         printf("-> (-r) Random seed\n");
@@ -284,7 +284,7 @@ int options_menu(int *verbose, double *timeLimit, int *randomSeed, int *showGnup
         {
             printf("\n");
             char error_info[] = "ERROR: Invalid input. Add a valid input.";
-            printCentered(error_info);
+            printCentered(error_info, ' ');
             printf("\n");
             err_flag = 0;
         }
@@ -353,17 +353,35 @@ int getTerminalWidth()
     #endif
 }
 
-void printCentered(const char *text)
+void printCentered(const char *text, char c)
 {
     int termWidth = getTerminalWidth();
     int textWidth = strlen(text);
-    int leadingSpaces = (termWidth - textWidth) / 2;
+    int leadingSpaces = (termWidth - textWidth - 2) / 2; // Subtracting 2 for the characters on both sides
 
+    // Print leading characters
     for (int i = 0; i < leadingSpaces; i++)
     {
-        putchar(' ');
+        putchar(c);
     }
+
+    // Print text
     printf("%s", text);
+
+    if (c != ' ')
+    {
+        // Print trailing characters
+        for (int i = 0; i < leadingSpaces; i++)
+        {
+            putchar(c);
+        }
+
+        // If the width is odd, print an additional trailing character
+        if ((termWidth - textWidth - 2) % 2 != 0)
+        {
+            putchar(c);
+        }
+    }
 }
 
 void printHorizontalLine(char c)
@@ -378,19 +396,19 @@ void printHorizontalLine(char c)
 
 void welcomeMessage()
 {
-    printHorizontalLine('-');
-    char welcome_message[] = "WELCOME TO THE TSP OPTIMIZATION PROGRAM";
-    printCentered(welcome_message);
-    printf("\n");
-    printHorizontalLine('-');
+    //printHorizontalLine('-');
+    char welcome_message[] = "   WELCOME TO THE TSP OPTIMIZATION PROGRAM   ";
+    printCentered(welcome_message , '-');
+    printf("\n\n");
+    //printHorizontalLine('-');
     //printf("\n");
 
     char info[] = "Authors: A. Pietrobon, A. Felline     Lecturer: M. Fischetti";
-    printCentered(info);
+    printCentered(info, ' ');
     printf("\n\n");
 
 	char info_2[] = "Operation Research 2 - A.Y. 2023-2024";
-    printCentered(info_2);
+    printCentered(info_2 , ' ');
     printf("\n");
 
     printHorizontalLine('-');
@@ -405,11 +423,11 @@ void showHelpMenu(int type)
     printf("\n");
 
     char helpMessage[] = "HELP MENU";
-    printCentered(helpMessage);
+    printCentered(helpMessage, ' ');
     printf("\n");
 
     char infoHelp[] = "Here you can find a more detailed response to your questions.";
-    printCentered(infoHelp);
+    printCentered(infoHelp, ' ');
     printf("\n\n");
     
     switch (type)
@@ -456,7 +474,7 @@ void quitMessage()
 
     printf("\n");
     char quit_info[] = "Program closed correctly.";
-    printCentered(quit_info);
+    printCentered(quit_info, ' ');
     printf("\n\n");
 
     exit(0);

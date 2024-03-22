@@ -20,8 +20,6 @@ typedef struct {
 	int nveh;
 
 	// parameters 
-	int model_type; 
-	int opt_type;
 	int old_benders;
 	int random_seed;
 	int num_threads;
@@ -56,6 +54,7 @@ typedef struct {
     char opt_name[50];
     int show_gnuplot;
 	char file_name[50];
+	char file_comment[50];
 
 } instance;
 
@@ -75,7 +74,7 @@ void show_solution(instance* inst, bool useGnuplot);
  * @param inst A pointer to the instance structure containing the solution data.
  * @param outputFileName The name of the file to write the solution to.
  */
-void save_solution(instance* inst, const char* outputFileName);
+void save_solution(instance* inst);
 
 /**
  * @brief Frees the memory allocated for the instance structure.

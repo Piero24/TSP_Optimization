@@ -1,45 +1,40 @@
 #include "../include/algoSelector.h"
 
-int apply_algorithm(instance* inst, char *AlgorithmName)
+int apply_algorithm(instance* inst)
 {
-    algorithmSelector(inst, AlgorithmName);
+    algorithmSelector(inst);
 
     if(inst->verbose > 0)
     {
         double time =((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC;
+        printf("\n\n");
 
-        printf("\n\n\n********************************************* BEST SOLUTION *********************************************\n");
-        printf("\nSelected Algorithm: %s\tStarting Node: %d\tTime: %f sec.\tCost: %f\n", AlgorithmName, inst->start, time, inst->zbest);
-        printf("\n*********************************************************************************************************\n\n\n");
+        char info[] = " BEST SOLUTION ";
+        printCentered(info, '*');
+	    printf("\n");
+
+        printf("\nSelected Algorithm: %s\t\t\tStarting Node: %d\t\t\tTime: %f sec.\t\t\tCost: %f\t\t\n", inst->algorithm_name, inst->start, time, inst->zbest);
+        printf("\n");
+
+        printHorizontalLine('*');
     }
 
     return 0;
 }
 
-int algorithmSelector(instance* inst, char *AlgorithmName)
+int algorithmSelector(instance* inst)
 {
     // If statement for selecting the algorithm 
-    if (inst->model_type == 1)
+    if (strcmp(inst->algorithm_name, "Nearest Neighbor") == 0)
     {
-        strcpy(AlgorithmName, "Nearest Neighbor");
         NNFromEachNode(inst);
 
-    } else if (inst->model_type == 2)
+    } else if (strcmp(inst->algorithm_name, "Variable Neighborhood Search") == 0)
     {
         printf("Model type not implemented\n");
         exit(0);
 
-    } else if (inst->model_type == 3)
-    {
-        printf("Model type not implemented\n");
-        exit(0);
-
-    } else if (inst->model_type == 4)
-    {
-        printf("Model type not implemented\n");
-        exit(0);
-
-    } else if (inst->model_type == 5)
+    } else if (strcmp(inst->algorithm_name, "Algo 3") == 0)
     {
         printf("Model type not implemented\n");
         exit(0);
@@ -53,22 +48,21 @@ int algorithmSelector(instance* inst, char *AlgorithmName)
 
     show_solution(inst, true);
 
-    // If statement for start 2opt 
-    if (inst->opt_type > 0)
-    {
-        twoOpt(inst);
-    }
-    
-    // If statement for selecting the optimization method
-    if (inst->opt_type == 2) 
-    {
-        tabuSearch(inst);
+    if (strcmp(inst->opt_name, "None") != 0) {
         
-    } else if (inst->model_type == 3)
-    {
-        printf("Optimization method not implemented\n");
-        exit(0);
+        twoOpt(inst);
+        
+        // If statement for selecting the optimization method
+        if (strcmp(inst->opt_name, "Tabu Search") == 0)
+        {
+            tabuSearch(inst);
+            
+        } else if (strcmp(inst->opt_name, "Opt 3") == 0)
+        {
+            printf("Optimization method not implemented\n");
+            exit(0);
 
+        }
     }
 
     return 0;

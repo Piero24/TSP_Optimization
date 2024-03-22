@@ -75,8 +75,9 @@ int getTerminalWidth();
  * @brief 
  * 
  * @param text
+ * @param c
  */
-void printCentered(const char *text);
+void printCentered(const char *text, char c);
 
 /**
  * @brief 

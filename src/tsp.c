@@ -61,7 +61,7 @@ void show_solution(instance* inst, bool useGnuplot)
     }
 }
 
-void save_solution(instance* inst, const char* outputFileName)
+void save_solution(instance* inst)
 {    
     // Create the "solution" directory
     #ifdef _WIN32
@@ -77,8 +77,8 @@ void save_solution(instance* inst, const char* outputFileName)
     // Modify the output file paths to include the "Archive/Image" and the "Archive/Svg" directories
     char pngPath[100]; // Adjust the size as needed
     char svgPath[100]; // Adjust the size as needed
-    sprintf(pngPath, "Archive/Image/%s.png", outputFileName);
-    sprintf(svgPath, "Archive/Svg/%s.svg", outputFileName);
+    sprintf(pngPath, "Archive/Image/%s.png", inst->algorithm_name);
+    sprintf(svgPath, "Archive/Svg/%s.svg", inst->algorithm_name);
 
     FILE *plotPNG = popen("gnuplot", "w");
     FILE *plotSVG = popen("gnuplot", "w");

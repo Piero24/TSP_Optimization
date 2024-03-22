@@ -13,10 +13,9 @@
  * the results to the standard output.
  * 
  * @param inst Pointer to the instance structure.
- * @param AlgorithmName The name of the algorithm to be used.
  * @return 0 if the algorithm runs successfully.
  */
-int apply_algorithm(instance* inst, char *AlgorithmName);
+int apply_algorithm(instance* inst);
 
 /**
  * @brief Selects and applies the appropriate algorithm based on the model type 
@@ -24,10 +23,9 @@ int apply_algorithm(instance* inst, char *AlgorithmName);
  * 
  * @param inst Pointer to the instance structure.
  * @param firstNode The starting node for the algorithm.
- * @param AlgorithmName The name of the algorithm to be used.
  * @return 0 if the algorithm runs successfully.
  */
-int algorithmSelector(instance* inst, char *AlgorithmName);
+int algorithmSelector(instance* inst);
 
 /**
  * @brief Substitute the path of the old best solution with the path of 

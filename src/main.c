@@ -19,8 +19,6 @@
 int main(int argc, char** argv)
 {
     instance inst;
-    char AlgorithmName[100];
-    char *AlgorithmNamePtr = AlgorithmName;
     
     if(argc<2)
     {
@@ -29,17 +27,13 @@ int main(int argc, char** argv)
     {
         parse_args(argc, argv, &inst);
     }
-    exit(1);
 
     read_input(&inst);
 
-    // -----------------------------------------------------
-    // Fix all the previous function befor continue with the refactor
-
-    apply_algorithm(&inst, AlgorithmName);
+    apply_algorithm(&inst);
 
     show_solution(&inst, true);
-    save_solution(&inst, AlgorithmName);
+    save_solution(&inst);
 
     free_instance(&inst);
     return 0;
