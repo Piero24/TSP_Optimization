@@ -43,10 +43,9 @@ int algorithmSelector(instance* inst)
     {
         printf("Model type not implemented\n");
         exit(0);
-
     } 
 
-    show_solution(inst, true);
+    // show_solution(inst, true);
 
     if (strcmp(inst->opt_name, "None") != 0) {
         
