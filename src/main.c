@@ -1,6 +1,6 @@
 // MacOS
 // rm -r build && mkdir build && cmake -S . -B build
-// make -C build && clear && ./TSP_Optimization -file Resource/pr10v1.tsp -model 1
+// make -C build && clear && ./TSP_Optimization -file Resource/pr10v1.tsp -model 1 -opt 1 -v 50 
 
 // Windows
 // rmdir /S /Q build && mkdir build && cmake . -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -B build

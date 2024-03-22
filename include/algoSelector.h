@@ -1,12 +1,13 @@
 #ifndef ALGOSELECTOR_H
 #define ALGOSELECTOR_H
+
 #include <stdio.h>
 #include <time.h>
 
+#include "tsp.h"
+#include "parser.h"
 #include "Algorithm/NN.h"
 #include "Algorithm/optimizations.h"
-#include "parser.h"
-#include "tsp.h"
 
 /**
  * @brief Measure the time it takes to run the selected algorithm and print 

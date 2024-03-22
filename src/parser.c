@@ -1,4 +1,5 @@
 #include "../include/parser.h"
+#include "../include/tsp.h"
 
 int parse_args(int argc, char** argv, instance* inst)
 {
@@ -101,7 +102,7 @@ void parameterPrint(instance* inst)
 
 	char *file_name = getFileName(inst->input_file);
 	printf("- File Name:              %s\n", file_name);
-	printf("- File Comment:           %s\n", inst->input_file);
+	printf("- File Comment:           %s\n", inst->file_comment);
 	printf("- Total N° of nodes:      %d\n\n", inst->nnodes);
 
 	printf("- Algorithm Name:         %s\n", inst->algorithm_name);
@@ -188,23 +189,37 @@ void print_error(const char *err)
 char *getFileName(const char *filePath)
 {
     const char *fileName = strrchr(filePath, '/');
-
     if (fileName != NULL)
 	{
         fileName++;
-
-    } else
+	} else 
 	{
         fileName = filePath;
     }
 
-    char *result = strdup(fileName);
+    // Check if the file name ends with ".tsp"
+    const char *extension = ".tsp";
+    size_t lenFileName = strlen(fileName);
+    size_t lenExtension = strlen(extension);
+
+    if (lenFileName > lenExtension && strcmp(fileName + lenFileName - lenExtension, extension) == 0)
+	{
+        lenFileName -= lenExtension;
+        while (lenFileName > 0 && fileName[lenFileName - 1] == '.')
+		{
+            lenFileName--;
+        }
+    }
+
+    char *result = malloc(lenFileName + 1);
     if (result == NULL)
 	{
-        // Error handling: Memory allocation failed
         fprintf(stderr, "Memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
+
+    strncpy(result, fileName, lenFileName);
+    result[lenFileName] = '\0';
     return result;
 }
 
@@ -284,6 +299,12 @@ int readInputParameters(instance* inst)
 				// Check if the first two characters are ": "
 				if (strncmp(trimmed_comment, ": ", 2) == 0) {
 					trimmed_comment += 2; // Move the pointer forward by two characters
+				}
+
+				// Remove the trailing '\n' if present
+				size_t len = strlen(trimmed_comment);
+				if (len > 0 && trimmed_comment[len - 1] == '\n') {
+					trimmed_comment[len - 1] = '\0'; // Replace '\n' with '\0'
 				}
 
 				strcpy(inst->file_comment, trimmed_comment);

@@ -1,17 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <time.h>
-
 #include "../include/tsp.h"
 
-/**
- * @brief Generates a data file with node coordinates for 
- * the specified instance and saves it to the given filename.
- * 
- * @param filename The name of the file to write the data to.
- * @param inst A pointer to the instance structure containing node coordinates.
- */
 void generateDataFile(const char* filename, instance* inst)
 {
     FILE* file = fopen("data.txt", "w");
@@ -63,22 +51,41 @@ void show_solution(instance* inst, bool useGnuplot)
 
 void save_solution(instance* inst)
 {    
+    char img_directory_name[50];
+    sprintf(img_directory_name, "Archive/Image/%s", inst->algorithm_name);
+
+    char svg_directory_name[50];
+    sprintf(svg_directory_name, "Archive/Svg/%s", inst->algorithm_name);
+
     // Create the "solution" directory
     #ifdef _WIN32
          _mkdir("Archive");
         _mkdir("Archive/Image");
+        _mkdir(img_directory_name);
         _mkdir("Archive/Svg");
+        _mkdir(svg_directory_name);
     #else
         mkdir("Archive", 0777);
         mkdir("Archive/Image", 0777);
+        mkdir(img_directory_name, 0777);
         mkdir("Archive/Svg", 0777);
+        mkdir(svg_directory_name, 0777);
     #endif
 
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+
+    char date_str[20];
+    strftime(date_str, sizeof(date_str), "%y-%m-%d", tm); // Format: YY-MM-DD
+    // strftime(date_str, sizeof(date_str), "%y-%m-%d_%H:%M", tm); // Format: YY-MM-DD HH:MM
+
+    char *file_name = getFileName(inst->input_file);
+
     // Modify the output file paths to include the "Archive/Image" and the "Archive/Svg" directories
-    char pngPath[100]; // Adjust the size as needed
-    char svgPath[100]; // Adjust the size as needed
-    sprintf(pngPath, "Archive/Image/%s.png", inst->algorithm_name);
-    sprintf(svgPath, "Archive/Svg/%s.svg", inst->algorithm_name);
+    char pngPath[100];
+    char svgPath[100];
+    sprintf(pngPath, "Archive/Image/%s/%s_%s.png", inst->algorithm_name, file_name, date_str);
+    sprintf(svgPath, "Archive/Svg/%s/%s_%s.svg", inst->algorithm_name, file_name, date_str);
 
     FILE *plotPNG = popen("gnuplot", "w");
     FILE *plotSVG = popen("gnuplot", "w");

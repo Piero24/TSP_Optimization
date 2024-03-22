@@ -1,6 +1,7 @@
-#include "../../include/Algorithm/optimizations.h"
+#include "../include/Algorithm/optimizations.h"
 
-void reverseSubvector(int* from, int* to){
+void reverseSubvector(int* from, int* to)
+{
     // Reverse the sub-array from A to B
     int* i = from;
     int* j = to;
@@ -98,14 +99,20 @@ int twoOpt(instance* inst)
     return 0;
 }
 
-bool nodeInList(int* node, int* list, int listLength){
+bool nodeInList(int* node, int* list, int listLength)
+{
     for(int i = 0; i < listLength; i++)
+    {
         if(*node == list[i])
+        {
             return true;
+        }
+    }
     return false;
 }
 
-void copyArray(int* from, int* to, int length){
+void copyArray(int* from, int* to, int length)
+{
     free(to);
     to = (int*) calloc(length, sizeof(int));
 

@@ -7,99 +7,138 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include "../include/tsp.h"
-#include "../include/parser.h"
+#include "tsp.h"
+#include "parser.h"
 
 /**
- * @brief 
+ * @brief Manages the main menu for initializing instance parameters.
+ * 
+ * This function initializes various parameters of the instance structure 
+ * based on user inputs through menus.
  * 
  * @param inst A pointer to the instance structure to be initialized.
- * 
- * @return
+ * @return Returns 0 upon successful execution.
  */
 int manage_menu(instance *inst);
 
 /**
- * @brief 
+ * @brief Clears the console screen.
+ * 
+ * This function clears the console screen, providing a clean 
+ * display for output.
  */
 void clearScreen();
 
 /**
- * @brief 
+ * @brief Manages the file menu for selecting input options.
  * 
- * @param file_name
- * @param n
+ * This function presents a menu for selecting input options, allowing 
+ * the user to choose between providing a file path or generating a 
+ * random input file with a specified number of points.
  * 
- * @return
+ * @param file_name The name of the input file to be selected.
+ * @param n A pointer to an integer representing the number of points 
+ * for a generated input file.
+ * @return Returns 0 upon successful execution.
  */
 int file_menu(char *file_name, int *n);
 
 /**
- * @brief 
+ * @brief Manages the algorithm selection menu.
  * 
- * @param algorithm_name
+ * This function presents a menu for selecting the algorithm to be 
+ * applied to the file.
  * 
- * @return
+ * @param algorithm_name A pointer to a character array where the 
+ * selected algorithm name will be stored.
+ * @return Returns 0 upon successful execution.
  */
 int algorithm_menu(char *algorithm_name);
 
 /**
- * @brief 
+ * @brief Manages the optimization method selection menu.
  * 
- * @param opt_name
+ * This function presents a menu for selecting the optimizer 
+ * to be applied to the solution found by the algorithm.
  * 
- * @return
+ * @param opt_name A pointer to a character array where the 
+ * selected optimizer name will be stored.
+ * @return Returns 0 upon successful execution.
  */
 int optimization_menu(char *opt_name);
 
 /**
- * @brief 
+ * @brief Manages the options menu for configuring various parameters.
  * 
- * @param verbose
- * @param time_limit
- * @param random_seed
- * @param show_gnuplot
+ * This function presents a menu for configuring options such as verbosity level, time limit, 
+ * random seed, and whether to show with gnuplot.
  * 
- * @return
+ * @param verbose A pointer to an integer representing the verbosity level (0 to 100).
+ * @param time_limit A pointer to a double representing the time limit.
+ * @param random_seed A pointer to an integer representing the random seed.
+ * @param show_gnuplot A pointer to an integer indicating whether to show with gnuplot.
+ * @return Returns 0 upon successful execution.
  */
 int options_menu(int *verbose, double *time_limit, int *random_seed, int *show_gnuplot);
 
 /**
- * @brief 
+ * @brief Retrieves the width of the terminal window.
  * 
- * @return
+ * This function determines the width of the terminal window in characters.
+ * 
+ * @return Returns the width of the terminal window.
  */
 int getTerminalWidth();
 
 /**
- * @brief 
+ * @brief Prints the given text centered within the terminal window, 
+ * surrounded by the specified character.
  * 
- * @param text
- * @param c
+ * This function prints the provided text centered within the terminal window, 
+ * with the surrounding character repeated to fill the remaining space on 
+ * both sides of the text.
+ * 
+ * @param text The text to be printed.
+ * @param c The character used to surround the text.
  */
 void printCentered(const char *text, char c);
 
 /**
- * @brief 
+ * @brief Prints a horizontal line using the specified character 
+ * across the terminal window.
  * 
- * @param c
+ * This function prints a horizontal line across the terminal 
+ * window using the provided character.
+ * 
+ * @param c The character used to draw the horizontal line.
  */
 void printHorizontalLine(char c);
 
 /**
- * @brief 
+ * @brief Displays the welcome message for the TSP optimization program.
+ * 
+ * This function displays the welcome message for the TSP optimization 
+ * program, including authors' information, lecturer's name, and academic year.
  */
 void welcomeMessage();
 
 /**
- * @brief 
+ * @brief Displays the help menu for providing additional information
+ * based on the specified type.
  * 
- * @param type
+ * This function displays a help menu providing additional information 
+ * based on the specified type, which corresponds to different
+ * sections of the program.
+ * 
+ * @param type An integer representing the type of help menu to be displayed.
  */
 void showHelpMenu(int type);
 
 /**
- * @brief 
+ * @brief Displays a message indicating that the program has been closed.
+ * 
+ * This function clears the screen, displays a farewell message, 
+ * and exits the program.
  */
 void quitMessage();
 

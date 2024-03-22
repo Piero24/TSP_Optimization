@@ -3,6 +3,12 @@
 
 #include <stdbool.h>
 #include <string.h> 
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <time.h>
+
+#include "parser.h"
 
 typedef struct {
 	double x, y;
@@ -57,6 +63,15 @@ typedef struct {
 	char file_comment[50];
 
 } instance;
+
+/**
+ * @brief Generates a data file with node coordinates for 
+ * the specified instance and saves it to the given filename.
+ * 
+ * @param filename The name of the file to write the data to.
+ * @param inst A pointer to the instance structure containing node coordinates.
+ */
+void generateDataFile(const char* filename, instance* inst);
 
 /**
  * @brief Prints the solution to the standard output or generates a plot using Gnuplot, 

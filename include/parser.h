@@ -1,7 +1,10 @@
-#include <float.h>
+#ifndef PARSER_H
+#define PARSER_H
+
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <float.h>
 #include <time.h>
 #include <math.h>
 
@@ -103,3 +106,5 @@ int readInputParameters(instance* inst);
  * @return 0 on success, non-zero on failure.
  */
 int read_input(instance* inst);
+
+#endif /* PARSER_H */
