@@ -1,7 +1,9 @@
 #ifndef ALGOSELECTOR_H
 #define ALGOSELECTOR_H
+
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
 
 #include "Algorithm/NN.h"
 #include "Algorithm/optimizations.h"
@@ -13,10 +15,9 @@
  * the results to the standard output.
  * 
  * @param inst Pointer to the instance structure.
- * @param AlgorithmName The name of the algorithm to be used.
  * @return 0 if the algorithm runs successfully.
  */
-int apply_algorithm(instance* inst, char *AlgorithmName);
+int apply_algorithm(instance* inst);
 
 /**
  * @brief Selects and applies the appropriate algorithm based on the model type 
@@ -24,10 +25,9 @@ int apply_algorithm(instance* inst, char *AlgorithmName);
  * 
  * @param inst Pointer to the instance structure.
  * @param firstNode The starting node for the algorithm.
- * @param AlgorithmName The name of the algorithm to be used.
  * @return 0 if the algorithm runs successfully.
  */
-int algorithmSelector(instance* inst, char *AlgorithmName);
+int algorithmSelector(instance* inst);
 
 /**
  * @brief Substitute the path of the old best solution with the path of 
@@ -37,7 +37,8 @@ int algorithmSelector(instance* inst, char *AlgorithmName);
  * @param cost Cost of the best solution.
  * @param inst Pointer to the instance structure that contain the information
  * of the new best solution.
+ * @return 0 if the time limit isn't violated yet, 1 otherwise
  */
-void bestSolution(int* result, double cost, instance* inst);
+int bestSolution(int* result, double cost, instance* inst);
 
 #endif /* ALGOSELECTOR_H */

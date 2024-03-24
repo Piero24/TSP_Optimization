@@ -1,16 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <time.h>
 
 #include "../include/tsp.h"
+#include "../include/parser.h"
 
-/**
- * @brief Generates a data file with node coordinates for 
- * the specified instance and saves it to the given filename.
- * 
- * @param filename The name of the file to write the data to.
- * @param inst A pointer to the instance structure containing node coordinates.
- */
 void generateDataFile(const char* filename, instance* inst)
 {
     FILE* file = fopen("data.txt", "w");
@@ -33,36 +28,6 @@ void show_solution(instance* inst, bool useGnuplot)
 {    
     if(useGnuplot)
     {
-        /*
-        // Generate data file
-        const char* dataFilename = "data.txt";
-        generateDataFile(dataFilename, inst);
-
-        // Create Gnuplot script file
-        FILE* scriptFile = fopen("plot_script.plt", "w");
-        if (scriptFile == NULL) 
-        {
-            perror("Error opening script file");
-            exit(1);
-        }
-
-        // Write Gnuplot commands to script file
-        fprintf(scriptFile, "set title \"Solution\"\n");
-        fprintf(scriptFile, "set xlabel \"X Axis\"\n");
-        fprintf(scriptFile, "set ylabel \"Y Axis\"\n");
-        fprintf(scriptFile, "set grid\n");
-        fprintf(scriptFile, "plot 'data.txt' with linespoints title \"Nodes\"\n");
-
-        fclose(scriptFile);
-
-        // Execute Gnuplot script
-        //system("gnuplot plot_script.plt");
-        system("gnuplot --persist plot_script.plt 2> gnuplot_error.log");
-
-        // Optionally, remove generated files
-        //remove(dataFilename);
-        //remove("plot_script.plt");
-        */
         FILE *plot = popen("gnuplot --persist", "w");
         
         fprintf(plot, "set title \"Solution\"\n");
@@ -80,6 +45,7 @@ void show_solution(instance* inst, bool useGnuplot)
         fprintf(plot, "%f %f\n", inst->coord[inst->best_sol[0]].x, inst->coord[inst->best_sol[0]].y);
         
         pclose(plot);
+        
     } else 
     {
         for(int i=0; i<inst->nnodes; i++)
@@ -89,24 +55,43 @@ void show_solution(instance* inst, bool useGnuplot)
     }
 }
 
-void save_solution(instance* inst, const char* outputFileName)
+void save_solution(instance* inst)
 {    
+    char img_directory_name[50];
+    sprintf(img_directory_name, "Archive/Image/%s", inst->algorithm_name);
+
+    char svg_directory_name[50];
+    sprintf(svg_directory_name, "Archive/Svg/%s", inst->algorithm_name);
+
     // Create the "solution" directory
     #ifdef _WIN32
          _mkdir("Archive");
         _mkdir("Archive/Image");
+        _mkdir(img_directory_name);
         _mkdir("Archive/Svg");
+        _mkdir(svg_directory_name);
     #else
         mkdir("Archive", 0777);
         mkdir("Archive/Image", 0777);
+        mkdir(img_directory_name, 0777);
         mkdir("Archive/Svg", 0777);
+        mkdir(svg_directory_name, 0777);
     #endif
 
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+
+    char date_str[20];
+    strftime(date_str, sizeof(date_str), "%y-%m-%d", tm); // Format: YY-MM-DD
+    // strftime(date_str, sizeof(date_str), "%y-%m-%d_%H:%M", tm); // Format: YY-MM-DD HH:MM
+
+    char *file_name = getFileName(inst->input_file);
+
     // Modify the output file paths to include the "Archive/Image" and the "Archive/Svg" directories
-    char pngPath[100]; // Adjust the size as needed
-    char svgPath[100]; // Adjust the size as needed
-    sprintf(pngPath, "Archive/Image/%s.png", outputFileName);
-    sprintf(svgPath, "Archive/Svg/%s.svg", outputFileName);
+    char pngPath[100];
+    char svgPath[100];
+    sprintf(pngPath, "Archive/Image/%s/%s_%s.png", inst->algorithm_name, file_name, date_str);
+    sprintf(svgPath, "Archive/Svg/%s/%s_%s.svg", inst->algorithm_name, file_name, date_str);
 
     FILE *plotPNG = popen("gnuplot", "w");
     FILE *plotSVG = popen("gnuplot", "w");
@@ -156,4 +141,55 @@ void free_instance(instance* inst)
 
     free(inst->distances);
     free(inst->best_sol);
+}
+
+double randomDouble(double min, double max)
+{
+    return min + (rand() / (double)RAND_MAX) * (max - min);
+}
+
+char* fileGenerator(int n)
+{
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+
+    char date_str[20];
+    strftime(date_str, sizeof(date_str), "%Y-%m-%d", tm); // Format: YYYYMMDD
+
+    // Create the file name
+    char file_name[50];
+    snprintf(file_name, sizeof(file_name), "Resource/pr%d-%s.tsp", n, date_str);
+
+    // Open the file
+    FILE *fp = fopen(file_name, "w");
+    if (fp == NULL)
+    {
+        printf("Error opening file.\n");
+        return NULL;
+    }
+
+    char f_name[50];
+    snprintf(f_name, sizeof(f_name), "pr %d %s", n, date_str);
+
+    fprintf(fp, "NAME : %s\n", f_name);
+    fprintf(fp, "COMMENT : %d-city problem (Random Generated)\n", n);
+    fprintf(fp, "TYPE : TSP\n");
+    fprintf(fp, "DIMENSION : %d\n", n);
+    fprintf(fp, "EDGE_WEIGHT_TYPE : EUC_2D\n");
+    fprintf(fp, "NODE_COORD_SECTION\n");
+
+    for (int i = 1; i <= n; i++)
+    {
+        double x = randomDouble(0, 10000);
+        double y = randomDouble(0, 10000);
+        fprintf(fp, "%d %.4f %.4f\n", i, x, y);
+    }
+
+    fclose(fp);
+
+    // Dynamically allocate memory for the file name
+    char *dynamic_file_name = malloc(strlen(file_name) + 1);
+    strcpy(dynamic_file_name, file_name);
+
+    return dynamic_file_name;
 }

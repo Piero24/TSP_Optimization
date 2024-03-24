@@ -1,3 +1,6 @@
+#ifndef OPTIMIZATIONS_H
+#define OPTIMIZATIONS_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -6,6 +9,17 @@
 #include "NN.h"
 #include "../algoSelector.h"
 #include "../tsp.h"
+
+/**
+ * @brief Reverses the elements in a sub-array defined by the pointers from and to.
+ * 
+ * This function reverses the elements in the sub-array defined by the pointers from and to.
+ * It swaps the elements symmetrically from the outer ends towards the center.
+ * 
+ * @param from Pointer to the first element of the sub-array.
+ * @param to Pointer to the last element of the sub-array.
+ */
+void reverseSubvector(int* from, int* to);
 
 /**
  * @brief Optimizes a solution by removing intersections
@@ -36,6 +50,33 @@
 int twoOpt(instance* inst);
 
 /**
+ * @brief Checks if a given node exists in a list.
+ * 
+ * This function iterates through the elements of the list to determine if 
+ * the specified node exists in the list.
+ * 
+ * @param node Pointer to the node to be checked.
+ * @param list Pointer to the list of nodes.
+ * @param listLength Length of the list.
+ * @return Returns true if the node exists in the list, otherwise false.
+ */
+bool nodeInList(int* node, int* list, int listLength);
+
+/**
+ * @brief Copies the contents of one array to another.
+ * 
+ * This function copies the contents of the 'from' array to the 'to' array.
+ * Memory for the 'to' array is allocated dynamically, and the 
+ * caller is responsible for freeing it.
+ * 
+ * @param from Pointer to the source array.
+ * @param to Pointer to the destination array. This pointer will be updated to 
+ * point to the newly allocated array.
+ * @param length Number of elements to copy.
+ */
+void copyArray(int* from, int* to, int length);
+
+/**
  * @brief Optimizes a solution by searching in the neighborhood of solutions (in terms of
  *  different edges). Uses tabu search to overcome local minimums
  * 
@@ -46,3 +87,13 @@ int twoOpt(instance* inst);
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
 int tabuSearch(instance* inst);
+
+/**
+ * @brief 2opt moves with kicks when the best solution gets stuck in local minimum
+ * 
+ * @param inst Pointer to the instance structure.
+ * @return 0 if the algorithm runs successfully, 1 if an error occurs.
+ */
+int variableNeighborhoodSearch(instance* inst);
+
+#endif /* OPTIMIZATIONS_H */

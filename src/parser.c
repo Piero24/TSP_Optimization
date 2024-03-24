@@ -1,93 +1,320 @@
 #include "../include/parser.h"
 
-void print_error(const char *err);
-char *getFileName(const char *filePath);
-const char* getTimeLimitString(double timeLimit);
-
 int parse_args(int argc, char** argv, instance* inst)
 {
+	int n = 0;
+	int help = 0;
+
 	// default   
-	inst->model_type = 0;
-	inst->opt_type = 0;
+	strcpy(inst->algorithm_name, "NULL");
+    strcpy(inst->opt_name, "NULL");
+	inst->show_gnuplot = 0;
+
 	inst->old_benders = 0;
 	strcpy(inst->input_file, "NULL");
-	inst->randomseed = 93846529; 
+	inst->random_seed = 93846529; 
 	inst->num_threads = 0;
-	inst->timelimit = DBL_MAX; 	//CPX_INFBOUND
-	inst->cutoff = DBL_MAX; 	//CPX_INFBOUND
+	inst->time_limit = DBL_MAX; 	//! CPX_INFBOUND
+	inst->cutoff = DBL_MAX; 		//! CPX_INFBOUND
 	inst->integer_costs = 0;
 	inst->verbose = 0;
 
 	inst->available_memory = 12000;   	// available memory, in MB, for Cplex execution (e.g., 12000)
 	inst->max_nodes = -1; 				// max n. of branching nodes in the final run (-1 unlimited)        
 
-    int help = 0; if ( argc < 1 ) help = 1;	
+	int model_type = 0;
+	int opt_type = 0;
+
 	for ( int i = 1; i < argc; i++ ) 
 	{ 
-		if ( strcmp(argv[i],"-file") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 			// input file
-		if ( strcmp(argv[i],"-input") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 			// input file
-		if ( strcmp(argv[i],"-f") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 				// input file
+		if ( strcmp(argv[i],"-file") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 					// input file
+		if ( strcmp(argv[i],"-input") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 					// input file
+		if ( strcmp(argv[i],"-f") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 						// input file
 		
-        if ( strcmp(argv[i],"-time_limit") == 0 ) { inst->timelimit = atof(argv[++i]); continue; }		// total time limit
-		if ( strcmp(argv[i],"-tl") == 0 ) { inst->timelimit = atof(argv[++i]); continue; }		        // total time limit
+        if ( strcmp(argv[i],"-time_limit") == 0 ) { inst->time_limit = atof(argv[++i]); continue; }				// total time limit
+		if ( strcmp(argv[i],"-tl") == 0 ) { inst->time_limit = atof(argv[++i]); continue; }		        		// total time limit
+		if ( strcmp(argv[i],"-t") == 0 ) { inst->time_limit = atof(argv[++i]); continue; }		        		// total time limit
 
-        if ( strcmp(argv[i],"-model_type") == 0 ) { inst->model_type = atoi(argv[++i]); continue; } 	// model type
-		if ( strcmp(argv[i],"-model") == 0 ) { inst->model_type = atoi(argv[++i]); continue; } 			// model type
-		if ( strcmp(argv[i],"-alg") == 0 ) { inst->model_type = atoi(argv[++i]); continue; }			// model type
+        if ( strcmp(argv[i],"-model_type") == 0 ) { model_type = atoi(argv[++i]); continue; } 					// model type
+		if ( strcmp(argv[i],"-model") == 0 ) { model_type = atoi(argv[++i]); continue; } 						// model type
+		if ( strcmp(argv[i],"-alg") == 0 ) { model_type = atoi(argv[++i]); continue; }							// model type
 		
-		if ( strcmp(argv[i],"-opt") == 0 ) { inst->opt_type = atoi(argv[++i]); continue; }				// optimization type
-		if ( strcmp(argv[i],"-2opt") == 0 ) { inst->opt_type = atoi(argv[++i]); continue; }				// optimization type
-		if ( strcmp(argv[i],"-optimization") == 0 ) { inst->opt_type = atoi(argv[++i]); continue; }		// optimization type
+		if ( strcmp(argv[i],"-opt") == 0 ) { opt_type = atoi(argv[++i]); continue; }							// optimization type
+		if ( strcmp(argv[i],"-2opt") == 0 ) { opt_type = atoi(argv[++i]); continue; }							// optimization type
+		if ( strcmp(argv[i],"-optimization") == 0 ) { opt_type = atoi(argv[++i]); continue; }					// optimization type
 
-		if ( strcmp(argv[i],"-seed") == 0 ) { inst->randomseed += abs(atoi(argv[++i])); continue; } 	// random seed
+		if ( strcmp(argv[i],"-seed") == 0 ) { inst->random_seed += abs(atoi(argv[++i])); continue; } 			// random seed
+		if ( strcmp(argv[i],"-r") == 0 ) { inst->random_seed += abs(atoi(argv[++i])); continue; } 				// random seed
 
-		if ( strcmp(argv[i],"-verbose") == 0 ) { inst->verbose = abs(atoi(argv[++i])); continue; } 	// verbose
-		if ( strcmp(argv[i],"-v") == 0 ) { inst->verbose = abs(atoi(argv[++i])); continue; } 			// verbose
+		if ( strcmp(argv[i],"-verbose") == 0 ) { inst->verbose = abs(atoi(argv[++i])); continue; } 				// verbose
+		if ( strcmp(argv[i],"-v") == 0 ) { inst->verbose = abs(atoi(argv[++i])); continue; } 					// verbose
+		
+		if ( strcmp(argv[i],"-generate") == 0 ) { n = abs(atoi(argv[++i])); continue; } 						// generated file
+		if ( strcmp(argv[i],"-g") == 0 ) { n = abs(atoi(argv[++i])); continue; } 								// generated file
+		
+		
+		if ( strcmp(argv[i],"-show") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 			// generated file
+		if ( strcmp(argv[i],"-plot") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 			// generated file
+		if ( strcmp(argv[i],"-gnuplot") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 		// generated file
+		if ( strcmp(argv[i],"-s") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 				// generated file
 
-		// if ( strcmp(argv[i],"-old_benders") == 0 ) { inst->old_benders = atoi(argv[++i]); continue; } 	// old benders
-		// if ( strcmp(argv[i],"-threads") == 0 ) { inst->num_threads = atoi(argv[++i]); continue; } 		// n. threads
-		// if ( strcmp(argv[i],"-memory") == 0 ) { inst->available_memory = atoi(argv[++i]); continue; }	// available memory (in MB)
-		// if ( strcmp(argv[i],"-node_file") == 0 ) { strcpy(inst->node_file,argv[++i]); continue; }		// cplex's node file
-		// if ( strcmp(argv[i],"-max_nodes") == 0 ) { inst->max_nodes = atoi(argv[++i]); continue; } 		// max n. of nodes
-		// if ( strcmp(argv[i],"-cutoff") == 0 ) { inst->cutoff = atof(argv[++i]); continue; }				// master cutoff
-		// if ( strcmp(argv[i],"-int") == 0 ) { inst->integer_costs = 1; continue; } 						// inteher costs
-		// if ( strcmp(argv[i],"-help") == 0 ) { help = 1; continue; } 										// help
-		// if ( strcmp(argv[i],"--help") == 0 ) { help = 1; continue; } 									// help
-		help = 1;
-    }      
+		// if ( strcmp(argv[i],"-old_benders") == 0 ) { inst->old_benders = atoi(argv[++i]); continue; } 		// old benders
+		// if ( strcmp(argv[i],"-threads") == 0 ) { inst->num_threads = atoi(argv[++i]); continue; } 			// n. threads
+		// if ( strcmp(argv[i],"-memory") == 0 ) { inst->available_memory = atoi(argv[++i]); continue; }		// available memory (in MB)
+		// if ( strcmp(argv[i],"-node_file") == 0 ) { strcpy(inst->node_file,argv[++i]); continue; }			// cplex's node file
+		// if ( strcmp(argv[i],"-max_nodes") == 0 ) { inst->max_nodes = atoi(argv[++i]); continue; } 			// max n. of nodes
+		// if ( strcmp(argv[i],"-cutoff") == 0 ) { inst->cutoff = atof(argv[++i]); continue; }					// master cutoff
+		// if ( strcmp(argv[i],"-int") == 0 ) { inst->integer_costs = 1; continue; } 							// inteher costs
+		
+		if ( strcmp(argv[i],"-help") == 0 ) { help = 1; continue; } 											// help
+		if ( strcmp(argv[i],"--help") == 0 ) { help = 1; continue; }  											// help
+		if ( strcmp(argv[i],"-h") == 0 ) { help = 1; continue; } 												// help
+    }  
 
-	if ( help || (inst->verbose >= 10) )		// print current parameters
+	if (help)
 	{
-		printf("\n\n\n\n");
-		printf("------------------------------ Selected Parameters (Course: Operation Research 2, A.Y. 2023/2024) ------------------------------\n");
-		
-		char *fileName = getFileName(inst->input_file);
-    	printf("- File Name:   %s\n", fileName);
-		// printf("-file %s\n", inst->input_file); 
+		showHelpMenu(5);
+	}
 
-		const char* timeLimitString = getTimeLimitString(inst->timelimit);
-		printf("- Time Limit:  %s\n", timeLimitString);
-		//printf("- time_limit %lf\n", inst->timelimit); 
+	intToModelName(inst, model_type);
+	intToOptName(inst, opt_type);
 
-		printf("- Model Type:  %d\n", inst->model_type); 
-		printf("- Optimization Method:  %d\n", inst->model_type); 
+	parameterPrint(inst);
 
+	srand(inst->random_seed);
 
-		printf("- Seed:        %d\n", inst->randomseed);
-		// printf("-old_benders %d\n", inst->old_benders);  
-		// printf("-threads %d\n", inst->num_threads);  
-		// printf("-max_nodes %d\n", inst->max_nodes); 
-		// printf("-memory %d\n", inst->available_memory); 
-		// printf("-int %d\n", inst->integer_costs); 
-		// printf("-node_file %s\n", inst->node_file);
-		// printf("-cutoff %lf\n", inst->cutoff); 
-		// printf("\nenter -help or --help for help\n");
-		printf("--------------------------------------------------------------------------------------------------------------------------------\n\n");
-	}        
-	
-	if ( help ) exit(1);
+	if (n > 0) 
+	{
+		char* name = fileGenerator(n);
+		strcpy(inst->input_file, name);
+		free(name);
+	}
 
     return 0;
+}
+
+void parameterPrint(instance* inst)
+{
+	readInputParameters(inst);
+
+	clearScreen();
+	welcomeMessage();
+	printf("\n");
+
+	char info[] = "      SELECTED PARAMETERS      ";
+    printCentered(info, ' ');
+	printf("\n");
+
+	char info_2[] = "*******************************";
+	printCentered(info_2, ' ');
+	printf("\n");
+
+	char *file_name = getFileName(inst->input_file);
+	printf("- File Name:              %s\n", file_name);
+	printf("- File Comment:           %s\n", inst->file_comment);
+	printf("- Total N° of nodes:      %d\n\n", inst->nnodes);
+
+	printf("- Algorithm Name:         %s\n", inst->algorithm_name);
+	printf("- Optimization Name:      %s\n\n", inst->opt_name);
+	
+	const char* time_limit_string = getTimeLimitString(inst->time_limit);
+	printf("- Time Limit:             %s\n", time_limit_string);
+
+	// printf("-old_benders %d\n", inst->old_benders);  
+	// printf("-threads %d\n", inst->num_threads);  
+	// printf("-max_nodes %d\n", inst->max_nodes); 
+	// printf("-memory %d\n", inst->available_memory); 
+	// printf("-int %d\n", inst->integer_costs); 
+	// printf("-node_file %s\n", inst->node_file);
+	// printf("-cutoff %lf\n", inst->cutoff); 
+	// printf("\nenter -help or --help for help\n");
+
+	printf("- Seed:                   %d\n\n", inst->random_seed);
+
+	printf("- Verbose:                %d\n", inst->verbose);
+	printf("- Show Real Time Plot:    %d\n", inst->show_gnuplot);
+
+	printf("\n");
+	printHorizontalLine('*');
+}
+
+int intToModelName(instance* inst, int type)
+{
+	switch (type)
+	{
+		case 0:
+			strcpy(inst->algorithm_name, "Random");
+			break;
+
+		case 1:
+			strcpy(inst->algorithm_name, "Nearest Neighbor");
+			break;
+
+		case 2:
+			strcpy(inst->algorithm_name, "Algo 3");
+			break;
+
+		default:
+			strcpy(inst->algorithm_name, "Undefined");
+			break;
+	}
+	return 0;
+}
+
+int intToOptName(instance* inst, int type)
+{
+	switch (type)
+	{
+		case 1:
+			strcpy(inst->opt_name, "2-Opt");
+			break;
+
+		case 2:
+			strcpy(inst->opt_name, "Tabu Search");
+			break;
+
+		case 3:
+			strcpy(inst->opt_name, "Variable Neighborhood Search");
+			break;
+
+		default:
+			strcpy(inst->opt_name, "None");
+			break;
+	}
+	return 0;
+}
+
+void print_error(const char *err)
+{
+    printf("\n\n ERROR: %s \n\n", err);
+    fflush(NULL);
+    exit(1);
+}
+
+char *getFileName(const char *filePath)
+{
+    const char *fileName = strrchr(filePath, '/');
+    if (fileName != NULL)
+	{
+        fileName++;
+	} else 
+	{
+        fileName = filePath;
+    }
+
+    // Check if the file name ends with ".tsp"
+    const char *extension = ".tsp";
+    size_t lenFileName = strlen(fileName);
+    size_t lenExtension = strlen(extension);
+
+    if (lenFileName > lenExtension && strcmp(fileName + lenFileName - lenExtension, extension) == 0)
+	{
+        lenFileName -= lenExtension;
+        while (lenFileName > 0 && fileName[lenFileName - 1] == '.')
+		{
+            lenFileName--;
+        }
+    }
+
+    char *result = malloc(lenFileName + 1);
+    if (result == NULL)
+	{
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    strncpy(result, fileName, lenFileName);
+    result[lenFileName] = '\0';
+    return result;
+}
+
+const char* getTimeLimitString(double time_limit) {
+
+    if (time_limit == DBL_MAX ) //! || timeLimit == CPX_INFBOUND) 
+	{
+        return "Inf";
+
+    } else
+	{
+        static char buffer[100];
+        snprintf(buffer, sizeof(buffer), "%lf", time_limit);
+        return buffer;
+    }
+}
+
+int readInputParameters(instance* inst)
+{
+	FILE *fin = fopen(inst->input_file, "r");
+	if ( fin == NULL ) 
+		print_error(" input file not found!");
+	
+	inst->nnodes = -1;
+	strcpy(inst->file_comment, "NULL");
+	char line[180];
+	char *par_name; 
+	char *token1;
+
+	int active_section = 0; // =1 NODE_COORD_SECTION, =2 DEMAND_SECTION, =3 DEPOT_SECTION 
+	
+	int do_print = ( inst->verbose >= 100 );
+
+	while ( fgets(line, sizeof(line), fin) != NULL )
+	{
+		if ( strlen(line) <= 1 ) continue; // skip empty lines
+	    par_name = strtok(line, " :");
+
+		if ( strncmp(par_name, "NAME", 4) == 0 ) 
+		{
+			active_section = 0;
+			continue;
+		}
+
+		if ( strncmp(par_name, "COMMENT", 7) == 0 ) 
+		{
+			active_section = 0;   
+			token1 = strtok(NULL, "");  
+			if ( inst->verbose >= 10 ) 
+			{
+				char* trimmed_comment = token1;
+
+				// Check if the first two characters are ": "
+				if (strncmp(trimmed_comment, ": ", 2) == 0) {
+					trimmed_comment += 2; // Move the pointer forward by two characters
+				}
+
+				// Remove the trailing '\n' if present
+				size_t len = strlen(trimmed_comment);
+				if (len > 0 && trimmed_comment[len - 1] == '\n') {
+					trimmed_comment[len - 1] = '\0'; // Replace '\n' with '\0'
+				}
+
+				strcpy(inst->file_comment, trimmed_comment);
+			}
+			continue;
+		}
+
+		if ( strncmp(par_name, "DIMENSION", 9) == 0 ) 
+		{
+			if ( inst->nnodes >= 0 ) print_error(" repeated DIMENSION section in input file");
+			token1 = strtok(NULL, " :");
+			inst->nnodes = atoi(token1);
+			if ( do_print ) printf(" ... nnodes %d\n", inst->nnodes); 
+			//inst->demand = (double *) calloc(inst->nnodes, sizeof(double));
+			inst->coord = (point *) calloc(inst->nnodes, sizeof(point));
+
+			inst->distances = (double **)malloc(inst->nnodes * sizeof(double *));
+			for (int i = 0; i < inst->nnodes; i++)
+				inst->distances[i] = (double *)malloc(inst->nnodes * sizeof(double));
+				
+			inst->best_sol = (int *) calloc(inst->nnodes, sizeof(int));
+
+			active_section = 0;  
+			continue;
+		}
+	}
+
+	fclose(fin); 
+	return 0;
 }
 
 int read_input(instance* inst)
@@ -127,7 +354,7 @@ int read_input(instance* inst)
 		{
 			active_section = 0;   
 			token1 = strtok(NULL, "");  
-			if ( inst->verbose >= 10 ) printf(" ... solving instance %s with model %d\n\n", token1, inst->model_type);
+			//if ( inst->verbose >= 10 ) printf(" ... solving instance %s with model %s\n\n", token1, inst->algorithm_name);
 			continue;
 		}   
 		
@@ -264,48 +491,4 @@ int read_input(instance* inst)
 
 	fclose(fin); 
     return 0;
-}
-
-/**
- * @brief Prints an error message to the standard output and exits the program.
- * 
- * @param err The error message to be printed.
- */
-void print_error(const char *err)
-{
-    printf("\n\n ERROR: %s \n\n", err);
-    fflush(NULL);
-    exit(1);
-}
-
-char *getFileName(const char *filePath) {
-    const char *fileName = strrchr(filePath, '/');
-
-    if (fileName != NULL) {
-        fileName++;
-    } else {
-        fileName = filePath;
-    }
-
-    char *result = strdup(fileName);
-    if (result == NULL) {
-        // Error handling: Memory allocation failed
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(EXIT_FAILURE);
-    }
-    return result;
-}
-
-const char* getTimeLimitString(double timeLimit) {
-
-    if (timeLimit == DBL_MAX ) //|| timeLimit == CPX_INFBOUND) 
-	{
-        return "Inf";
-
-    } else
-	{
-        static char buffer[100];
-        snprintf(buffer, sizeof(buffer), "%lf", timeLimit);
-        return buffer;
-    }
 }

@@ -2,6 +2,7 @@
 #define TSP_H
 
 #include <stdbool.h>
+#include <string.h> 
 
 typedef struct {
 	double x, y;
@@ -19,12 +20,10 @@ typedef struct {
 	int nveh;
 
 	// parameters 
-	int model_type; 
-	int opt_type;
 	int old_benders;
-	int randomseed;
+	int random_seed;
 	int num_threads;
-	double timelimit;						// overall time limit, in sec.s
+	double time_limit;						// overall time limit, in sec.s
 	char input_file[1000];		  			// input file
 	char node_file[1000];		  			// cplex node file
 	int available_memory;
@@ -50,7 +49,23 @@ typedef struct {
 	// int bigsstart;
 	// int fstart;
 	// int zstart;
+
+	char algorithm_name[50];
+    char opt_name[50];
+    int show_gnuplot;
+	char file_name[50];
+	char file_comment[50];
+
 } instance;
+
+/**
+ * @brief Generates a data file with node coordinates for 
+ * the specified instance and saves it to the given filename.
+ * 
+ * @param filename The name of the file to write the data to.
+ * @param inst A pointer to the instance structure containing node coordinates.
+ */
+void generateDataFile(const char* filename, instance* inst);
 
 /**
  * @brief Prints the solution to the standard output or generates a plot using Gnuplot, 
@@ -68,7 +83,7 @@ void show_solution(instance* inst, bool useGnuplot);
  * @param inst A pointer to the instance structure containing the solution data.
  * @param outputFileName The name of the file to write the solution to.
  */
-void save_solution(instance* inst, const char* outputFileName);
+void save_solution(instance* inst);
 
 /**
  * @brief Frees the memory allocated for the instance structure.
@@ -76,5 +91,25 @@ void save_solution(instance* inst, const char* outputFileName);
  * @param inst A pointer to the instance structure to be freed.
  */
 void free_instance(instance* inst);
+
+/**
+ * @brief Generate a random double between min and max
+ * 
+ * @param min The minimum value of the random number.
+ * @param max The maximum value of the random number.
+ * 
+ * @return A random double between min and max.
+ */
+double randomDouble(double min, double max);
+
+/**
+ * @brief Generate a .tsp file with n random nodes.
+ * The file it will be saved in the Resource folder.
+ * 
+ * @param n The number of nodes to generate.
+ * 
+ * @return The name of the file generated.
+ */
+char* fileGenerator(int n);
 
 #endif /* TSP_H */
