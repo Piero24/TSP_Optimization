@@ -88,4 +88,12 @@ void copyArray(int* from, int* to, int length);
  */
 int tabuSearch(instance* inst);
 
+/**
+ * @brief 2opt moves with kicks when the best solution gets stuck in local minimum
+ * 
+ * @param inst Pointer to the instance structure.
+ * @return 0 if the algorithm runs successfully, 1 if an error occurs.
+ */
+int variableNeighborhoodSearch(instance* inst);
+
 #endif /* OPTIMIZATIONS_H */

@@ -12,13 +12,19 @@ int NNFromEachNode(instance* inst)
         nearestNeighbor(inst, firstNode, result, &cost);
 
         if(bestCost == -1 || bestCost > cost){
-            if(inst->verbose >= 60) 
+            if(inst->verbose >= 80) 
                 printf("[NNFromEachNode] New best solution founded starting from %d with cost %f\n", firstNode, cost);
 
             bestCost = cost;
             bestFirst = firstNode;
-            bestSolution(result, cost, inst);
+
             inst->start = firstNode;
+
+            if(!bestSolution(result, cost, inst)){
+                if (inst->verbose >= 60) printf("[NNFromEachNode] Algorithm NOT completed, time limit reached.\n\n");
+                free(result);
+                return 1;
+            }
         }
     }
 

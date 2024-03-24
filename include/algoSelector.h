@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
 
 #include "Algorithm/NN.h"
 #include "Algorithm/optimizations.h"
@@ -36,7 +37,8 @@ int algorithmSelector(instance* inst);
  * @param cost Cost of the best solution.
  * @param inst Pointer to the instance structure that contain the information
  * of the new best solution.
+ * @return 0 if the time limit isn't violated yet, 1 otherwise
  */
-void bestSolution(int* result, double cost, instance* inst);
+int bestSolution(int* result, double cost, instance* inst);
 
 #endif /* ALGOSELECTOR_H */

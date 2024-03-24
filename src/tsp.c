@@ -180,8 +180,8 @@ char* fileGenerator(int n)
 
     for (int i = 1; i <= n; i++)
     {
-        double x = randomDouble(1.0, 9.999999);
-        double y = randomDouble(1.0, 9.999999);
+        double x = randomDouble(0, 10000);
+        double y = randomDouble(0, 10000);
         fprintf(fp, "%d %.4f %.4f\n", i, x, y);
     }
 

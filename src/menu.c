@@ -30,6 +30,7 @@ int manage_menu(instance *inst)
     clearScreen();
 
     options_menu(&inst->verbose, &inst->time_limit, &inst->random_seed, &inst->show_gnuplot);
+    srand(inst->random_seed);
     clearScreen();
 
     if (n > 0) 
@@ -138,7 +139,6 @@ int algorithm_menu(char *algorithm_name)
         
         printf("1 - Random\n");
         printf("2 - Nearest Neighbor\n");
-        printf("3 - Variable Neighborhood Search\n");
         printf("\n9 - Show help menu\n");
         printf("0 - Exit\n");
         
@@ -170,10 +170,6 @@ int algorithm_menu(char *algorithm_name)
                 strcpy(algorithm_name, "Nearest Neighbor");
                 return 0;
 
-            case 3:
-                strcpy(algorithm_name, "Variable Neighborhood Search");
-                return 0;
-
             case 9:
                 while (getchar() != '\n'); 
                 showHelpMenu(2);
@@ -203,6 +199,7 @@ int optimization_menu(char *opt_name)
         printf("1 - None\n");
         printf("2 - 2-Opt\n");
         printf("3 - Tabu Search (+ 2opt)\n");
+        printf("4 - VNS\n");
         printf("\n9 - Show help menu\n");
         printf("0 - Exit\n");
 
@@ -236,6 +233,10 @@ int optimization_menu(char *opt_name)
 
             case 3:
                 strcpy(opt_name, "Tabu Search");
+                return 0;
+            
+            case 4:
+                strcpy(opt_name, "Variable Neighborhood Search");
                 return 0;
 
             case 9:
@@ -343,9 +344,11 @@ int options_menu(int *verbose, double *timeLimit, int *randomSeed, int *showGnup
 int getTerminalWidth()
 {
     #ifdef _WIN32
+        /*
         CONSOLE_SCREEN_BUFFER_INFO csbi;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
         return csbi.dwSize.X;
+        //*/ return 100;
     #else
         struct winsize w;
         ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);

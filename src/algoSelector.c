@@ -1,5 +1,30 @@
 #include "../include/algoSelector.h"
 
+void Random(instance* inst)
+{
+    for (int i = 0; i < inst->nnodes; i++)
+    {
+        inst->best_sol[i] = i;
+    }
+
+    for (int i = 0; i < inst->nnodes/4; i++)
+    {
+        int a = rand() % (inst->nnodes + 1);
+        int b = rand() % (inst->nnodes + 1);
+
+        int temp = inst->best_sol[a];
+        inst->best_sol[a] = inst->best_sol[b];
+        inst->best_sol[b] = temp;
+    }
+
+    inst->zbest = 0;
+    for (int i = 1; i < inst->nnodes; i++)
+    {
+        inst->zbest += inst->distances[inst->best_sol[i]][inst->best_sol[i-1]];
+    }
+    inst->zbest += inst->distances[inst->best_sol[0]][inst->best_sol[inst->nnodes-1]];
+}
+
 int apply_algorithm(instance* inst)
 {
     algorithmSelector(inst);
@@ -25,14 +50,13 @@ int apply_algorithm(instance* inst)
 int algorithmSelector(instance* inst)
 {
     // If statement for selecting the algorithm 
-    if (strcmp(inst->algorithm_name, "Nearest Neighbor") == 0)
+    if (strcmp(inst->algorithm_name, "Random") == 0)
+    {
+        Random(inst);
+
+    } else if (strcmp(inst->algorithm_name, "Nearest Neighbor") == 0)
     {
         NNFromEachNode(inst);
-
-    } else if (strcmp(inst->algorithm_name, "Variable Neighborhood Search") == 0)
-    {
-        printf("Model type not implemented\n");
-        exit(0);
 
     } else if (strcmp(inst->algorithm_name, "Algo 3") == 0)
     {
@@ -45,29 +69,34 @@ int algorithmSelector(instance* inst)
         exit(0);
     } 
 
-    // show_solution(inst, true);
+    show_solution(inst, true);
 
-    if (strcmp(inst->opt_name, "None") != 0) {
-        
+    // If statement for selecting the optimization method
+    if (strcmp(inst->opt_name, "2-Opt") == 0){
         twoOpt(inst);
+        show_solution(inst, true);
+    
+    }else if (strcmp(inst->opt_name, "Tabu Search") == 0)
+    {
+        twoOpt(inst);
+        tabuSearch(inst);
+        show_solution(inst, true);
         
-        // If statement for selecting the optimization method
-        if (strcmp(inst->opt_name, "Tabu Search") == 0)
-        {
-            tabuSearch(inst);
-            
-        } else if (strcmp(inst->opt_name, "Opt 3") == 0)
-        {
-            printf("Optimization method not implemented\n");
-            exit(0);
+    }else if (strcmp(inst->opt_name, "Variable Neighborhood Search") == 0)
+    {
+        variableNeighborhoodSearch(inst);
+        show_solution(inst, true);
 
-        }
+    }else if (strcmp(inst->opt_name, "Opt 3") == 0)
+    {
+        printf("Optimization method not implemented\n");
+        exit(0);
+
     }
-
     return 0;
 }
 
-void bestSolution(int* result, double cost, instance* inst)
+int bestSolution(int* result, double cost, instance* inst)
 {
     for (int i = 0; i < inst->nnodes; i++)
     {
@@ -76,9 +105,12 @@ void bestSolution(int* result, double cost, instance* inst)
     inst->zbest = cost;
     inst->tbest = clock();
 
+    int time = (int)(((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC);
+    
     if(inst->verbose >= 50)
-    {
-        int time = (int)(((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC);
         printf("Best solution updated. Its cost is %f, it was founded after %d seconds\n", cost, time);
-    }
+    
+    if (time >= inst->time_limit)
+        return 1;
+    return 0;
 }

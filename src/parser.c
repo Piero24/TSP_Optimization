@@ -51,7 +51,7 @@ int parse_args(int argc, char** argv, instance* inst)
 		
 		if ( strcmp(argv[i],"-generate") == 0 ) { n = abs(atoi(argv[++i])); continue; } 						// generated file
 		if ( strcmp(argv[i],"-g") == 0 ) { n = abs(atoi(argv[++i])); continue; } 								// generated file
-		if (n > 0) {char* name = fileGenerator(n); strcpy(inst->input_file, name); free(name); continue;}
+		
 		
 		if ( strcmp(argv[i],"-show") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 			// generated file
 		if ( strcmp(argv[i],"-plot") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 			// generated file
@@ -80,6 +80,16 @@ int parse_args(int argc, char** argv, instance* inst)
 	intToOptName(inst, opt_type);
 
 	parameterPrint(inst);
+
+	srand(inst->random_seed);
+
+	if (n > 0) 
+	{
+		char* name = fileGenerator(n);
+		strcpy(inst->input_file, name);
+		free(name);
+	}
+
     return 0;
 }
 
@@ -132,24 +142,20 @@ int intToModelName(instance* inst, int type)
 {
 	switch (type)
 	{
+		case 0:
+			strcpy(inst->algorithm_name, "Random");
+			break;
+
 		case 1:
 			strcpy(inst->algorithm_name, "Nearest Neighbor");
 			break;
 
 		case 2:
-			strcpy(inst->algorithm_name, "Variable Neighborhood Search");
-			break;
-
-		case 3:
 			strcpy(inst->algorithm_name, "Algo 3");
 			break;
 
 		default:
-			// Seed the random number generator
-			srand(time(NULL));
-			// Generate a random number between 1 and 3
-			type = rand() % 3 + 1;
-			intToModelName(inst, type);
+			strcpy(inst->algorithm_name, "Undefined");
 			break;
 	}
 	return 0;
@@ -168,7 +174,7 @@ int intToOptName(instance* inst, int type)
 			break;
 
 		case 3:
-			strcpy(inst->opt_name, "Opt 3");
+			strcpy(inst->opt_name, "Variable Neighborhood Search");
 			break;
 
 		default:
@@ -235,30 +241,6 @@ const char* getTimeLimitString(double time_limit) {
         return buffer;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 int readInputParameters(instance* inst)
 {
