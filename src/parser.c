@@ -53,7 +53,6 @@ int parse_args(int argc, char** argv, instance* inst)
 		else if ( strcmp(argv[i],"-generate") == 0 ) n = abs(atoi(argv[++i]));							// generated file
 		else if ( strcmp(argv[i],"-g") == 0 ) n = abs(atoi(argv[++i]));									// generated file
 		
-		
 		else if ( strcmp(argv[i],"-show") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// generated file
 		else if ( strcmp(argv[i],"-plot") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// generated file
 		else if ( strcmp(argv[i],"-gnuplot") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));			// generated file
@@ -72,6 +71,15 @@ int parse_args(int argc, char** argv, instance* inst)
 		else if ( strcmp(argv[i],"-h") == 0 ) help = 1; 												// help
     }  
 
+	srand(inst->random_seed);
+
+	if (n > 0) 
+	{
+		char* name = fileGenerator(n);
+		strcpy(inst->input_file, name);
+		free(name);
+	}
+
 	if (help)
 	{
 		showHelpMenu(5);
@@ -81,15 +89,6 @@ int parse_args(int argc, char** argv, instance* inst)
 	intToOptName(inst, opt_type);
 
 	parameterPrint(inst);
-
-	srand(inst->random_seed);
-
-	if (n > 0) 
-	{
-		char* name = fileGenerator(n);
-		strcpy(inst->input_file, name);
-		free(name);
-	}
 
     return 0;
 }

@@ -25,41 +25,32 @@ void generateDataFile(const char* filename, instance* inst)
 }
 
 void show_solution(instance* inst, bool useGnuplot)
-{
+{    
     if(useGnuplot)
     {
-        FILE *data_file = fopen("plot_data.dat", "w");
-        
-        for(int i=0; i<inst->nnodes; i++)
-        {
-            fprintf(data_file, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
-        }
-        fprintf(data_file, "%f %f\n", inst->coord[inst->best_sol[0]].x, inst->coord[inst->best_sol[0]].y);
-
-        fclose(data_file);
-        
         if(inst->plot == NULL){
-            //printf("ok\n");
-            //fflush(stdin);
-            
-            inst->plot = popen("gnuplot --persist", "w");
-
+            inst->plot = _popen("gnuplot --persist", "w");
+        
             fprintf(inst->plot, "set title \"Solution\"\n");
             fprintf(inst->plot, "set xlabel \"X Axis\"\n");
             fprintf(inst->plot, "set ylabel \"Y Axis\"\n");
             fprintf(inst->plot, "set grid\n");
-            fprintf(inst->plot, "set term qt font \"Arial\"\n"); // Set font to Arial
+            fprintf(inst->plot, "set term qt persist font \"Arial\"\n"); // Set font to Arial
             fprintf(inst->plot, "set pointsize 0.1\n"); // Set font to Arial
-            fprintf(inst->plot, "plot 'plot_data.dat' with linespoints pointtype 7\n");
-            fprintf(inst->plot, "pause 1\n");
-            fprintf(inst->plot, "reread\n");
-
             fflush(inst->plot);
-            pclose(inst->plot);
-            
-            printf("ok\n");
-            fflush(stdin);
         }
+
+        fprintf(inst->plot, "plot '-' with linespoints pointtype 7\n");
+
+        for(int i=0; i<inst->nnodes; i++)
+        {
+            fprintf(inst->plot, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
+        }
+        fprintf(inst->plot, "%f %f\n", inst->coord[inst->best_sol[0]].x, inst->coord[inst->best_sol[0]].y);
+
+        fprintf(inst->plot, "e\n");
+
+        fflush(inst->plot);
 
     } else 
     {
@@ -174,7 +165,7 @@ char* fileGenerator(int n)
 
     // Create the file name
     char file_name[50];
-    snprintf(file_name, sizeof(file_name), "Resource/pr%d-%s.tsp", n, date_str);
+    snprintf(file_name, sizeof(file_name), "Resource\pr%d-%s.tsp", n, date_str);
 
     // Open the file
     FILE *fp = fopen(file_name, "w");
