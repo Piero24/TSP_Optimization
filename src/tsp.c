@@ -25,26 +25,42 @@ void generateDataFile(const char* filename, instance* inst)
 }
 
 void show_solution(instance* inst, bool useGnuplot)
-{    
+{
     if(useGnuplot)
     {
-        if(inst->plot == NULL)
-            inst->plot = popen("gnuplot --persist", "w");
+        FILE *data_file = fopen("plot_data.dat", "w");
         
-        fprintf(inst->plot, "set title \"Solution\"\n");
-        fprintf(inst->plot, "set xlabel \"X Axis\"\n");
-        fprintf(inst->plot, "set ylabel \"Y Axis\"\n");
-        fprintf(plot, "set grid\n");
-        fprintf(plot, "set term qt font \"Arial\"\n"); // Set font to Arial
-        fprintf(plot, "set pointsize 0.1\n"); // Set font to Arial
-        fprintf(plot, "plot '-' with linespoints pointtype 7\n");
-
         for(int i=0; i<inst->nnodes; i++)
         {
-            fprintf(plot, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
+            fprintf(data_file, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
         }
-        fprintf(plot, "%f %f\n", inst->coord[inst->best_sol[0]].x, inst->coord[inst->best_sol[0]].y);
+        fprintf(data_file, "%f %f\n", inst->coord[inst->best_sol[0]].x, inst->coord[inst->best_sol[0]].y);
+
+        fclose(data_file);
         
+        if(inst->plot == NULL){
+            //printf("ok\n");
+            //fflush(stdin);
+            
+            inst->plot = popen("gnuplot --persist", "w");
+
+            fprintf(inst->plot, "set title \"Solution\"\n");
+            fprintf(inst->plot, "set xlabel \"X Axis\"\n");
+            fprintf(inst->plot, "set ylabel \"Y Axis\"\n");
+            fprintf(inst->plot, "set grid\n");
+            fprintf(inst->plot, "set term qt font \"Arial\"\n"); // Set font to Arial
+            fprintf(inst->plot, "set pointsize 0.1\n"); // Set font to Arial
+            fprintf(inst->plot, "plot 'plot_data.dat' with linespoints pointtype 7\n");
+            fprintf(inst->plot, "pause 1\n");
+            fprintf(inst->plot, "reread\n");
+
+            fflush(inst->plot);
+            pclose(inst->plot);
+            
+            printf("ok\n");
+            fflush(stdin);
+        }
+
     } else 
     {
         for(int i=0; i<inst->nnodes; i++)
@@ -53,6 +69,7 @@ void show_solution(instance* inst, bool useGnuplot)
         }
     }
 }
+
 
 void save_solution(instance* inst)
 {    

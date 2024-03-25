@@ -9,6 +9,7 @@ int parse_args(int argc, char** argv, instance* inst)
 	strcpy(inst->algorithm_name, "NULL");
     strcpy(inst->opt_name, "NULL");
 	inst->show_gnuplot = -1;
+	inst->plot = NULL;
 
 	inst->old_benders = 0;
 	strcpy(inst->input_file, "NULL");

@@ -52,7 +52,7 @@ typedef struct {
 
 	char algorithm_name[50];
     char opt_name[50];
-    double show_gnuplot;
+    int show_gnuplot;
 	FILE *plot;
 	char file_name[50];
 	char file_comment[50];
