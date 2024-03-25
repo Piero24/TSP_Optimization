@@ -73,7 +73,7 @@ int twoOpt(instance* inst)
                 counter = 0;
 
                 // update official solution
-                if(!bestSolution(result, cost, inst)){
+                if(bestSolution(result, cost, inst) != 0){
                     if (inst->verbose >= 60) printf("[2opt] Optimization NOT completed, time limit reached.\n\n");
                     free(result);
                     return 1;

@@ -119,10 +119,10 @@ int bestSolution(int* result, double cost, instance* inst)
     if(inst->verbose >= 50)
         printf("Best solution updated. Its cost is %f, it was founded after %d seconds\n", cost, time);
     
-    if(inst->show_gnuplot != -1){
+    if(inst->show_gnuplot > -1){
         if(inst->show_gnuplot > 0)
             sleep_ms(inst->show_gnuplot*1000);
-        show_solution();
+        show_solution(inst, true);
     }
 
     if (time >= inst->time_limit)
