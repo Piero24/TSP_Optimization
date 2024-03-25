@@ -186,7 +186,11 @@ char* fileGenerator(int n)
 
     // Create the file name
     char file_name[50];
-    snprintf(file_name, sizeof(file_name), "Resource\pr%d-%s.tsp", n, date_str);
+    #ifdef _WIN32
+        snprintf(file_name, sizeof(file_name), "Resource\pr%d-%s.tsp", n, date_str);
+    #else
+        snprintf(file_name, sizeof(file_name), "Resource/pr%d-%s.tsp", n, date_str);
+    #endif
 
     // Open the file
     FILE *fp = fopen(file_name, "w");

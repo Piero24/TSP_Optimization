@@ -3,7 +3,7 @@
 
 ## real time gnuplot + -s (different color based on alg)
 
-## Make launcher file + compose csv + use python script
+## Make compose csv + use python script
 
 
 
@@ -22,7 +22,7 @@
 
 ## Make the initialization function
 
-## Sistemare screen width in windows
+## Fix screen width in windows
 
 ## fix verbose
 
