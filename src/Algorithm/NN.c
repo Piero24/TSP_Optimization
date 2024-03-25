@@ -30,6 +30,8 @@ int NNFromEachNode(instance* inst)
 
     if(inst->verbose >= 60) 
         printf("[NNFromEachNode] Best solution founded starting from %d with cost %f\n\n", bestFirst, bestCost);
+        
+    return 0;
 }
 
 //firstNode index of starting node (from 0 to nnodes-1)
