@@ -7,7 +7,8 @@
 
 
 
-## Complete the help messages
+
+
 
 ## Make the txt file with the explanation of the homework asked in class && Start preparing the Latex file with the solution proposed
 

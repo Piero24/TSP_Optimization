@@ -1,6 +1,7 @@
 // MacOS
 // rm -r build && mkdir build && cmake -S . -B build
-// make -C build && clear && ./TSP_Optimization -file Resource/pr10v1.tsp -model 1 -opt 1 -v 50 
+// make -C build && clear && ./TSP_Optimization -file Resource/pr10v1.tsp -model 1 -opt 1 -v 50
+// Resource/Launcher/launcher.txt
 
 // Windows
 // rmdir /S /Q build && mkdir build && cmake . -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -B build
@@ -40,6 +41,8 @@
 // ********************************************************************************************************************* 
 // *********************************************************************************************************************
 
+void manage_launcher(instance *inst, const char *filename);
+
 int main(int argc, char** argv)
 {
     instance inst;
@@ -47,6 +50,12 @@ int main(int argc, char** argv)
     if(argc<2)
     {
         manage_menu(&inst);
+
+    } else if (argc == 3 && strcmp(argv[1], "-launcher") == 0)
+    {
+        manage_launcher(&inst, argv[2]);
+        exit(0);
+
     } else
     {
         parse_args(argc, argv, &inst);
@@ -62,3 +71,31 @@ int main(int argc, char** argv)
     return 0;
 }
 
+void manage_launcher(instance *inst, const char *filename)
+{
+    FILE *file = fopen(filename, "r");
+    if (!file)
+    {
+        fprintf(stderr, "Error: Could not open file %s\n", filename);
+        return;
+    }
+
+    char line[256];
+    while (fgets(line, sizeof(line), file))
+    {
+        // Skip lines starting with "//"
+        if (strncmp(line, "//", 2) != 0)
+        {
+            char *token;
+            char *delim = " \n";
+            token = strtok(line, delim);
+
+            while (token != NULL)
+            {
+                printf("%s\n", token);
+                token = strtok(NULL, delim);
+            }
+        }
+    }
+    fclose(file);
+}

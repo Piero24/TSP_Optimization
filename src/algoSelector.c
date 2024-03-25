@@ -122,7 +122,6 @@ int bestSolution(int* result, double cost, instance* inst)
     if(inst->show_gnuplot != -1){
         if(inst->show_gnuplot > 0)
             sleep_ms(inst->show_gnuplot*1000);
-        show_solution();
     }
 
     if (time >= inst->time_limit)

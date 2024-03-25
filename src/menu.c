@@ -198,7 +198,7 @@ int optimization_menu(char *opt_name)
         printf("Select the optimizer you want to apply to the solution found by the algorithm.\n\n");
         printf("1 - None\n");
         printf("2 - 2-Opt\n");
-        printf("3 - Tabu Search (+ 2opt)\n");
+        printf("3 - Tabu Search (+ 2-Opt)\n");
         printf("4 - VNS\n");
         printf("\n9 - Show help menu\n");
         printf("0 - Exit\n");
@@ -272,7 +272,7 @@ int options_menu(int *verbose, double *timeLimit, int *randomSeed, int *showGnup
 
         clearScreen();
         welcomeMessage();
-        printf("\nCHOOSE ONE OR MORE OPTIONS\n");
+        printf("\nCHOOSE ONE OR MORE OPTIONS (Optionals)\n");
         printf("WARNING: you have to put one or all the options (e.g., -v 60 -t 25000 -r 5432 -s 3), the algorithm will start after you press ENTER\n\n");
         printf("-> (-v) Verbose from 0 to 100\n");
         printf("-> (-t) Time limit\n");
@@ -444,27 +444,37 @@ void showHelpMenu(int type)
 
     case 2:
         printf("\nALGORITHM HELP MENU'\n");
-        printf("Select the algorithm you want to apply to the file.\n\n");
-        printf("1 - Random: Simply move some nodes\n");
-        printf("2 - Nearest Neighbor\n");
-        printf("\n9 - Show help menu\n");
-        printf("0 - Exit\n");
+        printf("Select the algorithm you want to apply to the file:\n\n");
+        printf("1 - Random: Simply move 1/4 of the nodes in a random way.\n");
+        printf("2 - Nearest Neighbor: Select first the node with a lowest cost. Where the cost is the distance from the current node the next nodes.\n");
         break;
 
     case 3:
-        // ! Add help menu for optimization_menu
-        /* code */
+        printf("\nOPTIMIZATION METHOD HELP MENU'\n");
+        printf("Select the optimizer you want to apply to the solution found by the algorithm:\n\n");
+        printf("1 - None (default): No optimization it going to apply.\n");
+        printf("2 - 2-Opt: Swap the nodes on the path that have a crossing pair of arcs.\n");
+        printf("3 - Tabu Search (+ 2-Opt): After 2-Opt it perform a research in the neighborhood of the solution to find a better solution.\n");
+        printf("4 - VNS: Perform a research in the neighborhood of the solution to find a better solution.\n");
         break;
     
     case 4:
-        // ! Add help menu for options_menu
-        /* code */
+        printf("\nOPTIONS HELP MENU' (Optionals)\n");
+        printf("More options to see more information about what the algorithms and the optimization methods do:\n\n");
+        printf("-> (-v) Verbose (from 0 to 100): Show more info during the execution like the swapping of nodes and the current best solution found. (-v 60)\n");
+        printf("-> (-t) Time limit: For prevent the algorithm to run for an infinite amount of time (-t 600) in seconds. If stop it return the best solution found until that moment.\n");
+        printf("-> (-r) Random seed: Accept a personalized random seed for the generation of the nodes. (-r 1234)\n");
+        printf("-> (-s) Show GnuPlot: If activate show the real time plot execution of the algorithm graphically (-s 0: to show without slowing down, -s 2: show with slowing down of 2 sec)\n");
         break;
     
      case 5:
-        // ! Add help menu for the parser
-        /* code */
-        break;
+        printf("\nINLINE PARSER HELP MENU'\n");
+        printf("-> Input Files: -f: to use your own file (e.g. -f Resource/pr1020.tsp), -g to generate a new file with N nodes. (e.g. -g 1000)\n");
+        printf("-> Possible Algorithms: 1: Random, 2: Nearest Neighbor. (e.g. -algo 2)\n");
+        printf("-> Possible Optimization Methods: 1: None, 2: 2-Opt, 3: Tabu Search (+ 2-Opt), 4: VNS. (e.g. -opt 2)\n");
+        printf("-> Other Parameters (Optionals): -v: (from 0 to 100) show more details (-v 60), -t: time limit (-t 600), -r: personal seed (-r 579), -s: show real time plot (-s 5)\\nn");
+        printf("Example: ./TSP_Optimization -file Resource/pr10v1.tsp -model 1 -opt 1 -v 50 -t 120\n");
+        exit(0);
 
     default:
         break;
