@@ -23,6 +23,7 @@ int twoOpt(instance* inst)
     int* result = (int*) calloc(inst->nnodes, sizeof(int));
     double cost = inst->zbest;
     int counter = 0; // conts from how many cicles we haven't swapped two nodes
+    bool plotFlag = false;
 
     clock_t end;
     double time;
@@ -31,6 +32,10 @@ int twoOpt(instance* inst)
     {
         result[i] = inst->best_sol[i];
     }
+
+    FILE* plot = NULL;
+    point* costs = (point*)calloc(1, sizeof(point));
+    int nCosts = 0;
     
     if (inst->verbose >= 80) printf("[2opt] Initialization completed, starting optimization.\n");
 
@@ -79,6 +84,25 @@ int twoOpt(instance* inst)
                     return 1;
                 }
             }
+
+            if(plotFlag){
+                costs[nCosts].x = nCosts+1;
+                costs[nCosts].y = cost;
+
+                nCosts++;
+
+                show_cost(plot, costs, nCosts);
+
+                point* tmp = (point*)calloc(nCosts, sizeof(point));
+                for(int i=0;i<nCosts;i++){
+                    tmp[i] = costs[i];
+                    printf("%f %f\n", costs[i].x, costs[i].y);
+                }
+
+                free(costs);
+                costs = tmp;
+            }
+
         }
         
         // move A to the end of the array
@@ -95,6 +119,7 @@ int twoOpt(instance* inst)
 
     bestSolution(result, cost, inst);
     free(result);
+    free(costs);
     
     return 0;
 }
