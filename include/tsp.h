@@ -79,6 +79,15 @@ void generateDataFile(const char* filename, instance* inst);
 void show_solution(instance* inst, bool useGnuplot);
 
 /**
+ * @brief Plots the costs over time using Gnuplot.
+ * 
+ * @param plot A pointer to the gnuplot file.
+ * @param costs A vector of costs over time.
+ * @param n The number of costs in the vector.
+ */
+void show_cost(FILE* plot, point* costs, int n);
+
+/**
  * @brief Save the solution in a file ....
  * 
  * @param inst A pointer to the instance structure containing the solution data.

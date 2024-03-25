@@ -61,6 +61,27 @@ void show_solution(instance* inst, bool useGnuplot)
     }
 }
 
+void show_cost(FILE* plot, point* costs, int n)
+{    
+    if(plot == NULL){
+        plot = popen("gnuplot --persist", "w");
+    
+        fprintf(plot, "set title \"Costs\"\n");
+        fprintf(plot, "set xlabel \"Iteration\"\n");
+        fprintf(plot, "set ylabel \"Cost\"\n");
+        fprintf(plot, "set grid\n");
+        fprintf(plot, "set term qt persist font \"Arial\"\n"); // Set font to Arial
+        fprintf(plot, "set pointsize 0.5\n"); // Set font to Arial
+        fflush(plot);
+    }
+
+    fprintf(plot, "plot '-' with points pointtype 7\n");
+    for(int i=0; i<n; i++)
+        fprintf(plot, "%f %f\n", costs[i].x, costs[i].y);
+    
+    fprintf(plot, "e\n");
+    fflush(plot);
+}
 
 void save_solution(instance* inst)
 {    

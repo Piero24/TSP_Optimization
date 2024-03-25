@@ -20,7 +20,7 @@ int NNFromEachNode(instance* inst)
 
             inst->start = firstNode;
 
-            if(!bestSolution(result, cost, inst)){
+            if(bestSolution(result, cost, inst) != 0){
                 if (inst->verbose >= 60) printf("[NNFromEachNode] Algorithm NOT completed, time limit reached.\n\n");
                 free(result);
                 return 1;
