@@ -247,7 +247,7 @@ int readInputParameters(instance* inst)
 	FILE *fin = fopen(inst->input_file, "r");
 	if ( fin == NULL ) 
 		print_error(" input file not found!");
-	
+
 	inst->nnodes = -1;
 	strcpy(inst->file_comment, "NULL");
 	char line[180];

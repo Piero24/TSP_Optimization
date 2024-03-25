@@ -41,7 +41,7 @@
 // ********************************************************************************************************************* 
 // *********************************************************************************************************************
 
-void manage_launcher(instance *inst, const char *filename);
+int manage_launcher(instance *inst, const char *filename);
 
 int main(int argc, char** argv)
 {
@@ -54,7 +54,6 @@ int main(int argc, char** argv)
     } else if (argc == 3 && strcmp(argv[1], "-launcher") == 0)
     {
         manage_launcher(&inst, argv[2]);
-        exit(0);
 
     } else
     {
@@ -71,13 +70,13 @@ int main(int argc, char** argv)
     return 0;
 }
 
-void manage_launcher(instance *inst, const char *filename)
+int manage_launcher(instance *inst, const char *filename)
 {
     FILE *file = fopen(filename, "r");
     if (!file)
     {
         fprintf(stderr, "Error: Could not open file %s\n", filename);
-        return;
+        return 1;
     }
 
     char line[256];
@@ -88,14 +87,31 @@ void manage_launcher(instance *inst, const char *filename)
         {
             char *token;
             char *delim = " \n";
-            token = strtok(line, delim);
+            // Assuming a maximum of 256 words per line
+            char *words[256];
+            // Start with 1 to reserve the first cell for an empty string
+            int argc = 1;
 
-            while (token != NULL)
+            token = strtok(line, delim);
+            
+            while (token != NULL && argc < 256)
             {
                 printf("%s\n", token);
+                words[argc++] = token;
                 token = strtok(NULL, delim);
             }
+
+            parse_args(argc, words, inst);
+
+            read_input(inst);
+            apply_algorithm(inst);
+
+            show_solution(inst, true);
+            save_solution(inst);
+
+            free_instance(inst);
         }
     }
     fclose(file);
+    return 0;
 }

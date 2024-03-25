@@ -29,7 +29,7 @@ void show_solution(instance* inst, bool useGnuplot)
     if(useGnuplot)
     {
         if(inst->plot == NULL){
-            inst->plot = _popen("gnuplot --persist", "w");
+            inst->plot = popen("gnuplot --persist", "w");
         
             fprintf(inst->plot, "set title \"Solution\"\n");
             fprintf(inst->plot, "set xlabel \"X Axis\"\n");
