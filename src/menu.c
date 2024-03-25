@@ -6,7 +6,7 @@ int manage_menu(instance *inst)
     // default   
     strcpy(inst->algorithm_name, "NULL");
     strcpy(inst->opt_name, "NULL");
-    inst->show_gnuplot = 0;
+    inst->show_gnuplot = -1;
 	inst->old_benders = 0;
 	strcpy(inst->input_file, "NULL");
 	inst->random_seed = 93846529; 
@@ -436,13 +436,19 @@ void showHelpMenu(int type)
     switch (type)
     {
     case 1:
-        // ! Add help menu for file_menu
-        /* code */
+        printf("\nINPUT FILE HELP MENU'\n");
+        printf("There are 2 possible parameters that are accepted:\n\n");
+        printf("-> (-f) When you already have a .tsp file you can use this to apply the algorithm to the file. (e.g. -f Resource/pr1002.tsp)\n");
+        printf("-> (-g) If you don't have a file .tsp you can generate a file with a custom number of nodes. (e.g. -g 1500)\n");
         break;
 
     case 2:
-        // ! Add help menu for algorithm_menu
-        /* code */
+        printf("\nALGORITHM HELP MENU'\n");
+        printf("Select the algorithm you want to apply to the file.\n\n");
+        printf("1 - Random: Simply move some nodes\n");
+        printf("2 - Nearest Neighbor\n");
+        printf("\n9 - Show help menu\n");
+        printf("0 - Exit\n");
         break;
 
     case 3:
@@ -464,7 +470,7 @@ void showHelpMenu(int type)
         break;
     }
 
-    printf("Press ENTER to continue: ");
+    printf("Press ENTER to return: ");
     // Clear input buffer
     // while (getchar() != '\n'); 
     fgets(input, 500, stdin);

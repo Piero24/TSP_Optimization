@@ -28,11 +28,12 @@ void show_solution(instance* inst, bool useGnuplot)
 {    
     if(useGnuplot)
     {
-        FILE *plot = popen("gnuplot --persist", "w");
+        if(inst->plot == NULL)
+            inst->plot = popen("gnuplot --persist", "w");
         
-        fprintf(plot, "set title \"Solution\"\n");
-        fprintf(plot, "set xlabel \"X Axis\"\n");
-        fprintf(plot, "set ylabel \"Y Axis\"\n");
+        fprintf(inst->plot, "set title \"Solution\"\n");
+        fprintf(inst->plot, "set xlabel \"X Axis\"\n");
+        fprintf(inst->plot, "set ylabel \"Y Axis\"\n");
         fprintf(plot, "set grid\n");
         fprintf(plot, "set term qt font \"Arial\"\n"); // Set font to Arial
         fprintf(plot, "set pointsize 0.1\n"); // Set font to Arial
@@ -43,8 +44,6 @@ void show_solution(instance* inst, bool useGnuplot)
             fprintf(plot, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
         }
         fprintf(plot, "%f %f\n", inst->coord[inst->best_sol[0]].x, inst->coord[inst->best_sol[0]].y);
-        
-        pclose(plot);
         
     } else 
     {

@@ -69,23 +69,18 @@ int algorithmSelector(instance* inst)
         exit(0);
     } 
 
-    show_solution(inst, true);
-
     // If statement for selecting the optimization method
     if (strcmp(inst->opt_name, "2-Opt") == 0){
         twoOpt(inst);
-        show_solution(inst, true);
     
     }else if (strcmp(inst->opt_name, "Tabu Search") == 0)
     {
         twoOpt(inst);
         tabuSearch(inst);
-        show_solution(inst, true);
         
     }else if (strcmp(inst->opt_name, "Variable Neighborhood Search") == 0)
     {
         variableNeighborhoodSearch(inst);
-        show_solution(inst, true);
 
     }else if (strcmp(inst->opt_name, "Opt 3") == 0)
     {
@@ -94,6 +89,20 @@ int algorithmSelector(instance* inst)
 
     }
     return 0;
+}
+
+void sleep_ms(int milliseconds)
+{
+    #ifdef WIN32
+        Sleep(milliseconds);
+    #elif _POSIX_C_SOURCE >= 199309L
+        struct timespec ts;
+        ts.tv_sec = milliseconds / 1000;
+        ts.tv_nsec = (milliseconds % 1000) * 1000000;
+        nanosleep(&ts, NULL);
+    #else
+        usleep(milliseconds * 1000);
+    #endif
 }
 
 int bestSolution(int* result, double cost, instance* inst)
@@ -110,6 +119,12 @@ int bestSolution(int* result, double cost, instance* inst)
     if(inst->verbose >= 50)
         printf("Best solution updated. Its cost is %f, it was founded after %d seconds\n", cost, time);
     
+    if(inst->show_gnuplot != -1){
+        if(inst->show_gnuplot > 0)
+            sleep_ms(inst->show_gnuplot*1000);
+        show_solution();
+    }
+
     if (time >= inst->time_limit)
         return 1;
     return 0;

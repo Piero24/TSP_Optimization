@@ -8,7 +8,7 @@ int parse_args(int argc, char** argv, instance* inst)
 	// default   
 	strcpy(inst->algorithm_name, "NULL");
     strcpy(inst->opt_name, "NULL");
-	inst->show_gnuplot = 0;
+	inst->show_gnuplot = -1;
 
 	inst->old_benders = 0;
 	strcpy(inst->input_file, "NULL");
@@ -27,48 +27,48 @@ int parse_args(int argc, char** argv, instance* inst)
 
 	for ( int i = 1; i < argc; i++ ) 
 	{ 
-		if ( strcmp(argv[i],"-file") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 					// input file
-		if ( strcmp(argv[i],"-input") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 					// input file
-		if ( strcmp(argv[i],"-f") == 0 ) { strcpy(inst->input_file,argv[++i]); continue; } 						// input file
+		if ( strcmp(argv[i],"-file") == 0 ) strcpy(inst->input_file,argv[++i]); 						// input file
+		else if ( strcmp(argv[i],"-input") == 0 ) strcpy(inst->input_file,argv[++i]); 					// input file
+		else if ( strcmp(argv[i],"-f") == 0 ) strcpy(inst->input_file,argv[++i]);						// input file
 		
-        if ( strcmp(argv[i],"-time_limit") == 0 ) { inst->time_limit = atof(argv[++i]); continue; }				// total time limit
-		if ( strcmp(argv[i],"-tl") == 0 ) { inst->time_limit = atof(argv[++i]); continue; }		        		// total time limit
-		if ( strcmp(argv[i],"-t") == 0 ) { inst->time_limit = atof(argv[++i]); continue; }		        		// total time limit
+        else if ( strcmp(argv[i],"-time_limit") == 0 ) inst->time_limit = atof(argv[++i]);				// total time limit
+		else if ( strcmp(argv[i],"-tl") == 0 ) inst->time_limit = atof(argv[++i]);        				// total time limit
+		else if ( strcmp(argv[i],"-t") == 0 ) inst->time_limit = atof(argv[++i]);	        			// total time limit
 
-        if ( strcmp(argv[i],"-model_type") == 0 ) { model_type = atoi(argv[++i]); continue; } 					// model type
-		if ( strcmp(argv[i],"-model") == 0 ) { model_type = atoi(argv[++i]); continue; } 						// model type
-		if ( strcmp(argv[i],"-alg") == 0 ) { model_type = atoi(argv[++i]); continue; }							// model type
+        else if ( strcmp(argv[i],"-model_type") == 0 ) model_type = atoi(argv[++i]);					// model type
+		else if ( strcmp(argv[i],"-model") == 0 ) model_type = atoi(argv[++i]);							// model type
+		else if ( strcmp(argv[i],"-alg") == 0 ) model_type = atoi(argv[++i]);							// model type
 		
-		if ( strcmp(argv[i],"-opt") == 0 ) { opt_type = atoi(argv[++i]); continue; }							// optimization type
-		if ( strcmp(argv[i],"-2opt") == 0 ) { opt_type = atoi(argv[++i]); continue; }							// optimization type
-		if ( strcmp(argv[i],"-optimization") == 0 ) { opt_type = atoi(argv[++i]); continue; }					// optimization type
+		else if ( strcmp(argv[i],"-opt") == 0 ) opt_type = atoi(argv[++i]);								// optimization type
+		else if ( strcmp(argv[i],"-2opt") == 0 ) opt_type = atoi(argv[++i]);							// optimization type
+		else if ( strcmp(argv[i],"-optimization") == 0 ) opt_type = atoi(argv[++i]);					// optimization type
 
-		if ( strcmp(argv[i],"-seed") == 0 ) { inst->random_seed += abs(atoi(argv[++i])); continue; } 			// random seed
-		if ( strcmp(argv[i],"-r") == 0 ) { inst->random_seed += abs(atoi(argv[++i])); continue; } 				// random seed
+		else if ( strcmp(argv[i],"-seed") == 0 ) inst->random_seed += abs(atoi(argv[++i])); 			// random seed
+		else if ( strcmp(argv[i],"-r") == 0 ) inst->random_seed += abs(atoi(argv[++i]));				// random seed
 
-		if ( strcmp(argv[i],"-verbose") == 0 ) { inst->verbose = abs(atoi(argv[++i])); continue; } 				// verbose
-		if ( strcmp(argv[i],"-v") == 0 ) { inst->verbose = abs(atoi(argv[++i])); continue; } 					// verbose
+		else if ( strcmp(argv[i],"-verbose") == 0 ) inst->verbose = abs(atoi(argv[++i]));				// verbose
+		else if ( strcmp(argv[i],"-v") == 0 ) inst->verbose = abs(atoi(argv[++i]));						// verbose
 		
-		if ( strcmp(argv[i],"-generate") == 0 ) { n = abs(atoi(argv[++i])); continue; } 						// generated file
-		if ( strcmp(argv[i],"-g") == 0 ) { n = abs(atoi(argv[++i])); continue; } 								// generated file
+		else if ( strcmp(argv[i],"-generate") == 0 ) n = abs(atoi(argv[++i]));							// generated file
+		else if ( strcmp(argv[i],"-g") == 0 ) n = abs(atoi(argv[++i]));									// generated file
 		
 		
-		if ( strcmp(argv[i],"-show") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 			// generated file
-		if ( strcmp(argv[i],"-plot") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 			// generated file
-		if ( strcmp(argv[i],"-gnuplot") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 		// generated file
-		if ( strcmp(argv[i],"-s") == 0 ) { inst->show_gnuplot = abs(atoi(argv[++i])); continue; } 				// generated file
+		else if ( strcmp(argv[i],"-show") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// generated file
+		else if ( strcmp(argv[i],"-plot") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// generated file
+		else if ( strcmp(argv[i],"-gnuplot") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));			// generated file
+		else if ( strcmp(argv[i],"-s") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// generated file
 
-		// if ( strcmp(argv[i],"-old_benders") == 0 ) { inst->old_benders = atoi(argv[++i]); continue; } 		// old benders
-		// if ( strcmp(argv[i],"-threads") == 0 ) { inst->num_threads = atoi(argv[++i]); continue; } 			// n. threads
-		// if ( strcmp(argv[i],"-memory") == 0 ) { inst->available_memory = atoi(argv[++i]); continue; }		// available memory (in MB)
-		// if ( strcmp(argv[i],"-node_file") == 0 ) { strcpy(inst->node_file,argv[++i]); continue; }			// cplex's node file
-		// if ( strcmp(argv[i],"-max_nodes") == 0 ) { inst->max_nodes = atoi(argv[++i]); continue; } 			// max n. of nodes
-		// if ( strcmp(argv[i],"-cutoff") == 0 ) { inst->cutoff = atof(argv[++i]); continue; }					// master cutoff
-		// if ( strcmp(argv[i],"-int") == 0 ) { inst->integer_costs = 1; continue; } 							// inteher costs
+		// else if ( strcmp(argv[i],"-old_benders") == 0 ) inst->old_benders = atoi(argv[++i]); 		// old benders
+		// else if ( strcmp(argv[i],"-threads") == 0 ) inst->num_threads = atoi(argv[++i]); 			// n. threads
+		// else if ( strcmp(argv[i],"-memory") == 0 ) inst->available_memory = atoi(argv[++i]);			// available memory (in MB)
+		// else if ( strcmp(argv[i],"-node_file") == 0 ) strcpy(inst->node_file,argv[++i]);				// cplex's node file
+		// else if ( strcmp(argv[i],"-max_nodes") == 0 ) inst->max_nodes = atoi(argv[++i]); 			// max n. of nodes
+		// else if ( strcmp(argv[i],"-cutoff") == 0 ) inst->cutoff = atof(argv[++i]);					// master cutoff
+		// else if ( strcmp(argv[i],"-int") == 0 ) inst->integer_costs = 1; 							// inteher costs
 		
-		if ( strcmp(argv[i],"-help") == 0 ) { help = 1; continue; } 											// help
-		if ( strcmp(argv[i],"--help") == 0 ) { help = 1; continue; }  											// help
-		if ( strcmp(argv[i],"-h") == 0 ) { help = 1; continue; } 												// help
+		else if ( strcmp(argv[i],"-help") == 0 ) help = 1; 												// help
+		else if ( strcmp(argv[i],"--help") == 0 ) help = 1;  											// help
+		else if ( strcmp(argv[i],"-h") == 0 ) help = 1; 												// help
     }  
 
 	if (help)
