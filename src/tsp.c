@@ -28,29 +28,29 @@ void show_solution(instance* inst, bool useGnuplot)
 {    
     if(useGnuplot)
     {
-        if(inst->plot == NULL){
-            inst->plot = popen("gnuplot --persist", "w");
+        if(inst->plotSolution == NULL){
+            inst->plotSolution = popen("gnuplot --persist", "w");
         
-            fprintf(inst->plot, "set title \"Solution\"\n");
-            fprintf(inst->plot, "set xlabel \"X Axis\"\n");
-            fprintf(inst->plot, "set ylabel \"Y Axis\"\n");
-            fprintf(inst->plot, "set grid\n");
-            fprintf(inst->plot, "set term qt persist font \"Arial\"\n"); // Set font to Arial
-            fprintf(inst->plot, "set pointsize 0.1\n"); // Set font to Arial
-            fflush(inst->plot);
+            fprintf(inst->plotSolution, "set title \"Solution\"\n");
+            fprintf(inst->plotSolution, "set xlabel \"X Axis\"\n");
+            fprintf(inst->plotSolution, "set ylabel \"Y Axis\"\n");
+            fprintf(inst->plotSolution, "set grid\n");
+            fprintf(inst->plotSolution, "set term qt persist font \"Arial\"\n"); // Set font to Arial
+            fprintf(inst->plotSolution, "set pointsize 0.1\n"); // Set font to Arial
+            fflush(inst->plotSolution);
         }
 
-        fprintf(inst->plot, "plot '-' with linespoints pointtype 7\n");
+        fprintf(inst->plotSolution, "plot '-' with linespoints pointtype 7\n");
 
         for(int i=0; i<inst->nnodes; i++)
         {
-            fprintf(inst->plot, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
+            fprintf(inst->plotSolution, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
         }
-        fprintf(inst->plot, "%f %f\n", inst->coord[inst->best_sol[0]].x, inst->coord[inst->best_sol[0]].y);
+        fprintf(inst->plotSolution, "%f %f\n", inst->coord[inst->best_sol[0]].x, inst->coord[inst->best_sol[0]].y);
 
-        fprintf(inst->plot, "e\n");
+        fprintf(inst->plotSolution, "e\n");
 
-        fflush(inst->plot);
+        fflush(inst->plotSolution);
 
     } else 
     {
@@ -61,26 +61,30 @@ void show_solution(instance* inst, bool useGnuplot)
     }
 }
 
-void show_cost(FILE* plot, point* costs, int n)
+void show_costs(instance* inst, point* costs, int n)
 {    
-    if(plot == NULL){
-        plot = popen("gnuplot --persist", "w");
+    if(inst->plotCosts == NULL){
+        inst->plotCosts = popen("gnuplot --persist", "w");
     
-        fprintf(plot, "set title \"Costs\"\n");
-        fprintf(plot, "set xlabel \"Iteration\"\n");
-        fprintf(plot, "set ylabel \"Cost\"\n");
-        fprintf(plot, "set grid\n");
-        fprintf(plot, "set term qt persist font \"Arial\"\n"); // Set font to Arial
-        fprintf(plot, "set pointsize 0.5\n"); // Set font to Arial
-        fflush(plot);
+        fprintf(inst->plotCosts, "set title \"Solution\"\n");
+        fprintf(inst->plotCosts, "set xlabel \"X Axis\"\n");
+        fprintf(inst->plotCosts, "set ylabel \"Y Axis\"\n");
+        fprintf(inst->plotCosts, "set grid\n");
+        fprintf(inst->plotCosts, "set term qt persist font \"Arial\"\n"); // Set font to Arial
+        fprintf(inst->plotCosts, "set pointsize 0.5\n"); // Set font to Arial
+        fflush(inst->plotCosts);
     }
 
-    fprintf(plot, "plot '-' with points pointtype 7\n");
+    fprintf(inst->plotCosts, "plot '-' with linespoints pointtype 7\n");
+
     for(int i=0; i<n; i++)
-        fprintf(plot, "%f %f\n", costs[i].x, costs[i].y);
-    
-    fprintf(plot, "e\n");
-    fflush(plot);
+    {
+        fprintf(inst->plotCosts, "%f %f\n", costs[i].x, costs[i].y);
+    }
+
+    fprintf(inst->plotCosts, "e\n");
+
+    fflush(inst->plotCosts);
 }
 
 void save_solution(instance* inst)
@@ -186,11 +190,7 @@ char* fileGenerator(int n)
 
     // Create the file name
     char file_name[50];
-    #ifdef _WIN32
-        snprintf(file_name, sizeof(file_name), "Resource\pr%d-%s.tsp", n, date_str);
-    #else
-        snprintf(file_name, sizeof(file_name), "Resource/pr%d-%s.tsp", n, date_str);
-    #endif
+    snprintf(file_name, sizeof(file_name), "Resource/pr%d-%s.tsp", n, date_str);
 
     // Open the file
     FILE *fp = fopen(file_name, "w");

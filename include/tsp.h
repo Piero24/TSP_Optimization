@@ -53,7 +53,8 @@ typedef struct {
 	char algorithm_name[50];
     char opt_name[50];
     int show_gnuplot;
-	FILE *plot;
+	FILE *plotSolution;
+	FILE *plotCosts;
 	char file_name[50];
 	char file_comment[50];
 
@@ -85,7 +86,7 @@ void show_solution(instance* inst, bool useGnuplot);
  * @param costs A vector of costs over time.
  * @param n The number of costs in the vector.
  */
-void show_cost(FILE* plot, point* costs, int n);
+void show_cost(instance* inst, point* costs, int n);
 
 /**
  * @brief Save the solution in a file ....

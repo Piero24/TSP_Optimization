@@ -33,15 +33,15 @@ int twoOpt(instance* inst)
         result[i] = inst->best_sol[i];
     }
 
-    FILE* plot = NULL;
     point* costs = (point*)calloc(1, sizeof(point));
-    int nCosts = 0;
+    int nCosts = 0, xIndex = 0;
     
     if (inst->verbose >= 80) printf("[2opt] Initialization completed, starting optimization.\n");
 
     do 
     {
-        counter += 1;
+        counter++;
+        xIndex++;
 
         int* A = &result[0];
         int* A1 = &result[1];
@@ -77,30 +77,29 @@ int twoOpt(instance* inst)
                 cost = cost - (distAA1 + distBB1) + (distAB + distA1B1);
                 counter = 0;
 
+                if(plotFlag){
+                    costs[nCosts].x = xIndex;
+                    costs[nCosts].y = cost;
+
+                    nCosts++;
+                    show_costs(inst, costs, nCosts);
+
+                    point* tmp = (point*)calloc(nCosts+1, sizeof(point));
+                    for(int i=0;i<nCosts;i++){
+                        tmp[i] = costs[i];
+                    }
+
+                    free(costs);
+                    costs = tmp;
+                }
+
                 // update official solution
                 if(bestSolution(result, cost, inst) != 0){
                     if (inst->verbose >= 60) printf("[2opt] Optimization NOT completed, time limit reached.\n\n");
                     free(result);
                     return 1;
                 }
-            }
 
-            if(plotFlag){
-                costs[nCosts].x = nCosts+1;
-                costs[nCosts].y = cost;
-
-                nCosts++;
-
-                show_cost(plot, costs, nCosts);
-
-                point* tmp = (point*)calloc(nCosts, sizeof(point));
-                for(int i=0;i<nCosts;i++){
-                    tmp[i] = costs[i];
-                    printf("%f %f\n", costs[i].x, costs[i].y);
-                }
-
-                free(costs);
-                costs = tmp;
             }
 
         }
@@ -165,6 +164,10 @@ int tabuSearch(instance* inst)
     int* tabuList = (int *) calloc(tenure + 1, sizeof(int));
     int tabuPos = 0;
 
+    point* costs = (point*)calloc(1, sizeof(point));
+    int nCosts = 0, xIndex = 0;
+    bool plotFlag = false;
+
     // time checkers
     clock_t end;
     double time;
@@ -184,6 +187,7 @@ int tabuSearch(instance* inst)
         int* bestSol = (int *) calloc(inst->nnodes, sizeof(int));
         double bestCost = -1;
         int swappedNode = -1;
+        xIndex++;
 
         // HEURISTIC SEARCH:
         /*
@@ -278,8 +282,8 @@ int tabuSearch(instance* inst)
         for(int i = 0; i < inst->nnodes; i++)
         {
             result[i] = bestSol[i];
-            cost = bestCost;
         }
+        cost = bestCost;
 
         if(cost < inst->zbest)
         {
@@ -288,6 +292,22 @@ int tabuSearch(instance* inst)
         }
 
         free(bestSol);
+
+        if(plotFlag){
+            costs[nCosts].x = xIndex;
+            costs[nCosts].y = bestCost;
+
+            nCosts++;
+            show_costs(inst, costs, nCosts);
+
+            point* tmp = (point*)calloc(nCosts+1, sizeof(point));
+            for(int i=0;i<nCosts;i++){
+                tmp[i] = costs[i];
+            }
+
+            free(costs);
+            costs = tmp;
+        }
         
         // TIME CHECK
         /*
