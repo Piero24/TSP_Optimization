@@ -23,7 +23,6 @@ int twoOpt(instance* inst)
     int* result = (int*) calloc(inst->nnodes, sizeof(int));
     double cost = inst->zbest;
     int counter = 0; // conts from how many cicles we haven't swapped two nodes
-    bool plotFlag = false;
 
     clock_t end;
     double time;
@@ -35,6 +34,7 @@ int twoOpt(instance* inst)
 
     point* costs = (point*)calloc(1, sizeof(point));
     int nCosts = 0, xIndex = 0;
+    bool plotFlag = false;
     
     if (inst->verbose >= 80) printf("[2opt] Initialization completed, starting optimization.\n");
 
@@ -399,6 +399,10 @@ int variableNeighborhoodSearch(instance* inst)
     double cost = inst->zbest;
     for (int i = 0; i < inst->nnodes; i++)
         result[i] = inst->best_sol[i];
+    
+    point* costs = (point*)calloc(1, sizeof(point));
+    int nCosts = 0, xIndex = 0;
+    bool plotFlag = false;
 
     if (inst->verbose >= 80) printf("[VNS] Initialization completed, starting optimization.\n");
 
@@ -408,9 +412,11 @@ int variableNeighborhoodSearch(instance* inst)
         // 2OPT SECTION
 
         int counter = 0; // conts from how many cicles we haven't swapped two nodes
+        
         do 
         {
             counter += 1;
+            xIndex++;
 
             int* A = &result[0];
             int* A1 = &result[1];
@@ -440,6 +446,22 @@ int variableNeighborhoodSearch(instance* inst)
                     // update official solution
                     if(cost < inst->zbest)
                         bestSolution(result, cost, inst);
+                    
+                    if(plotFlag){
+                        costs[nCosts].x = xIndex;
+                        costs[nCosts].y = cost;
+
+                        nCosts++;
+                        //show_costs(inst, costs, nCosts);
+
+                        point* tmp = (point*)calloc(nCosts+1, sizeof(point));
+                        for(int i=0;i<nCosts;i++){
+                            tmp[i] = costs[i];
+                        }
+
+                        free(costs);
+                        costs = tmp;
+                    }
                 }
             }
             
@@ -459,6 +481,23 @@ int variableNeighborhoodSearch(instance* inst)
         int nkicks = (rand() % 9) + 2; // range 2-10
         for(;nkicks > 0; nkicks--){
             kick(&cost, result, inst);
+        }
+
+        xIndex++;
+        if(plotFlag){
+            costs[nCosts].x = xIndex;
+            costs[nCosts].y = cost;
+
+            nCosts++;
+            show_costs(inst, costs, nCosts);
+
+            point* tmp = (point*)calloc(nCosts+1, sizeof(point));
+            for(int i=0;i<nCosts;i++){
+                tmp[i] = costs[i];
+            }
+
+            free(costs);
+            costs = tmp;
         }
 
         if (inst->verbose >= 80) printf("[VNS - 2opt] Kicks done, cost: %f.\n\n", cost);

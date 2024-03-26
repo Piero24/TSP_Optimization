@@ -71,7 +71,7 @@ void show_costs(instance* inst, point* costs, int n)
         fprintf(inst->plotCosts, "set ylabel \"Y Axis\"\n");
         fprintf(inst->plotCosts, "set grid\n");
         fprintf(inst->plotCosts, "set term qt persist font \"Arial\"\n"); // Set font to Arial
-        fprintf(inst->plotCosts, "set pointsize 0.5\n"); // Set font to Arial
+        fprintf(inst->plotCosts, "set pointsize 0.3\n"); // Set font to Arial
         fflush(inst->plotCosts);
     }
 
@@ -97,7 +97,7 @@ void save_solution(instance* inst)
 
     // Create the "solution" directory
     #ifdef _WIN32
-         _mkdir("Archive");
+        _mkdir("Archive");
         _mkdir("Archive/Image");
         _mkdir(img_directory_name);
         _mkdir("Archive/Svg");

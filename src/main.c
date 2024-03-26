@@ -5,7 +5,7 @@
 
 // Windows
 // rmdir /S /Q build && mkdir build && cmake . -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -B build
-// make -C build && cls && TSP_Optimization -file Resource/pr10v1.tsp -model 1 -v 90
+// make -C build && cls && TSP_Optimization -file Resource/pr10v1.tsp -g 100 -model 0 -opt 1 -s 0
 
 #include <stdio.h>
 #include <time.h>
