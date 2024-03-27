@@ -7,14 +7,18 @@
 // rmdir /S /Q build && mkdir build && cmake . -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -B build
 // make -C build && cls && TSP_Optimization -file Resource/pr10v1.tsp -g 100 -model 0 -opt 1 -s 0
 
+
+// Linux
+// rm -r build && mkdir build && cmake -S . -B build
+// make -C build && clear && ./TSP_Optimization
 #include <stdio.h>
 #include <time.h>
 
-#include "../include/tsp.h"
-#include "../include/Algorithm/NN.h"
-#include "../include/parser.h"
-#include "../include/algoSelector.h"
-#include "../include/menu.h"
+#include "tsp.h"
+#include "Algorithm/NN.h"
+#include "parser.h"
+#include "algoSelector.h"
+#include "menu.h"
 
 
 // ********************************************************************************************************************* 
@@ -114,4 +118,4 @@ int manage_launcher(instance *inst, const char *filename)
     }
     fclose(file);
     return 0;
-}
+}//*/

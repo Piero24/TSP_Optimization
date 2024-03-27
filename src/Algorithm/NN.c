@@ -1,4 +1,4 @@
-#include "../include/Algorithm/NN.h"
+#include "Algorithm/NN.h"
 
 int NNFromEachNode(instance* inst)
 {
@@ -7,6 +7,11 @@ int NNFromEachNode(instance* inst)
 
     int bestFirst = -1;
     double bestCost = -1;
+
+    inst->plotCosts = NULL;
+    point* costs = (point*)calloc(1, sizeof(point));
+    int nCosts = 0;
+    bool plotFlag = false;
 
     for (int firstNode = 0; firstNode < inst->nnodes; firstNode++){
         nearestNeighbor(inst, firstNode, result, &cost);
@@ -26,11 +31,29 @@ int NNFromEachNode(instance* inst)
                 return 1;
             }
         }
+
+        if(plotFlag){
+            costs[nCosts].x = firstNode;
+            costs[nCosts].y = cost;
+
+            nCosts++;
+            show_costs(inst, costs, nCosts, true);
+
+            point* tmp = (point*)calloc(nCosts+1, sizeof(point));
+            for(int i=0;i<nCosts;i++){
+                tmp[i] = costs[i];
+            }
+
+            free(costs);
+            costs = tmp;
+        }
     }
 
     if(inst->verbose >= 60) 
         printf("[NNFromEachNode] Best solution founded starting from %d with cost %f\n\n", bestFirst, bestCost);
-        
+    
+    close(inst->plotCosts);
+    
     return 0;
 }
 

@@ -85,8 +85,10 @@ void show_solution(instance* inst, bool useGnuplot);
  * @param plot A pointer to the gnuplot file.
  * @param costs A vector of costs over time.
  * @param n The number of costs in the vector.
+ * @param alg True if the function is called by an algorithm, false if it is
+ * 	called by an optimization method.
  */
-void show_cost(instance* inst, point* costs, int n);
+void show_cost(instance* inst, point* costs, int n, bool alg);
 
 /**
  * @brief Save the solution in a file ....

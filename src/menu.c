@@ -1,4 +1,4 @@
-#include "../include/menu.h"
+#include "menu.h"
 
 int manage_menu(instance *inst)
 {

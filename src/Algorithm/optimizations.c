@@ -1,4 +1,4 @@
-#include "../../include/Algorithm/optimizations.h"
+#include "Algorithm/optimizations.h"
 
 void reverseSubvector(int* from, int* to)
 {
@@ -32,6 +32,7 @@ int twoOpt(instance* inst)
         result[i] = inst->best_sol[i];
     }
 
+    inst->plotCosts = NULL;
     point* costs = (point*)calloc(1, sizeof(point));
     int nCosts = 0, xIndex = 0;
     bool plotFlag = false;
@@ -82,7 +83,7 @@ int twoOpt(instance* inst)
                     costs[nCosts].y = cost;
 
                     nCosts++;
-                    show_costs(inst, costs, nCosts);
+                    show_costs(inst, costs, nCosts, false);
 
                     point* tmp = (point*)calloc(nCosts+1, sizeof(point));
                     for(int i=0;i<nCosts;i++){
@@ -97,6 +98,7 @@ int twoOpt(instance* inst)
                 if(bestSolution(result, cost, inst) != 0){
                     if (inst->verbose >= 60) printf("[2opt] Optimization NOT completed, time limit reached.\n\n");
                     free(result);
+                    close(inst->plotCosts);
                     return 1;
                 }
 
@@ -119,6 +121,7 @@ int twoOpt(instance* inst)
     bestSolution(result, cost, inst);
     free(result);
     free(costs);
+    close(inst->plotCosts);
     
     return 0;
 }
@@ -164,6 +167,7 @@ int tabuSearch(instance* inst)
     int* tabuList = (int *) calloc(tenure + 1, sizeof(int));
     int tabuPos = 0;
 
+    inst->plotCosts = NULL;
     point* costs = (point*)calloc(1, sizeof(point));
     int nCosts = 0, xIndex = 0;
     bool plotFlag = false;
@@ -298,7 +302,7 @@ int tabuSearch(instance* inst)
             costs[nCosts].y = bestCost;
 
             nCosts++;
-            show_costs(inst, costs, nCosts);
+            show_costs(inst, costs, nCosts, false);
 
             point* tmp = (point*)calloc(nCosts+1, sizeof(point));
             for(int i=0;i<nCosts;i++){
@@ -326,6 +330,7 @@ int tabuSearch(instance* inst)
 
     free(result);
     free(tabuList);
+    close(inst->plotCosts);
 
     return 0;
 }
@@ -400,6 +405,7 @@ int variableNeighborhoodSearch(instance* inst)
     for (int i = 0; i < inst->nnodes; i++)
         result[i] = inst->best_sol[i];
     
+    inst->plotCosts = NULL;
     point* costs = (point*)calloc(1, sizeof(point));
     int nCosts = 0, xIndex = 0;
     bool plotFlag = false;
@@ -452,7 +458,6 @@ int variableNeighborhoodSearch(instance* inst)
                         costs[nCosts].y = cost;
 
                         nCosts++;
-                        //show_costs(inst, costs, nCosts);
 
                         point* tmp = (point*)calloc(nCosts+1, sizeof(point));
                         for(int i=0;i<nCosts;i++){
@@ -489,7 +494,7 @@ int variableNeighborhoodSearch(instance* inst)
             costs[nCosts].y = cost;
 
             nCosts++;
-            show_costs(inst, costs, nCosts);
+            show_costs(inst, costs, nCosts, false);
 
             point* tmp = (point*)calloc(nCosts+1, sizeof(point));
             for(int i=0;i<nCosts;i++){
@@ -511,7 +516,7 @@ int variableNeighborhoodSearch(instance* inst)
     }while(time < inst->time_limit);
     
     free(result);
+    close(inst->plotCosts);
     
-    // when local minimum: kick
     return 0;
 }

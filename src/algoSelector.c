@@ -1,4 +1,4 @@
-#include "../include/algoSelector.h"
+#include "algoSelector.h"
 
 void Random(instance* inst)
 {

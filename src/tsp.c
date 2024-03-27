@@ -3,8 +3,8 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#include "../include/tsp.h"
-#include "../include/parser.h"
+#include "tsp.h"
+#include "parser.h"
 
 void generateDataFile(const char* filename, instance* inst)
 {
@@ -61,7 +61,7 @@ void show_solution(instance* inst, bool useGnuplot)
     }
 }
 
-void show_costs(instance* inst, point* costs, int n)
+void show_costs(instance* inst, point* costs, int n, bool alg)
 {    
     if(inst->plotCosts == NULL){
         inst->plotCosts = popen("gnuplot --persist", "w");
@@ -71,12 +71,28 @@ void show_costs(instance* inst, point* costs, int n)
         fprintf(inst->plotCosts, "set ylabel \"Y Axis\"\n");
         fprintf(inst->plotCosts, "set grid\n");
         fprintf(inst->plotCosts, "set term qt persist font \"Arial\"\n"); // Set font to Arial
-        fprintf(inst->plotCosts, "set pointsize 0.3\n"); // Set font to Arial
+        fprintf(inst->plotCosts, "set pointsize 0.5\n"); // Set font to Arial
+
         fflush(inst->plotCosts);
     }
 
-    fprintf(inst->plotCosts, "plot '-' with linespoints pointtype 7\n");
+    fprintf(inst->plotCosts, "set arrow 1 from 0,%f to %f,%f nohead lc \"red\"\n", inst->zbest, costs[n-1].x, inst->zbest);
 
+    if(alg)
+        fprintf(inst->plotCosts, "plot '-' title \"%s\" with linespoints pointtype 7 linecolor ", inst->algorithm_name);
+    else
+        fprintf(inst->plotCosts, "plot '-' title \"%s\" with linespoints pointtype 7 linecolor ", inst->opt_name);
+    
+    if(alg && strcmp(inst->algorithm_name, "Nearest Neighborhood")){
+        fprintf(inst->plotCosts, "\"blue\"\n");
+    }else if(!alg && strcmp(inst->opt_name, "2-Opt")){
+        fprintf(inst->plotCosts, "\"green\"\n");
+    }else if(!alg && strcmp(inst->opt_name, "Tabu Search")){
+        fprintf(inst->plotCosts, "\"light magenta\"\n");
+    }else if(!alg && strcmp(inst->opt_name, "Variable Neighborhood Search")){
+        fprintf(inst->plotCosts, "\"purple\"\n");
+    }
+    
     for(int i=0; i<n; i++)
     {
         fprintf(inst->plotCosts, "%f %f\n", costs[i].x, costs[i].y);

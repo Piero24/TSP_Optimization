@@ -2,12 +2,15 @@ cmake_minimum_required(VERSION 3.20)
 project(TSP_Optimization VERSION 1.0)
 
 # # find_package(PackageName REQUIRED)
+
+include_directories(/opt/ibm/ILOG/CPLEX_Studio2211/cplex/include)
 # # find_package(Boost COMPONENTS filesystem REQUIRED)
 # # include_directories( ${PackageName_INCLUDE_DIRS} )
 # # include_directories(${Boost_INCLUDE_DIRS})
 
+
 # Add the include directory containing vrp.h
-include_directories(src)
+include_directories(include)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
@@ -25,5 +28,5 @@ add_executable(TSP_Optimization
 )
 
 # target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} ${Boost_FILESYSTEM_LIBRARY})
-
+target_link_libraries(TSP_Optimization PRIVATE ${CPLEX_LIBRARIES} dl m)
 include(CPack)
