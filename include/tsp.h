@@ -88,7 +88,7 @@ void show_solution(instance* inst, bool useGnuplot);
  * @param alg True if the function is called by an algorithm, false if it is
  * 	called by an optimization method.
  */
-void show_cost(instance* inst, point* costs, int n, bool alg);
+void show_costs(instance* inst, point* costs, int n, bool alg);
 
 /**
  * @brief Save the solution in a file ....

@@ -52,8 +52,6 @@ int NNFromEachNode(instance* inst)
     if(inst->verbose >= 60) 
         printf("[NNFromEachNode] Best solution founded starting from %d with cost %f\n\n", bestFirst, bestCost);
     
-    close(inst->plotCosts);
-    
     return 0;
 }
 

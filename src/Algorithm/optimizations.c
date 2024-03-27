@@ -98,7 +98,6 @@ int twoOpt(instance* inst)
                 if(bestSolution(result, cost, inst) != 0){
                     if (inst->verbose >= 60) printf("[2opt] Optimization NOT completed, time limit reached.\n\n");
                     free(result);
-                    close(inst->plotCosts);
                     return 1;
                 }
 
@@ -121,7 +120,6 @@ int twoOpt(instance* inst)
     bestSolution(result, cost, inst);
     free(result);
     free(costs);
-    close(inst->plotCosts);
     
     return 0;
 }
@@ -330,7 +328,6 @@ int tabuSearch(instance* inst)
 
     free(result);
     free(tabuList);
-    close(inst->plotCosts);
 
     return 0;
 }
@@ -516,7 +513,6 @@ int variableNeighborhoodSearch(instance* inst)
     }while(time < inst->time_limit);
     
     free(result);
-    close(inst->plotCosts);
     
     return 0;
 }
