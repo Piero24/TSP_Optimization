@@ -16,8 +16,8 @@ int parse_args(int argc, char** argv, instance* inst)
 	strcpy(inst->input_file, "NULL");
 	inst->random_seed = 93846529; 
 	inst->num_threads = 0;
-	inst->time_limit = DBL_MAX; 	//! CPX_INFBOUND
-	inst->cutoff = DBL_MAX; 		//! CPX_INFBOUND
+	inst->time_limit = CPX_INFBOUND; 	// If Cplex is not installed in your machine use DBL_MAX
+	inst->cutoff = CPX_INFBOUND; 		// If Cplex is not installed in your machine use DBL_MAX
 	inst->integer_costs = 0;
 	inst->verbose = 0;
 
@@ -229,9 +229,10 @@ char *getFileName(const char *filePath)
     return result;
 }
 
-const char* getTimeLimitString(double time_limit) {
-
-    if (time_limit == DBL_MAX ) //! || timeLimit == CPX_INFBOUND) 
+const char* getTimeLimitString(double time_limit)
+{
+	// If Cplex is not installed in your machine use only (time_limit == DBL_MAX)
+    if (time_limit == DBL_MAX || time_limit == CPX_INFBOUND)
 	{
         return "Inf";
 

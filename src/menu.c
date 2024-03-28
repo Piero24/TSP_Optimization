@@ -1,5 +1,6 @@
 #include "menu.h"
 
+
 int manage_menu(instance *inst)
 {
     int n = 0;
@@ -13,8 +14,8 @@ int manage_menu(instance *inst)
 	strcpy(inst->input_file, "NULL");
 	inst->random_seed = 93846529; 
 	inst->num_threads = 0;
-	inst->time_limit = DBL_MAX; 	//CPX_INFBOUND
-	inst->cutoff = DBL_MAX; 	//CPX_INFBOUND
+	inst->time_limit = CPX_INFBOUND; 	// If Cplex is not installed in your machine use DBL_MAX
+	inst->cutoff = CPX_INFBOUND; 		// If Cplex is not installed in your machine use DBL_MAX
 	inst->integer_costs = 0;
 	inst->verbose = 0;
 

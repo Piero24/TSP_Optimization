@@ -25,8 +25,10 @@
 
 #include <unistd.h>
 
-#include "../include/tsp.h"
-#include "../include/parser.h"
+#include <cplex.h> //CPX_INFBOUND
+
+#include "tsp.h"
+#include "parser.h"
 
 /**
  * @brief Manages the main menu for initializing instance parameters.
