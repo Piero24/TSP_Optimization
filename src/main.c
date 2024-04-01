@@ -1,5 +1,5 @@
 // MacOS
-// rm -r build && mkdir build && cmake -S . -B build
+// rm -r build && mkdir build && cmake -S . -DCPLEXDIR="/Applications/CPLEX_Studio2211/cplex" -B build
 // make -C build && clear && ./TSP_Optimization -file Resource/pr10v1.tsp -model 1 -opt 1 -v 50
 // Resource/Launcher/launcher.txt
 
