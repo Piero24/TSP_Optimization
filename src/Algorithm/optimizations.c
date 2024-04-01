@@ -168,7 +168,7 @@ int tabuSearch(instance* inst)
     inst->plotCosts = NULL;
     point* costs = (point*)calloc(1, sizeof(point));
     int nCosts = 0, xIndex = 0;
-    bool plotFlag = true;
+    bool plotFlag = false;
 
     // time checkers
     clock_t end;
