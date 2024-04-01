@@ -1,0 +1,5 @@
+Alg 4: First Cplex implementation.
+
+Modeling of the TSP Problem with Cplex. Implementation and use of the Cplex library to get the solution. 
+
+

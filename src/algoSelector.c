@@ -58,10 +58,9 @@ int algorithmSelector(instance* inst)
     {
         NNFromEachNode(inst);
 
-    } else if (strcmp(inst->algorithm_name, "Algo 3") == 0)
+    } else if (strcmp(inst->algorithm_name, "CPLEX") == 0)
     {
-        printf("Model type not implemented\n");
-        exit(0);
+        TSPopt(inst);
 
     } else 
     {

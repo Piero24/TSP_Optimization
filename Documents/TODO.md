@@ -5,12 +5,11 @@
 
 ## fix cplex on windows
 
-## do first cplex algorithm
 
 
 
 
-
+## add input flag for cost-itaration function plot
 
 ## Make the txt file with the explanation of the homework asked in class && Start preparing the Latex file with the solution proposed
 
@@ -21,6 +20,10 @@
 ## Make the initialization function
 
 ## Fix screen width in windows
+
+## assert instead of printError
+
+## distance function
 
 
 

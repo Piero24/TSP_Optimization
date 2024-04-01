@@ -142,6 +142,7 @@ int algorithm_menu(char *algorithm_name)
         
         printf("1 - Random\n");
         printf("2 - Nearest Neighbor\n");
+        printf("3 - Cplex\n");
         printf("\n9 - Show help menu\n");
         printf("0 - Exit\n");
         
@@ -171,6 +172,10 @@ int algorithm_menu(char *algorithm_name)
 
             case 2:
                 strcpy(algorithm_name, "Nearest Neighbor");
+                return 0;
+            
+            case 3:
+                strcpy(algorithm_name, "CPLEX");
                 return 0;
 
             case 9:
@@ -450,6 +455,7 @@ void showHelpMenu(int type)
         printf("Select the algorithm you want to apply to the file:\n\n");
         printf("1 - Random: Simply move 1/4 of the nodes in a random way.\n");
         printf("2 - Nearest Neighbor: Select first the node with a lowest cost. Where the cost is the distance from the current node the next nodes.\n");
+        printf("3 - Cplex: Use of Cplex library\n");
         break;
 
     case 3:
@@ -473,7 +479,7 @@ void showHelpMenu(int type)
      case 5:
         printf("\nINLINE PARSER HELP MENU'\n");
         printf("-> Input Files: -f: to use your own file (e.g. -f Resource/pr1020.tsp), -g to generate a new file with N nodes. (e.g. -g 1000)\n");
-        printf("-> Possible Algorithms: 1: Random, 2: Nearest Neighbor. (e.g. -algo 2)\n");
+        printf("-> Possible Algorithms: 1: Random, 2: Nearest Neighbor 3: Cplex (e.g. -algo 2)\n");
         printf("-> Possible Optimization Methods: 1: None, 2: 2-Opt, 3: Tabu Search (+ 2-Opt), 4: VNS. (e.g. -opt 2)\n");
         printf("-> Other Parameters (Optionals): -v: (from 0 to 100) show more details (-v 60), -t: time limit (-t 600), -r: personal seed (-r 579), -s: show real time plot (-s 5)\\nn");
         printf("Example: ./TSP_Optimization -file Resource/pr10v1.tsp -model 1 -opt 1 -v 50 -t 120\n");

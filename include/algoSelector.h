@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "Algorithm/NN.h"
+#include "Algorithm/cplexAlg.h"
 #include "Algorithm/optimizations.h"
 #include "parser.h"
 #include "tsp.h"

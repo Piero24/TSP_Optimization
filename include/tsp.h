@@ -2,7 +2,11 @@
 #define TSP_H
 
 #include <stdbool.h>
-#include <string.h> 
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <time.h>
 
 typedef struct {
 	double x, y;

@@ -152,7 +152,7 @@ int intToModelName(instance* inst, int type)
 			break;
 
 		case 2:
-			strcpy(inst->algorithm_name, "Algo 3");
+			strcpy(inst->algorithm_name, "CPLEX");
 			break;
 
 		default:

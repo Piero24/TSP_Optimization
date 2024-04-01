@@ -25,6 +25,7 @@ add_executable(TSP_Optimization
     src/main.c
     src/algoSelector.c
     src/Algorithm/NN.c
+    src/Algorithm/cplexAlg.c
     src/parser.c
     src/tsp.c
     src/Algorithm/optimizations.c
