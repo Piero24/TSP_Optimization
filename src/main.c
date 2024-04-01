@@ -4,12 +4,13 @@
 // Resource/Launcher/launcher.txt
 
 // Windows
-// rmdir /S /Q build && mkdir build && cmake . -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -B build
-// make -C build && cls && TSP_Optimization -file Resource/pr10v1.tsp -g 100 -model 0 -opt 1 -s 0
+// rmdir /S /Q build && mkdir build && cmake . -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCPLEX_LIBRARIES="C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/" -B build
+// make -C build && cls && TSP_Optimization -file Resource/pr10v1.tsp -g 100 -model 0 -opt 2 -s 0 -v 80 -tl 20
 
 // Linux
 // rm -r build && mkdir build && cmake -S . -B build
 // make -C build && clear && ./TSP_Optimization
+
 #include <stdio.h>
 #include <time.h>
 

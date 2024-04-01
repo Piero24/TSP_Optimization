@@ -138,9 +138,6 @@ bool nodeInList(int* node, int* list, int listLength)
 
 void copyArray(int* from, int* to, int length)
 {
-    free(to);
-    to = (int*) calloc(length, sizeof(int));
-
     for(int i = 0; i < length; i++)
     {
         to[i] = from[i];
@@ -165,10 +162,13 @@ int tabuSearch(instance* inst)
     int* tabuList = (int *) calloc(tenure + 1, sizeof(int));
     int tabuPos = 0;
 
+    for (int i = 0; i < tenure; i++)
+        tabuList[i] = -1;
+
     inst->plotCosts = NULL;
     point* costs = (point*)calloc(1, sizeof(point));
     int nCosts = 0, xIndex = 0;
-    bool plotFlag = false;
+    bool plotFlag = true;
 
     // time checkers
     clock_t end;
@@ -199,59 +199,43 @@ int tabuSearch(instance* inst)
         */
 
         // swap two nodes A and B
-        for(int* A = &result[0]; A <= &result[inst->nnodes-1]; A++)
+        for(int A = 0; A < inst->nnodes; A++)
         {
             // if node A is in tabù list, skip it
-            if(nodeInList(A, tabuList, tabuPos))
-                continue;
+            if(nodeInList(&result[A], tabuList, tenure)) continue;
             
             // choose node B to swap
-            for(int* B = A+1; B <= &result[inst->nnodes-1]; B++)
+            for(int B = A+1; B < inst->nnodes; B++)
             {
                 // if node B is in tabù list, skip it
-                if(nodeInList(B, tabuList, tabuPos))
-                    continue;
+                if(nodeInList(&result[B], tabuList, tenure) || (A == 0 && B == inst->nnodes-1)) continue;
                 
                 // save indexes of node neighbors
-                int* prevA = (*A == result[0]) ? &result[inst->nnodes-1] : A-1;
-                int* succB = (*B == result[inst->nnodes-1]) ? &result[0] : B+1;
+                int prevA = (A == 0) ? inst->nnodes-1 : A-1;
+                int succB = (B == inst->nnodes-1) ? 0 : B+1;
 
                 //compute costs
-                double old = inst->distances[*prevA][*A] + inst->distances[*succB][*B];
-                double new = inst->distances[*prevA][*B] + inst->distances[*succB][*A];
-                
+                double old = inst->distances[result[prevA]][result[A]] + inst->distances[result[succB]][result[B]];
+                double new = inst->distances[result[prevA]][result[B]] + inst->distances[result[succB]][result[A]];
+
                 // if is the first non-tabù solution, save it as current candidate
-                if(bestCost == -1)
+                if(bestCost == -1 || new < old)
                 {
-                    if (inst->verbose >= 90) 
+                    if (bestCost == -1 && inst->verbose >= 80) 
                         printf("[Tabu' Search] First feasible solution found, saving it\n");
                     
                     // copy current solution
                     copyArray(result, bestSol, inst->nnodes);
 
-                    // compute costs
-                    bestCost = 0;
-                    for(int* i = &bestSol[1]; i <= &bestSol[inst->nnodes-1]; i++)
-                        bestCost += inst->distances[*i][*(i-1)];
-                    bestCost += inst->distances[bestSol[0]][bestSol[inst->nnodes-1]];
+                    // do swap and update costs
+                    reverseSubvector(&bestSol[A], &bestSol[B]);
+                    bestCost = cost - old + new;
 
-                    // do swap and update costs
-                    reverseSubvector(A, B);
-                    bestCost = bestCost - old + new;
-                } 
-                
-                // if it's not the first but is still better, update current candidate
-                else if(new < old)
-                {
-                    // do swap and update costs
-                    reverseSubvector(A, B);
-                    bestCost = bestCost - old + new;
-                    
                     // save swapped node
-                    swappedNode = *A;
+                    swappedNode = result[A];
 
-                    if (inst->verbose >= 90) 
-                        printf("[Tabu' Search] Swapping nodes %d and %d. New cost is %f\n", *A, *B, bestCost);
+                    if (inst->verbose >= 90)
+                        printf("[Tabu' Search] Swapping nodes %d and %d. New cost is %f\n", result[A], result[B], bestCost);
                 }
             }
         }
@@ -263,32 +247,30 @@ int tabuSearch(instance* inst)
          * Otherwise we can update the current best solution.
          */
         
-        if(bestCost > cost)
+        if(bestCost >= cost)
         {
             tabuList[tabuPos] = swappedNode;
             tabuPos++;
 
             // if tabù list is full do FIFO
             if(tabuPos > tenure)
-            {
                 tabuPos = 0;
-            }
 
-            if (inst->verbose >= 95) 
+            if (inst->verbose >= 80) 
                 printf("[Tabu' Search] The new solution is worse, adding it to tabu' list\n");
         }
 
-        if (inst->verbose >= 90) 
+        if (inst->verbose >= 80) 
             printf("[Tabu' Search] Updating new 'current' solution. Old cost: %f, New cost: %f\n", cost, bestCost);
         
-        for(int i = 0; i < inst->nnodes; i++)
-        {
-            result[i] = bestSol[i];
-        }
+        copyArray(bestSol, result, inst->nnodes);
         cost = bestCost;
 
         if(cost < inst->zbest)
         {
+            if (inst->verbose >= 80) 
+                printf("[Tabu' Search] Updating best official solution.\n");
+        
             // update official solution
             bestSolution(result, cost, inst);
         }
@@ -320,7 +302,9 @@ int tabuSearch(instance* inst)
         end = clock();
         time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
-        if (inst->verbose >= 90) printf("[Tabu' Search] time: %f, limit:%f\n", time, inst->time_limit);
+        if (inst->verbose >= 80) printf("[Tabu' Search] time: %f, limit:%f\n", time, inst->time_limit);
+
+        //system("pause");
 
     }while(time < inst->time_limit);
 
@@ -328,6 +312,7 @@ int tabuSearch(instance* inst)
 
     free(result);
     free(tabuList);
+    free(costs);
 
     return 0;
 }
