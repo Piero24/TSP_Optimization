@@ -7,7 +7,6 @@ double dist(int i, int j, instance *inst)
 
 int TSPopt(instance *inst)
 {  
-
 	// open CPLEX model
 	int error;
 	CPXENVptr env = CPXopenCPLEX(&error);
@@ -23,18 +22,23 @@ int TSPopt(instance *inst)
 	double *xstar = (double *) calloc(ncols, sizeof(double));
     double objval = 0;
 
-    //CPXgetx(env, lp, xstar, 0, ncols-1)
+    // CPXgetx(env, lp, xstar, 0, ncols-1)
 	if ( CPXsolution(env, lp, NULL, &objval, xstar, NULL, NULL, NULL) ) print_error("CPXgetx() error");	
     
     // print solution
     if(inst->verbose >= 100){
         printf("costs:%f\n", objval);
+
         for ( int i = 0; i < inst->nnodes; i++ )
         {
             for ( int j = i+1; j < inst->nnodes; j++ )
             {
-                if ( xstar[xpos(i,j,inst)] > 0.5 ) printf("x(%3d,%3d) = 1\n", i+1,j+1); // print dei lati scelti
-                    // xstar non è mai precisamente 0 o 1
+				// print the selected edges
+                if ( xstar[xpos(i,j,inst)] > 0.5 ) 
+				{
+					// xstar itìs never 0 o 1 precisely
+					printf("x(%3d,%3d) = 1\n", i+1,j+1);
+				}
             }
         }
     }
@@ -53,14 +57,17 @@ int TSPopt(instance *inst)
 
 }
 
-void convertSolution(double *xstar, int* result, instance* inst){
+void convertSolution(double *xstar, int* result, instance* inst)
+{
     int currentPos = 0, lastNode = 0, currentNode = 0;
-    
     result[currentPos++] = currentNode;
     
-    while(currentPos < inst->nnodes){
-        for(int i=0;i<inst->nnodes;i++){
-            if(i != lastNode && i != currentNode && xstar[xpos(currentNode, i, inst)] > 0.5){
+    while(currentPos < inst->nnodes)
+	{
+        for(int i=0;i<inst->nnodes;i++)
+		{
+            if(i != lastNode && i != currentNode && xstar[xpos(currentNode, i, inst)] > 0.5)
+			{
                 lastNode = currentNode;
                 currentNode = i;
                 result[currentPos++] = i;
@@ -77,14 +84,14 @@ int xpos(int i, int j, instance *inst)
 	int pos = i * inst->nnodes + j - (( i + 1 ) * ( i + 2 )) / 2;
 	return pos;
 }
-	
 
 void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 {    
 	int izero = 0;
 	char binary = 'B'; 
 	
-	char **cname = (char **) calloc(1, sizeof(char *));		// (char **) required by cplex...
+	// (char **) required by cplex...
+	char **cname = (char **) calloc(1, sizeof(char *));
 	cname[0] = (char *) calloc(100, sizeof(char));
 
 	// add binary var.s x(i,j) for i < j  
@@ -92,8 +99,10 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 	{
 		for ( int j = i+1; j < inst->nnodes; j++ )
 		{
-			sprintf(cname[0], "x(%d,%d)", i+1,j+1);  // x(1,2), x(1,3) ....
-			double obj = dist(i,j,inst); // cost == distance   
+			// x(1,2), x(1,3) ....
+			sprintf(cname[0], "x(%d,%d)", i+1,j+1);
+			// cost == distance   
+			double obj = dist(i,j,inst);
 			double lb = 0.0;
 			double ub = 1.0;
 
@@ -103,15 +112,17 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 	} 
 
 	// add degree constr.s 
-
 	int *index = (int *) malloc(inst->nnodes * sizeof(int));
-	double *value = (double *) malloc(inst->nnodes * sizeof(double));  // coefficienti per indicare quali lati sto controllando (tutti quelli collegati con h tranne h stesso)
+
+	// coefficients to indicate which sides I'm checking (all those connected to h except h itself)
+	double *value = (double *) malloc(inst->nnodes * sizeof(double));
 	
 	// add the degree constraints
-	for ( int h = 0; h < inst->nnodes; h++ )  // degree constraints
+	for ( int h = 0; h < inst->nnodes; h++ )
 	{
 		double rhs = 2.0;
-		char sense = 'E';                     // 'E' for equality constraint 
+		// 'E' for equality constraint 
+		char sense = 'E';
 		sprintf(cname[0], "degree(%d)", h+1); 
 		int nnz = 0;
 		for ( int i = 0; i < inst->nnodes; i++ )
@@ -122,7 +133,10 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 			nnz++;
 		}
 		
-		if ( CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, &cname[0]) ) print_error(" wrong CPXaddrows [degree]");
+		if ( CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, &cname[0]) )
+		{
+			print_error(" wrong CPXaddrows [degree]");
+		}
 	} 
 
     free(value);
@@ -144,7 +158,6 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 
 	free(cname[0]);
 	free(cname);
-
 }
 
 /*
