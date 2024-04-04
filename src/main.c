@@ -41,6 +41,9 @@
 // *** check yet. I suggest to check this function first and than if the problem isn't solved after moving the include
 // *** in the headers file check the others func.
 // ***
+// *** parameterPrint -> menu.c, parser.c
+// *** getFileName -> parser.c, tsp.c
+// *** parameterPrint -> parser.c, menu.c
 // ***
 // ********************************************************************************************************************* 
 // *********************************************************************************************************************
