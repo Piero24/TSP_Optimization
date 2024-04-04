@@ -8,6 +8,10 @@
 #include <sys/stat.h>
 #include <time.h>
 
+#ifdef _WIN32
+    #include <Windows.h>
+#endif
+
 typedef struct {
 	double x, y;
 } point;
@@ -59,6 +63,7 @@ typedef struct {
     int show_gnuplot;
 	FILE *plotSolution;
 	FILE *plotCosts;
+	
 	char file_name[50];
 	char file_comment[50];
 

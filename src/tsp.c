@@ -1,6 +1,12 @@
 #include "tsp.h"
 #include "parser.h"
 
+#ifdef _WIN32
+    #define popen _popen
+    #define pclose _pclose
+    #define mkdir _mkdir
+#endif
+
 void generateDataFile(const char* filename, instance* inst)
 {
     FILE* file = fopen("data.txt", "w");
@@ -24,8 +30,9 @@ void show_solution(instance* inst, bool useGnuplot)
     if(useGnuplot)
     {
         if(inst->plotSolution == NULL){
+            
             inst->plotSolution = popen("gnuplot --persist", "w");
-        
+            
             fprintf(inst->plotSolution, "set title \"Solution\"\n");
             fprintf(inst->plotSolution, "set xlabel \"X Axis\"\n");
             fprintf(inst->plotSolution, "set ylabel \"Y Axis\"\n");
@@ -59,8 +66,9 @@ void show_solution(instance* inst, bool useGnuplot)
 void show_costs(instance* inst, point* costs, int n, bool alg)
 {    
     if(inst->plotCosts == NULL){
+
         inst->plotCosts = popen("gnuplot --persist", "w");
-    
+        
         fprintf(inst->plotCosts, "set title \"Solution\"\n");
         fprintf(inst->plotCosts, "set xlabel \"X Axis\"\n");
         fprintf(inst->plotCosts, "set ylabel \"Y Axis\"\n");
@@ -107,19 +115,11 @@ void save_solution(instance* inst)
     sprintf(svg_directory_name, "Archive/Svg/%s", inst->algorithm_name);
 
     // Create the "solution" directory
-    #ifdef _WIN32
-        _mkdir("Archive");
-        _mkdir("Archive/Image");
-        _mkdir(img_directory_name);
-        _mkdir("Archive/Svg");
-        _mkdir(svg_directory_name);
-    #else
-        mkdir("Archive", 0777);
-        mkdir("Archive/Image", 0777);
-        mkdir(img_directory_name, 0777);
-        mkdir("Archive/Svg", 0777);
-        mkdir(svg_directory_name, 0777);
-    #endif
+    mkdir("Archive", 0777);
+    mkdir("Archive/Image", 0777);
+    mkdir(img_directory_name, 0777);
+    mkdir("Archive/Svg", 0777);
+    mkdir(svg_directory_name, 0777);
 
     time_t t = time(NULL);
     struct tm *tm = localtime(&t);
@@ -167,10 +167,12 @@ void save_solution(instance* inst)
 
     fprintf(plotPNG, "e\n");
     fflush(plotPNG);
+    
     pclose(plotPNG);
 
     fprintf(plotSVG, "e\n");
     fflush(plotSVG);
+    
     pclose(plotSVG);
 }
 
@@ -201,13 +203,15 @@ char* fileGenerator(int n)
 
     // Create the file name
     char file_name[50];
+
     snprintf(file_name, sizeof(file_name), "Resource/pr%d-%s.tsp", n, date_str);
 
     // Open the file
+    printf("%s\n",file_name);
     FILE *fp = fopen(file_name, "w");
     if (fp == NULL)
     {
-        printf("Error opening file.\n");
+        perror("Error opening file.\n");
         return NULL;
     }
 

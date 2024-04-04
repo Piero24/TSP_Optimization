@@ -21,9 +21,9 @@
     // }
 #else
     #include <sys/ioctl.h>
+    #include <unistd.h>
 #endif
 
-#include <unistd.h>
 
 #include <cplex.h> //CPX_INFBOUND
 
