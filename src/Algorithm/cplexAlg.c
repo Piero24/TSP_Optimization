@@ -160,14 +160,89 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 	free(cname);
 }
 
-/*
+int bendersLoop(instance *inst)
+{  
+	// open CPLEX model
+	int error, ncomp;
+	CPXENVptr env = CPXopenCPLEX(&error);
+	CPXLPptr lp = CPXcreateprob(env, &error, "TSP"); 
+	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
+	double *xstar = (double *) calloc(ncols, sizeof(double));
+    double objval = 0;
+
+	build_model(inst, env, lp);
+	
+	//first check of time
+	clock_t end = clock();
+    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+
+	do{
+		//set time limit
+		CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit - time);
+
+		//compute solution
+		if ( CPXmipopt(env,lp) ) print_error("CPXmipopt() error");
+    	if ( CPXsolution(env, lp, NULL, &objval, xstar, NULL, NULL, NULL) ) print_error("CPXgetx() error");	
+
+		//save lower bound
+		if(inst->best_lb > objval)
+			inst->best_lb = objval;
+
+		// compute connected components
+		int* succ, comp;
+		build_sol(xstar, inst, succ, comp, &ncomp);
+
+		// if there is only 1 connected compotent the solution is found
+		if(ncomp == 1) break;
+
+		// otherwise add sub-tour elimination contraint
+		add_SEC(inst, env, lp, ncomp, comp);
+
+		//check time
+		end = clock();
+        time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+	}while(time < inst->time_limit);
+	
+    // print solution
+    if(inst->verbose >= 100){
+        printf("costs:%f\n", objval);
+
+        for ( int i = 0; i < inst->nnodes; i++ )
+        {
+            for ( int j = i+1; j < inst->nnodes; j++ )
+            {
+				// print the selected edges
+                if ( xstar[xpos(i,j,inst)] > 0.5 ) 
+				{
+					// xstar itìs never 0 o 1 precisely
+					printf("x(%3d,%3d) = 1\n", i+1,j+1);
+				}
+            }
+        }
+    }
+
+	if(ncomp == 1){
+		int* result = (int *) calloc(inst->nnodes, sizeof(int));
+		convertSolution(xstar, result, inst);
+		bestSolution(result, objval, inst);
+		free(result);
+	}else if(inst->verbose >= 60){
+		printf("[cplex - Benders' loop] solution not found");
+	}
+	
+	// free and close cplex model   
+    free(xstar);
+	CPXfreeprob(env, &lp);
+	CPXcloseCPLEX(&env); 
+
+	return 0; // or an appropriate nonzero error code
+
+}
+
 #define DEBUG    // da commentare se non si vuole il debugging
 #define EPS 1e-5
 
-/*********************************************************************************************************************************/
-//void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *ncomp) // build succ() and comp() wrt xstar()...
-/*********************************************************************************************************************************/
-/*
+void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *ncomp) // build succ() and comp() wrt xstar()...
 {   
 
 #ifdef DEBUG
@@ -177,7 +252,7 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 		for ( int j = i+1; j < inst->nnodes; j++ )
 		{
 			int k = xpos(i,j,inst);
-			if ( fabs(xstar[k]) > EPS && fabs(xstar[k]-1.0)) > EPS ) print_error(" wrong xstar in build_sol()");
+			if ( fabs(xstar[k]) > EPS && fabs(xstar[k]-1.0) > EPS ) print_error(" wrong xstar in build_sol()");
 			if ( xstar[k] > 0.5 ) 
 			{
 				++degree[i];
@@ -226,6 +301,43 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 		
 		// go to the next component...
 	}
+}
+
+void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
+	if(ncomp == 1) print_error("add_SEC called with ncomp=1");
+	
+	int izero = 0;
+	int ncols = CPXgetnumcols(env, lp);
+	int* index = (int*) calloc(ncols, sizeof(int)); // indici delle variabili con coefficiente diverso da zero 
+	int* value = (int*) calloc(ncols, sizeof(int)); // valore dei coefficienti della sommatoria
+	char **cname = (char **) calloc(1, sizeof(char *));
+	cname[0] = (char *) calloc(100, sizeof(char));
+
+	for(int k=1; k<ncomp; k++){
+		int nnz = 0; // number of non zero
+		char sense = "L"; // <=
+		double rhs = -1.0; // right hand side of contraint
+		sprintf(cname[0], "component(%d)", k+1); 
+		
+		// aggiungo vincolo per component #k
+		for(int i=0; i<ncols; i++){
+			if(comp[i] != k) continue;
+			rhs += 1;
+			
+			for(int j=i+1; j<ncols-1; j++){
+				if(comp[j] != k) continue;
+					
+				index[nnz] = xpos(i,j, inst);
+				value[nnz] = 1.0;
+				nnz ++;
+			}
+		}
+		
+		CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, &cname[0]);
+	}
+
+	free(index);
+	free(value);
 }
 
 /*
