@@ -60,4 +60,26 @@ int xpos(int i, int j, instance *inst);
  */
 void build_model(instance *inst, CPXENVptr env, CPXLPptr lp);
 
+/**
+ * @brief
+ * 
+ * @param xstar
+ * @param inst
+ * @param succ
+ * @param comp
+ * @param ncomp
+ */
+void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *ncomp);
+
+/**
+ * @brief
+ * 
+ * @param inst
+ * @param env
+ * @param lp
+ * @param ncomp
+ * @param comp
+ */
+void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp);
+
 #endif /* CPLEXALG_H */

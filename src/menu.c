@@ -1,5 +1,10 @@
 #include "menu.h"
 
+// MACOS: Se tolti VSCode da errore ma compila ugualmente
+// Ci sono anche su menu.h
+#include "tsp.h"
+#include "parser.h"
+#include <cplex.h> //CPX_INFBOUND
 
 int manage_menu(instance *inst)
 {

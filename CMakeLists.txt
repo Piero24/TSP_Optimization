@@ -35,6 +35,6 @@ add_executable(TSP_Optimization
 
 # target_link_directories(TSP_Optimization "C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/lib/x64_windows_msvc14/stat_mdd/")
 
-# target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} ${Boost_FILESYSTEM_LIBRARY})
-target_link_libraries(TSP_Optimization PRIVATE "C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/lib/x64_windows_msvc14/stat_mdd/ilocplex.lib" "C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/lib/x64_windows_msvc14/stat_mdd/cplex2211.lib")
+target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} ${Boost_FILESYSTEM_LIBRARY})
+# target_link_libraries(TSP_Optimization PRIVATE "C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/lib/x64_windows_msvc14/stat_mdd/ilocplex.lib" "C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/lib/x64_windows_msvc14/stat_mdd/cplex2211.lib")
 include(CPack)

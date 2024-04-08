@@ -190,13 +190,13 @@ int bendersLoop(instance *inst)
 
 		// compute connected components
 		int* succ, comp;
-		build_sol(xstar, inst, succ, comp, &ncomp);
+		build_sol(xstar, inst, succ, &comp, &ncomp);
 
 		// if there is only 1 connected compotent the solution is found
 		if(ncomp == 1) break;
 
 		// otherwise add sub-tour elimination contraint
-		add_SEC(inst, env, lp, ncomp, comp);
+		add_SEC(inst, env, lp, ncomp, &comp);
 
 		//check time
 		end = clock();
@@ -309,13 +309,13 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
 	int izero = 0;
 	int ncols = CPXgetnumcols(env, lp);
 	int* index = (int*) calloc(ncols, sizeof(int)); // indici delle variabili con coefficiente diverso da zero 
-	int* value = (int*) calloc(ncols, sizeof(int)); // valore dei coefficienti della sommatoria
+	double* value = (double*) calloc(ncols, sizeof(int)); // valore dei coefficienti della sommatoria
 	char **cname = (char **) calloc(1, sizeof(char *));
 	cname[0] = (char *) calloc(100, sizeof(char));
 
 	for(int k=1; k<ncomp; k++){
 		int nnz = 0; // number of non zero
-		char sense = "L"; // <=
+		char sense = 'L'; // <=
 		double rhs = -1.0; // right hand side of contraint
 		sprintf(cname[0], "component(%d)", k+1); 
 		
