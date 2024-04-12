@@ -6,7 +6,6 @@
 #include "algoSelector.h"
 #include <cplex.h>
 
-
 /**
  * @brief Calculates the distance between two points in a given instance.
  * 

@@ -3,7 +3,7 @@ project(TSP_Optimization VERSION 1.0)
 
 # # find_package(PackageName REQUIRED)
 
-include_directories(TSP_Optimization "C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/include/ilcplex")
+include_directories(TSP_Optimization "C:/Program Files/IBM/ILOG/CPLEX_Studio2211/cplex/include/ilcplex")
 # # find_package(Boost COMPONENTS filesystem REQUIRED)
 # # include_directories( ${PackageName_INCLUDE_DIRS} )
 # # include_directories(${Boost_INCLUDE_DIRS})
@@ -17,9 +17,10 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
 # set(CPLEXDIR /Applications/CPLEX_Studio2211/cplex)
-set(CPLEX_LIBRARIES "C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/lib/x64_windows_msvc14/stat_mdd/")
+set(CPLEX_LIBRARIES "C:/Program Files/IBM/ILOG/CPLEX_Studio2211/cplex/lib/x64_windows_msvc14/stat_mdd/")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I. -I${CPLEXDIR}/include/ilcplex")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${CPLEXDIR}/lib/arm64_osx/static_pic -L. -lcplex -lpthread -ldl")
+set(CPLEX_LIB "C:/Program Files/IBM/ILOG/CPLEX_Studio2211/cplex/lib/x64_windows_msvc14/stat_mdd/cplex2211.lib")
 
 # Add source files
 add_executable(TSP_Optimization
@@ -33,8 +34,5 @@ add_executable(TSP_Optimization
     src/menu.c
 )
 
-# target_link_directories(TSP_Optimization "C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/lib/x64_windows_msvc14/stat_mdd/")
-
-target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} ${Boost_FILESYSTEM_LIBRARY})
-# target_link_libraries(TSP_Optimization PRIVATE "C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/lib/x64_windows_msvc14/stat_mdd/ilocplex.lib" "C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/lib/x64_windows_msvc14/stat_mdd/cplex2211.lib")
+target_link_libraries( ${PROJECT_NAME} PRIVATE ${OpenCV_LIBS} ${Boost_FILESYSTEM_LIBRARY} ${CPLEX_LIB})
 include(CPack)

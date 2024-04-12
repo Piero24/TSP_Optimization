@@ -7,11 +7,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <cplex.h> //CPX_INFBOUND
 
 #include "tsp.h"
 #include "menu.h"
-
-#include <cplex.h> //CPX_INFBOUND
 
 /**
  * @brief Parses command-line arguments to initialize the instance structure.
