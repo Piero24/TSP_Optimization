@@ -134,4 +134,15 @@ double randomDouble(double min, double max);
  */
 char* fileGenerator(int n);
 
+/**
+ * @brief Return distance between node a and b.
+ * 
+ * @param inst A pointer to the instance structure to be freed.
+ * @param a The index of the first node.
+ * @param b The index of the second nod.
+ * 
+ * @return The distance between node a and b.
+ */
+double dist(instance* inst, int a, int b);
+
 #endif /* TSP_H */

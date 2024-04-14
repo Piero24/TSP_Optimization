@@ -7,6 +7,11 @@
     #define mkdir _mkdir
 #endif
 
+double dist(instance* inst, int a, int b)
+{
+    return inst->distances[a][b];
+}
+
 void generateDataFile(const char* filename, instance* inst)
 {
     FILE* file = fopen("data.txt", "w");

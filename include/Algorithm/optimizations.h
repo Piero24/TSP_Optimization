@@ -50,6 +50,23 @@ void reverseSubvector(int* from, int* to);
 int twoOpt(instance* inst);
 
 /**
+ * @brief The actual loop of a twoOpt optimization.
+ * 
+ * @param inst Pointer to the instance structure.
+ * @param result Pointer to the array with the inizial solution that will be optimized. 
+ *  Will contain the optimized solution after the function ends.
+ * @param cost Pointer to the variable to store the cost of the solution.
+ * 
+ * @param costs Pointer to array of costs function (needed for plotting).
+ * @param nCosts Number of elements of costs.
+ * @param xIndex Iterations counter (needed for plotting).
+ * 
+ * @param VNS True if the caller function is VNS, false otherwise.
+ * @param plotFlag True if the costs function should be plotted, false otherwise.
+ */
+void twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCosts, int* xIndex, bool VNS, bool plotFlag);
+
+/**
  * @brief Checks if a given node exists in a list.
  * 
  * This function iterates through the elements of the list to determine if 

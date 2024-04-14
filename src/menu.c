@@ -357,11 +357,7 @@ int options_menu(int *verbose, double *timeLimit, int *randomSeed, int *showGnup
 int getTerminalWidth()
 {
     #ifdef _WIN32
-        /*
-        CONSOLE_SCREEN_BUFFER_INFO csbi;
-        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-        return csbi.dwSize.X;
-        //*/ return 100;
+        return 100;
     #else
         struct winsize w;
         ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);

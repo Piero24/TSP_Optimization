@@ -1,10 +1,5 @@
 #include "Algorithm/cplexAlg.h"
 
-double dist(int i, int j, instance *inst)
-{
-	return inst->distances[i][j];
-}
-
 int TSPopt(instance *inst)
 {  
 	// open CPLEX model
@@ -102,7 +97,7 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 			// x(1,2), x(1,3) ....
 			sprintf(cname[0], "x(%d,%d)", i+1,j+1);
 			// cost == distance   
-			double obj = dist(i,j,inst);
+			double obj = dist(inst, i, j);
 			double lb = 0.0;
 			double ub = 1.0;
 

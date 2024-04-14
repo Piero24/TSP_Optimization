@@ -20,9 +20,9 @@ void Random(instance* inst)
     inst->zbest = 0;
     for (int i = 1; i < inst->nnodes; i++)
     {
-        inst->zbest += inst->distances[inst->best_sol[i]][inst->best_sol[i-1]];
+        inst->zbest += dist(inst, inst->best_sol[i], inst->best_sol[i-1]);
     }
-    inst->zbest += inst->distances[inst->best_sol[0]][inst->best_sol[inst->nnodes-1]];
+    inst->zbest += dist(inst, inst->best_sol[0], inst->best_sol[inst->nnodes-1]);
 }
 
 int apply_algorithm(instance* inst)

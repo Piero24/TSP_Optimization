@@ -81,14 +81,14 @@ int nearestNeighbor(instance* inst, int firstNode, int* result, double* cost)
     {
         if(inst->verbose > 95) printf("[Nearest Neighbor] Current node: %d\n", result[current]);
 
-        double minDist = inst->distances[result[current]][result[current+1]];
+        double minDist = dist(inst, result[current], result[current+1]);
         int nearest = current+1;
 
         for(int next=current+2; next<inst->nnodes; next++)
         {
-            if(inst->distances[result[current]][result[next]] < minDist)
+            if(dist(inst, result[current], result[next]) < minDist)
             {
-                minDist = inst->distances[result[current]][result[next]];
+                minDist = dist(inst, result[current], result[next]);
                 nearest = next;
             }
         }
@@ -97,11 +97,11 @@ int nearestNeighbor(instance* inst, int firstNode, int* result, double* cost)
         result[current+1] = result[nearest];
         result[nearest] = tmp;
 
-        *cost += inst->distances[result[current]][result[nearest]];
+        *cost += dist(inst, result[current], result[nearest]);
         if(inst->verbose > 95) printf("[Nearest Neighbor] Current cost: %f\n", *cost);
     }
 
-    *cost += inst->distances[result[0]][result[inst->nnodes-1]];
+    *cost += dist(inst, result[0], result[inst->nnodes-1]);
     if(inst->verbose > 95) printf("[Nearest Neighbor] Current cost: %f\n", *cost);
 
     if(inst->verbose > 80) printf("[Nearest Neighbor] Algorithm finished\n\n");

@@ -3,8 +3,6 @@
 
 ## Make compose csv + use python script
 
-## fix cplex on windows
-
 
 
 
@@ -19,11 +17,7 @@
 
 ## Make the initialization function
 
-## Fix screen width in windows
-
 ## assert instead of printError
-
-## distance function
 
 
 

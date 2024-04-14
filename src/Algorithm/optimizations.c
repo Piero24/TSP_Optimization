@@ -16,114 +16,6 @@ void reverseSubvector(int* from, int* to)
     }
 }
 
-int twoOpt(instance* inst)
-{
-    if (inst->verbose >= 80) printf("[2opt] Starting initialization.\n");
-
-    int* result = (int*) calloc(inst->nnodes, sizeof(int));
-    double cost = inst->zbest;
-    int counter = 0; // conts from how many cicles we haven't swapped two nodes
-
-    clock_t end;
-    double time;
-    
-    for (int i = 0; i < inst->nnodes; i++)
-    {
-        result[i] = inst->best_sol[i];
-    }
-
-    inst->plotCosts = NULL;
-    point* costs = (point*)calloc(1, sizeof(point));
-    int nCosts = 0, xIndex = 0;
-    bool plotFlag = false;
-    
-    if (inst->verbose >= 80) printf("[2opt] Initialization completed, starting optimization.\n");
-
-    do 
-    {
-        counter++;
-        xIndex++;
-
-        int* A = &result[0];
-        int* A1 = &result[1];
-
-        for (int* B = &result[2]; B < &result[inst->nnodes-2]; B++)
-        {
-            int* B1 = B + 1;
-            
-            // Calculate the euclidean distance between the nodes: d(A1,B1) + d(A,B) < d(A1,A) + d(B1,B)
-            double distA1B1 = inst->distances[*A1][*B1];
-            double distAB = inst->distances[*A][*B];
-
-            double distAA1 = inst->distances[*A][*A1];
-            double distBB1 = inst->distances[*B][*B1];
-
-            if (inst->verbose >= 100){
-                printf("[2opt] A: %f - %f\n", inst->coord[*A].x, inst->coord[*A].y);
-                printf("[2opt] A1: %f - %f\n", inst->coord[*A1].x, inst->coord[*A1].y);
-                printf("[2opt] B: %f - %f\n", inst->coord[*B].x, inst->coord[*B].y);
-                printf("[2opt] B1: %f - %f\n", inst->coord[*B1].x, inst->coord[*B1].y);
-                printf("[2opt] Trying to swap edges %d-%d and %d-%d with %d-%d and %d-%d\n", *A1, *A, *B, *B1,*A1, *B1, *B, *A);
-                printf("[2opt] Distances: A1B1: %f, AB: %f, AA1: %f, BB1: %f\n\n", distA1B1, distAB, distAA1, distBB1);
-            }
-
-            if (distAB + distA1B1 < distAA1 + distBB1)
-            {
-                if (inst->verbose >= 90) 
-                    printf("[2opt] Swapping edges %d-%d and %d-%d with %d-%d and %d-%d\n", *A, *A1, *B, *B1, *A1, *B1, *B, *A);
-
-                // Reverse the sub-array from A to B
-                reverseSubvector(A1, B);
-
-                cost = cost - (distAA1 + distBB1) + (distAB + distA1B1);
-                counter = 0;
-
-                if(plotFlag){
-                    costs[nCosts].x = xIndex;
-                    costs[nCosts].y = cost;
-
-                    nCosts++;
-                    show_costs(inst, costs, nCosts, false);
-
-                    point* tmp = (point*)calloc(nCosts+1, sizeof(point));
-                    for(int i=0;i<nCosts;i++){
-                        tmp[i] = costs[i];
-                    }
-
-                    free(costs);
-                    costs = tmp;
-                }
-
-                // update official solution
-                if(bestSolution(result, cost, inst) != 0){
-                    if (inst->verbose >= 60) printf("[2opt] Optimization NOT completed, time limit reached.\n\n");
-                    free(result);
-                    return 1;
-                }
-
-            }
-
-        }
-        
-        // move A to the end of the array
-        int Acopy = *A;
-        for(int i=0; i<inst->nnodes-1; i++){
-            result[i] = result[i+1];
-        }
-
-        result[inst->nnodes-1] = Acopy;
-
-    } while (counter < inst->nnodes);
-
-    if (inst->verbose >= 80) printf("[2opt] Optimization completed.\n\n");
-
-    bestSolution(result, cost, inst);
-    free(result);
-    free(costs);
-    
-    return 0;
-}
-
 bool nodeInList(int* node, int* list, int listLength)
 {
     for(int i = 0; i < listLength; i++)
@@ -142,6 +34,178 @@ void copyArray(int* from, int* to, int length)
     {
         to[i] = from[i];
     }
+}
+
+/**
+    | a | b | c | d | A | A | A | A | A | B | B | B | B | B | o | p | q | r |
+	             ^^^ ^^^             ^^^ ^^^             ^^^ ^^^
+	              i  i+1     <        j  j+1    <         k  k+1
+
+    i -> j+1
+    j+1 -> k
+    k -> i+1
+    i+1 -> j
+    j -> k+1
+    k+1 -> i
+	
+    | a | b | c | d | B | B | B | B | B | A | A | A | A | A | o | p | q | r |
+	             ^^^ ^^^             ^^^ ^^^             ^^^ ^^^
+	              i  j+1              k  i+1              j  k+1
+
+    code:
+    copy array from i+1 to j (included) in tmp
+    copy array from j+1 to k (included) in positions from i+1 to (i+1)+(k-(j+1)+1)
+    copy tmp in positions from (i+1)+(k-(j+1)+1) to (i+1)+(k-(j+1)+1)+(j-(i+1))
+*/
+void kick(double* cost, int* result, instance* inst){
+    //find 3 points in the vector
+    int i = rand() % (inst->nnodes-5);
+    int j = (rand() % (inst->nnodes - (i+2) - 3)) + i + 2;
+    int k = (rand() % (inst->nnodes - (j+2) - 1)) + j + 2;
+
+    //remove old costs
+    *cost -= dist(inst, result[i], result[i+1]);
+    *cost -= dist(inst, result[j], result[j+1]);
+    *cost -= dist(inst, result[k], result[k+1]);
+
+    //add new costs
+    *cost += dist(inst, result[i], result[j+1]);
+    *cost += dist(inst, result[j], result[k+1]);
+    *cost += dist(inst, result[k], result[i+1]);
+
+    //compute subvectors sizes
+    int sizeA = j - (i+1) + 1;
+    int sizeB = k - (j+1) + 1;
+
+    //swap subvectors
+    int* tmp = (int*) calloc(sizeA, sizeof(int));
+    for(int a = 0; a < sizeA; a++){
+        tmp[a] = result[i + 1 + a];
+    }
+
+    for(int b = 0; b < sizeB; b++){
+        result[i + 1 + b] = result[j + 1 + b];
+    }
+
+    for(int a = 0; a < sizeA; a++){
+        result[i + 1 + sizeB + a] = tmp[a];
+    }
+}
+
+void twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCosts, int* xIndex, bool VNS, bool plotFlag){
+    int counter = 0; // conts from how many cicles we haven't swapped two nodes
+
+    do 
+    {
+        counter++;
+        *xIndex++;
+
+        int* A = &result[0];
+        int* A1 = &result[1];
+
+        for (int* B = &result[2]; B < &result[inst->nnodes-2]; B++)
+        {
+            int* B1 = B + 1;
+            
+            // Calculate the euclidean distance between the nodes: d(A1,B1) + d(A,B) < d(A1,A) + d(B1,B)
+            double distA1B1 = dist(inst, *A1, *B1);
+            double distAB = dist(inst, *A, *B);
+
+            double distAA1 = dist(inst, *A, *A1);
+            double distBB1 = dist(inst, *B, *B1);
+
+            if (inst->verbose >= 100){
+                printf("[2optLoop] A: %f - %f\n", inst->coord[*A].x, inst->coord[*A].y);
+                printf("[2optLoop] A1: %f - %f\n", inst->coord[*A1].x, inst->coord[*A1].y);
+                printf("[2optLoop] B: %f - %f\n", inst->coord[*B].x, inst->coord[*B].y);
+                printf("[2optLoop] B1: %f - %f\n", inst->coord[*B1].x, inst->coord[*B1].y);
+                printf("[2optLoop] Trying to swap edges %d-%d and %d-%d with %d-%d and %d-%d\n", *A1, *A, *B, *B1,*A1, *B1, *B, *A);
+                printf("[2optLoop] Distances: A1B1: %f, AB: %f, AA1: %f, BB1: %f\n\n", distA1B1, distAB, distAA1, distBB1);
+            }
+
+            if (distAB + distA1B1 < distAA1 + distBB1)
+            {
+                if (inst->verbose >= 90) 
+                    printf("[2optLoop] Swapping edges %d-%d and %d-%d with %d-%d and %d-%d\n", *A, *A1, *B, *B1, *A1, *B1, *B, *A);
+
+                // Reverse the sub-array from A to B
+                reverseSubvector(A1, B);
+
+                *cost = *cost - (distAA1 + distBB1) + (distAB + distA1B1);
+                counter = 0;
+
+                // update official solution
+                if(*cost < inst->zbest){
+                    if(bestSolution(result, *cost, inst) != 0 && VNS){
+                        if (inst->verbose >= 60) 
+                            printf("[2optLoop] Optimization NOT completed, time limit reached.\n\n");
+                        free(result);
+                        return 1;
+                    }
+                }
+
+                if(plotFlag){
+                    costs[*nCosts].x = *xIndex;
+                    costs[*nCosts].y = *cost;
+
+                    *nCosts++;
+                    if(!VNS)
+                        show_costs(inst, costs, *nCosts, false);
+
+                    point* tmp = (point*)calloc(*nCosts+1, sizeof(point));
+                    for(int i=0;i<*nCosts;i++){
+                        tmp[i] = costs[i];
+                    }
+
+                    free(costs);
+                    costs = tmp;
+                }
+            }
+        }
+        
+        // move A to the end of the array
+        int Acopy = *A;
+        for(int i=0; i<inst->nnodes-1; i++){
+            result[i] = result[i+1];
+        }
+
+        result[inst->nnodes-1] = Acopy;
+
+    } while (counter < inst->nnodes);
+
+    free(costs);
+}
+
+int twoOpt(instance* inst)
+{
+    if (inst->verbose >= 80) printf("[2opt] Starting initialization.\n");
+
+    int* result = (int*) calloc(inst->nnodes, sizeof(int));
+    double cost = inst->zbest;
+
+    for (int i = 0; i < inst->nnodes; i++)
+    {
+        result[i] = inst->best_sol[i];
+    }
+    
+    inst->plotCosts = NULL;
+    point* costs = (point*)calloc(1, sizeof(point));
+    int nCosts = 0, xIndex = 0;
+    bool plotFlag = false;
+
+    clock_t end;
+    double time;
+    
+    if (inst->verbose >= 80) printf("[2opt] Initialization completed, starting optimization.\n");
+
+    twoOptLoop(inst, result, &cost, costs, &nCosts, &xIndex, false, false);
+
+    if (inst->verbose >= 80) printf("[2opt] Optimization completed.\n\n");
+
+    bestSolution(result, cost, inst);
+    free(result);
+    
+    return 0;
 }
 
 int tabuSearch(instance* inst)
@@ -215,9 +279,9 @@ int tabuSearch(instance* inst)
                 int succB = (B == inst->nnodes-1) ? 0 : B+1;
 
                 //compute costs
-                double old = inst->distances[result[prevA]][result[A]] + inst->distances[result[succB]][result[B]];
-                double new = inst->distances[result[prevA]][result[B]] + inst->distances[result[succB]][result[A]];
-
+                double old = dist(inst, result[prevA], result[A]) + dist(inst, result[succB], result[B]);
+                double new = dist(inst, result[prevA], result[B]) + dist(inst, result[succB], result[A]);
+                
                 // if is the first non-tabù solution, save it as current candidate
                 if(bestCost == -1 || new < old)
                 {
@@ -317,62 +381,6 @@ int tabuSearch(instance* inst)
     return 0;
 }
 
-/**
-    | a | b | c | d | A | A | A | A | A | B | B | B | B | B | o | p | q | r |
-	             ^^^ ^^^             ^^^ ^^^             ^^^ ^^^
-	              i  i+1     <        j  j+1    <         k  k+1
-
-    i -> j+1
-    j+1 -> k
-    k -> i+1
-    i+1 -> j
-    j -> k+1
-    k+1 -> i
-	
-    | a | b | c | d | B | B | B | B | B | A | A | A | A | A | o | p | q | r |
-	             ^^^ ^^^             ^^^ ^^^             ^^^ ^^^
-	              i  j+1              k  i+1              j  k+1
-
-    code:
-    copy array from i+1 to j (included) in tmp
-    copy array from j+1 to k (included) in positions from i+1 to (i+1)+(k-(j+1)+1)
-    copy tmp in positions from (i+1)+(k-(j+1)+1) to (i+1)+(k-(j+1)+1)+(j-(i+1))
-*/
-void kick(double* cost, int* result, instance* inst){
-    //find 3 points in the vector
-    int i = rand() % (inst->nnodes-5);
-    int j = (rand() % (inst->nnodes - (i+2) - 3)) + i + 2;
-    int k = (rand() % (inst->nnodes - (j+2) - 1)) + j + 2;
-
-    //remove old costs
-    *cost -= inst->distances[result[i]][result[i+1]];
-    *cost -= inst->distances[result[j]][result[j+1]];
-    *cost -= inst->distances[result[k]][result[k+1]];
-
-    //add new costs
-    *cost += inst->distances[result[i]][result[j+1]];
-    *cost += inst->distances[result[j]][result[k+1]];
-    *cost += inst->distances[result[k]][result[i+1]];
-
-    //compute subvectors sizes
-    int sizeA = j - (i+1) + 1;
-    int sizeB = k - (j+1) + 1;
-
-    //swap subvectors
-    int* tmp = (int*) calloc(sizeA, sizeof(int));
-    for(int a = 0; a < sizeA; a++){
-        tmp[a] = result[i + 1 + a];
-    }
-
-    for(int b = 0; b < sizeB; b++){
-        result[i + 1 + b] = result[j + 1 + b];
-    }
-
-    for(int a = 0; a < sizeA; a++){
-        result[i + 1 + sizeB + a] = tmp[a];
-    }
-}
-
 int variableNeighborhoodSearch(instance* inst)
 {
     // time checkers
@@ -399,68 +407,7 @@ int variableNeighborhoodSearch(instance* inst)
             
         // 2OPT SECTION
 
-        int counter = 0; // conts from how many cicles we haven't swapped two nodes
-        
-        do 
-        {
-            counter += 1;
-            xIndex++;
-
-            int* A = &result[0];
-            int* A1 = &result[1];
-
-            for (int* B = &result[2]; B < &result[inst->nnodes-2]; B++)
-            {
-                int* B1 = B + 1;
-                
-                // Calculate the euclidean distance between the nodes: d(A1,B1) + d(A,B) < d(A1,A) + d(B1,B)
-                double distA1B1 = inst->distances[*A1][*B1];
-                double distAB = inst->distances[*A][*B];
-
-                double distAA1 = inst->distances[*A][*A1];
-                double distBB1 = inst->distances[*B][*B1];
-
-                if (distAB + distA1B1 < distAA1 + distBB1)
-                {
-                    if (inst->verbose >= 90) 
-                        printf("[VNS - 2opt] Swapping edges %d-%d and %d-%d with %d-%d and %d-%d\n", *A, *A1, *B, *B1, *A1, *B1, *B, *A);
-
-                    // Reverse the sub-array from A to B
-                    reverseSubvector(A1, B);
-
-                    cost = cost - (distAA1 + distBB1) + (distAB + distA1B1);
-                    counter = 0;
-
-                    // update official solution
-                    if(cost < inst->zbest)
-                        bestSolution(result, cost, inst);
-                    
-                    if(plotFlag){
-                        costs[nCosts].x = xIndex;
-                        costs[nCosts].y = cost;
-
-                        nCosts++;
-
-                        point* tmp = (point*)calloc(nCosts+1, sizeof(point));
-                        for(int i=0;i<nCosts;i++){
-                            tmp[i] = costs[i];
-                        }
-
-                        free(costs);
-                        costs = tmp;
-                    }
-                }
-            }
-            
-            // move A to the end of the array
-            int Acopy = *A;
-            for(int i=0; i<inst->nnodes-1; i++){
-                result[i] = result[i+1];
-            }
-
-            result[inst->nnodes-1] = Acopy;
-
-        } while (counter < inst->nnodes);
+        twoOptLoop(inst, result, &cost, costs, &nCosts, &xIndex, true, false);
 
         if (inst->verbose >= 80) printf("[VNS - 2opt] Optimization completed, cost: %f, kicking the solution.\n", cost);
 

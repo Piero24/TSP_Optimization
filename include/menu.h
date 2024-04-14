@@ -7,18 +7,6 @@
 
 #ifdef _WIN32
     #include <Windows.h>
-    // void getConsoleSize(int *width, int *height) {
-    //     CONSOLE_SCREEN_BUFFER_INFO csbi;
-    //     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-    //     *width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    //     *height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-    // }
-    // int main() {
-    //     int width, height;
-    //     getConsoleSize(&width, &height);
-    //     printf("Console width: %d, height: %d\n", width, height);
-    //     return 0;
-    // }
 #else
     #include <sys/ioctl.h>
     #include <unistd.h>
