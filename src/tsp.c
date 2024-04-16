@@ -68,6 +68,46 @@ void show_solution(instance* inst, bool useGnuplot)
     }
 }
 
+void show_solution_comps(instance* inst, bool useGnuplot, int** result, int ncomp)
+{    
+    if(useGnuplot)
+    {
+        if(inst->plotSolution == NULL){
+            
+            inst->plotSolution = popen("gnuplot --persist", "w");
+            
+            fprintf(inst->plotSolution, "set title \"Solution\"\n");
+            fprintf(inst->plotSolution, "set xlabel \"X Axis\"\n");
+            fprintf(inst->plotSolution, "set ylabel \"Y Axis\"\n");
+            fprintf(inst->plotSolution, "set grid\n");
+            fprintf(inst->plotSolution, "set term qt persist font \"Arial\"\n"); // Set font to Arial
+            fprintf(inst->plotSolution, "set pointsize 0.1\n"); // Set font to Arial
+            fprintf(inst->plotSolution, "set datafile separator \"\t\"");
+            fprintf(inst->plotSolution, "plot '-' with linespoints pointtype 7\n");
+        }
+
+        for(int j=1; j<ncomp+1; j++){
+            for(int i=0; i<inst->nnodes && result[j][i] != -1; i++)
+            {
+                fprintf(inst->plotSolution, "%f %f\n", inst->coord[result[j][i]].x, inst->coord[result[j][i]].y);
+            }
+            if(result[j][0] != -1 && result[j][0] != -1)
+                fprintf(inst->plotSolution, "%f %f\n", inst->coord[result[j][0]].x, inst->coord[result[j][0]].y);
+        }
+
+        fprintf(inst->plotSolution, "e\n");
+
+        fflush(inst->plotSolution);
+
+    } else 
+    {
+        for(int i=0; i<inst->nnodes; i++)
+        {
+            printf("%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
+        }
+    }
+}
+
 void show_costs(instance* inst, point* costs, int n, bool alg)
 {    
     if(inst->plotCosts == NULL){

@@ -145,4 +145,6 @@ char* fileGenerator(int n);
  */
 double dist(instance* inst, int a, int b);
 
+void show_solution_comps(instance* inst, bool useGnuplot, int** result, int ncomp);
+
 #endif /* TSP_H */

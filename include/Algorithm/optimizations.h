@@ -63,8 +63,9 @@ int twoOpt(instance* inst);
  * 
  * @param VNS True if the caller function is VNS, false otherwise.
  * @param plotFlag True if the costs function should be plotted, false otherwise.
+ * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
-void twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCosts, int* xIndex, bool VNS, bool plotFlag);
+int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCosts, int* xIndex, bool VNS, bool plotFlag);
 
 /**
  * @brief Checks if a given node exists in a list.

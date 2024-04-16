@@ -7,17 +7,6 @@
 #include <cplex.h>
 
 /**
- * @brief Calculates the distance between two points in a given instance.
- * 
- * @param i The index of the first point.
- * @param j The index of the second point.
- * @param inst Pointer to the instance containing the points and their distances.
- * 
- * @return The distance between points i and j in the instance.
- */
-double dist(int i, int j, instance *inst);
-
-/**
  * @brief Solves the Traveling Salesman Problem (TSP) using CPLEX optimization.
  * 
  * @param inst Pointer to the instance containing problem data.
@@ -28,13 +17,11 @@ double dist(int i, int j, instance *inst);
 int TSPopt(instance *inst);
 
 /**
- * @brief Converts the solution obtained from CPLEX into a feasible TSP path.
+ * @brief Converts the solution obtained from build_sol into a list of feasible TSP paths.
  * 
- * @param xstar Array containing the solution values obtained from CPLEX.
- * @param result Array to store the converted solution (TSP path).
- * @param inst Pointer to the instance containing problem data.
+ * @param 
  */
-void convertSolution(double *xstar, int* result, instance* inst);
+int** convertSolution(int *succ, int *comp, int ncomp, instance* inst);
 
 /**
  * @brief Calculates the position of the (i, j) element in a one-dimensional 
@@ -80,5 +67,7 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *n
  * @param comp
  */
 void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp);
+
+void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *cost);
 
 #endif /* CPLEXALG_H */

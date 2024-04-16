@@ -6,6 +6,7 @@
 // Windows
 // cmake . -B build --fresh && cmake --build build --clean-first
 // Debug\TSP_Optimization.exe -g 100 -model 1 -opt 3 -s 0 -v 60 -tl 10
+// Debug\TSP_Optimization.exe -g 100 -model 2 -v 95 -tl 20
 
 // Linux
 // rm -r build && mkdir build && cmake -S . -DCPLEXDIR="C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/" -B build
@@ -113,7 +114,7 @@ int manage_launcher(instance *inst, const char *filename)
             read_input(inst);
             apply_algorithm(inst);
 
-            show_solution(inst, true);
+            //show_solution(inst, true);
             save_solution(inst);
 
             free_instance(inst);

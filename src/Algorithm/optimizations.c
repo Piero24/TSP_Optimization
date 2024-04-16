@@ -92,7 +92,7 @@ void kick(double* cost, int* result, instance* inst){
     }
 }
 
-void twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCosts, int* xIndex, bool VNS, bool plotFlag){
+int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCosts, int* xIndex, bool VNS, bool plotFlag){
     int counter = 0; // conts from how many cicles we haven't swapped two nodes
 
     do 
@@ -174,6 +174,7 @@ void twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nC
     } while (counter < inst->nnodes);
 
     free(costs);
+    return 0;
 }
 
 int twoOpt(instance* inst)

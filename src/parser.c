@@ -155,6 +155,10 @@ int intToModelName(instance* inst, int type)
 			strcpy(inst->algorithm_name, "CPLEX");
 			break;
 
+		case 3:
+			strcpy(inst->algorithm_name, "Benders' Loop");
+			break;
+
 		default:
 			strcpy(inst->algorithm_name, "Undefined");
 			break;

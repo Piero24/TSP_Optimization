@@ -62,6 +62,10 @@ int algorithmSelector(instance* inst)
     {
         TSPopt(inst);
 
+    } else if (strcmp(inst->algorithm_name, "Benders' Loop") == 0)
+    {
+        bendersLoop(inst);
+
     } else 
     {
         printf("Model type not implemented\n");
@@ -106,13 +110,14 @@ void sleep_ms(int milliseconds)
 
 int bestSolution(int* result, double cost, instance* inst)
 {
-    for (int i = 0; i < inst->nnodes; i++)
+    for (int i = 0; i < inst->nnodes && result[i] != -1; i++)
     {
         inst->best_sol[i] = result[i];
     }
+    
     inst->zbest = cost;
     inst->tbest = clock();
-
+    
     int time = (int)(((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC);
     
     if(inst->verbose >= 50)

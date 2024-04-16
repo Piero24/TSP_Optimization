@@ -1,7 +1,12 @@
 #include "Algorithm/cplexAlg.h"
 
+#define DEBUG    // da commentare se non si vuole il debugging
+#define EPS 1e-5
+
 int TSPopt(instance *inst)
 {  
+	if(inst->verbose >= 60) printf("[CPLEX] Initializing algorithm...\n");
+
 	// open CPLEX model
 	int error;
 	CPXENVptr env = CPXopenCPLEX(&error);
@@ -9,20 +14,21 @@ int TSPopt(instance *inst)
 
 	build_model(inst, env, lp);
 	
-	// Cplex's parameter setting
+	// Cplex's get best sol
+	if(inst->verbose >= 60) printf("[CPLEX] Getting best solution\n");
 	if ( CPXmipopt(env,lp) ) print_error("CPXmipopt() error");    
 
-	// get the optimal solution found by CPLEX
+	// get info of the optimal solution found by CPLEX
 	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
 	double *xstar = (double *) calloc(ncols, sizeof(double));
     double objval = 0;
-
-    // CPXgetx(env, lp, xstar, 0, ncols-1)
-	if ( CPXsolution(env, lp, NULL, &objval, xstar, NULL, NULL, NULL) ) print_error("CPXgetx() error");	
+	
+    CPXgetbestobjval(env, lp, &objval);
+	CPXgetx(env, lp, xstar, 0, ncols - 1);
     
     // print solution
-    if(inst->verbose >= 100){
-        printf("costs:%f\n", objval);
+    if(inst->verbose >= 95){
+        printf("[CPLEX] Costs:%f\n", objval);
 
         for ( int i = 0; i < inst->nnodes; i++ )
         {
@@ -32,19 +38,28 @@ int TSPopt(instance *inst)
                 if ( xstar[xpos(i,j,inst)] > 0.5 ) 
 				{
 					// xstar itìs never 0 o 1 precisely
-					printf("x(%3d,%3d) = 1\n", i+1,j+1);
+					printf("[CPLEX] x(%3d,%3d) = 1\n", i+1,j+1);
 				}
             }
         }
     }
 
-    int* result = (int *) calloc(inst->nnodes, sizeof(int));
-    convertSolution(xstar, result, inst);
-    bestSolution(result, objval, inst);
+    int** result;
+	int ncomp;
+	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
+	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
+	
+	build_sol(xstar, inst, succ, comp, &ncomp);
+	result = convertSolution(succ, comp, ncomp, inst);
+	show_solution_comps(inst, true, result, ncomp);
+    //bestSolution(result[1], objval, inst);
 	
 	// free and close cplex model   
+    for(int i=1; i<ncomp+1; i++) free(result[i]);
+	free(result);
     free(xstar);
-    free(result);
+    free(succ);
+    free(comp);
 	CPXfreeprob(env, &lp);
 	CPXcloseCPLEX(&env); 
 
@@ -52,24 +67,52 @@ int TSPopt(instance *inst)
 
 }
 
-void convertSolution(double *xstar, int* result, instance* inst)
+int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
 {
-    int currentPos = 0, lastNode = 0, currentNode = 0;
-    result[currentPos++] = currentNode;
-    
-    while(currentPos < inst->nnodes)
-	{
-        for(int i=0;i<inst->nnodes;i++)
-		{
-            if(i != lastNode && i != currentNode && xstar[xpos(currentNode, i, inst)] > 0.5)
-			{
-                lastNode = currentNode;
-                currentNode = i;
-                result[currentPos++] = i;
-                break;
-            }
-        }
-    }
+	if(inst->verbose >= 95) printf("[convertSolution] Creating result array.\n");
+
+	int** result = (int **) calloc(ncomp+1, sizeof(int*));
+	for(int i=1; i<ncomp+1; i++){
+		result[i] = (int *) calloc(inst->nnodes, sizeof(int));
+
+		for(int j=0; j<inst->nnodes; j++){
+			result[i][j] = -1;
+		}
+	}
+
+	if(inst->verbose >= 95) printf("[convertSolution] Creating indexes array.\n");
+
+	int* indexes = (int *) calloc(ncomp+1, sizeof(int));
+	for(int i=0; i<ncomp+1; i++) indexes[i] = 0;
+
+	if(inst->verbose >= 95) printf("[convertSolution] Starting converting. ncomp %d\n", ncomp);
+
+    for(int i=0; i<inst->nnodes; i++){
+		if(indexes[comp[i]] == 0){
+			result[comp[i]][0] = i;
+			indexes[comp[i]]++;
+			int next = succ[i];
+
+			while(next != i){
+				result[comp[i]][indexes[comp[i]]] = next;
+				indexes[comp[i]]++;
+				next = succ[next];
+			}
+		}
+	}
+
+	if(inst->verbose >= 95)
+		for(int i=1; i<ncomp; i++){
+			printf("[convertSolution]");
+			for(int j=0; j<inst->nnodes && result[i][j] != -1; j++){
+				printf(" result[%d][%d] %d\t", i, j, result[i][j]);
+			}
+			printf("\n");
+		}
+
+
+	free(indexes);
+	return result;
 }
 
 int xpos(int i, int j, instance *inst)
@@ -157,41 +200,63 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 
 int bendersLoop(instance *inst)
 {  
-	// open CPLEX model
+	if(inst->verbose >= 60) printf("[Benders] Initializing algorithm...\n");
+
+	// open and build CPLEX model
 	int error, ncomp;
 	CPXENVptr env = CPXopenCPLEX(&error);
 	CPXLPptr lp = CPXcreateprob(env, &error, "TSP"); 
-	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
-	double *xstar = (double *) calloc(ncols, sizeof(double));
-    double objval = 0;
-
 	build_model(inst, env, lp);
+
+	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
+    double objval = 0;
+	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
+	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
+	double *xstar = (double *) calloc(ncols, sizeof(double));
+
+	if(inst->verbose >= 60) printf("[Benders] Algorithm initialized, starting processing...\n");
 	
 	//first check of time
 	clock_t end = clock();
     double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
-
+	
 	do{
 		//set time limit
 		CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit - time);
 
 		//compute solution
 		if ( CPXmipopt(env,lp) ) print_error("CPXmipopt() error");
-    	if ( CPXsolution(env, lp, NULL, &objval, xstar, NULL, NULL, NULL) ) print_error("CPXgetx() error");	
+		CPXgetbestobjval(env, lp, &objval);
+		CPXgetx(env, lp, xstar, 0, ncols - 1);
 
 		//save lower bound
 		if(inst->best_lb > objval)
 			inst->best_lb = objval;
-
+		
+		printf("[Benders] before build_sol\n");
+		
 		// compute connected components
-		int* succ, comp;
-		build_sol(xstar, inst, succ, &comp, &ncomp);
+		build_sol(xstar, inst, succ, comp, &ncomp);
 
+		if(inst->verbose >= 80) printf("[Benders] Found solution with %d components with cost %f\n", ncomp, objval);
+		
 		// if there is only 1 connected compotent the solution is found
 		if(ncomp == 1) break;
 
+		// merge components
+		mergeComponents(inst, &ncomp, comp, succ, &objval);
+		int** result = convertSolution(succ, comp, ncomp, inst);
+
+		if(objval < inst->zbest)
+			bestSolution(result[1], objval, inst);
+		
+		for(int i=1; i<ncomp+1; i++) free(result[i]);
+		free(result);
+
+		if(inst->verbose >= 80) printf("[Benders] Merged solution has cost %f\n", objval);
+
 		// otherwise add sub-tour elimination contraint
-		add_SEC(inst, env, lp, ncomp, &comp);
+		add_SEC(inst, env, lp, ncomp, comp);
 
 		//check time
 		end = clock();
@@ -217,9 +282,13 @@ int bendersLoop(instance *inst)
     }
 
 	if(ncomp == 1){
-		int* result = (int *) calloc(inst->nnodes, sizeof(int));
-		convertSolution(xstar, result, inst);
-		bestSolution(result, objval, inst);
+		int** result = convertSolution(succ, comp, ncomp, inst);
+
+		if(objval < inst->zbest)
+			bestSolution(result[0], objval, inst);
+		show_solution_comps(inst, true, result, ncomp);
+
+		for(int i=1; i<ncomp+1; i++) free(result[i]);
 		free(result);
 	}else if(inst->verbose >= 60){
 		printf("[cplex - Benders' loop] solution not found");
@@ -227,6 +296,8 @@ int bendersLoop(instance *inst)
 	
 	// free and close cplex model   
     free(xstar);
+	free(succ);
+	free(comp);
 	CPXfreeprob(env, &lp);
 	CPXcloseCPLEX(&env); 
 
@@ -234,21 +305,22 @@ int bendersLoop(instance *inst)
 
 }
 
-#define DEBUG    // da commentare se non si vuole il debugging
-#define EPS 1e-5
-
 void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *ncomp) // build succ() and comp() wrt xstar()...
 {   
 
 #ifdef DEBUG
 	int *degree = (int *) calloc(inst->nnodes, sizeof(int));
-	for ( int i = 0; i < inst->nnodes; i++ )
+	for ( int i = 0; i < inst->nnodes-1; i++ )
 	{
 		for ( int j = i+1; j < inst->nnodes; j++ )
 		{
 			int k = xpos(i,j,inst);
-			if ( fabs(xstar[k]) > EPS && fabs(xstar[k]-1.0) > EPS ) print_error(" wrong xstar in build_sol()");
-			if ( xstar[k] > 0.5 ) 
+			if (fabs(xstar[k]) > EPS && fabs(xstar[k]-1.0) > EPS){
+				printf("i %d j %d xpos %d\n", i, j, k);
+				printf("fabs(xstar[k]) %f, fabs(xstar[k]-1.0) %f\n", fabs(xstar[k]), fabs(xstar[k]-1.0));
+				print_error(" wrong xstar in build_sol()");
+			}
+			if (xstar[k] > 0.5) 
 			{
 				++degree[i];
 				++degree[j];
@@ -333,6 +405,98 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
 
 	free(index);
 	free(value);
+}
+
+void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *cost){
+	/*
+	data una coppia di nodi A e B tali che comp[A] != comp[B] prendiamo anche i successivi A1 = succ[A] e B1 = succ[B]
+
+	troviamo il miglior modo di unire comp[A] con comp[B] (da scegliere se unire A con B o con succ[B] e quindi A1 con succ[B] o B)
+
+	la differenza di costo data da questa unione è
+	diffC = - dist(A, A1) - dist(B, B1) + dist(A, B) + dist(A1, B1)
+	oppure
+	diffC = - dist(A, A1) - dist(B, B1) + dist(A, B1) + dist(A1, B)
+
+	la coppia di nodi da scegliere è quella con diffC minimo
+	*/
+	if(inst->verbose >= 90) printf("[mergeComponents] Starting the merge of %d components\n", *ncomp);
+
+	while(*ncomp > 1){
+		if(inst->verbose >= 95) printf("[mergeComponents] Current #components: %d\n", *ncomp);
+
+		// find best swap
+		int bestA = -1, bestB = -1;
+		double bestDiffC = DBL_MAX;
+		bool bestSwapAB = false;
+		for(int A=0;A<inst->nnodes;A++){
+			for(int B=A+1;B<inst->nnodes;B++){
+				if(comp[A] == comp[B])
+					continue;
+				
+				int A1 = succ[A], B1 = succ[B];
+				double diffC = 0;
+				bool swapAB = false;
+				if(dist(inst, A, B) + dist(inst, A1, B1) < dist(inst, A, B1) + dist(inst, A1, B)){
+					diffC = - dist(inst, A, A1) - dist(inst, B, B1) + dist(inst, A, B) + dist(inst, A1, B1);
+					swapAB = true;
+				}else{
+					diffC = - dist(inst, A, A1) - dist(inst, B, B1) + dist(inst, A, B1) + dist(inst, A1, B);
+					swapAB = false;
+				}
+				
+				if(diffC < bestDiffC){
+					bestDiffC = diffC;
+					bestA = A;
+					bestB = B;
+					bestSwapAB = swapAB;
+				}
+			}
+		}
+
+
+		// do best swap
+		int A1 = succ[bestA], B1 = succ[bestB];
+		
+		if(inst->verbose >= 95) printf("[mergeComponents] Best merging found: A: %d\tA1: %d\tB: %d\tB1: %d\n", bestA, A1, bestB, B1);
+		if(inst->verbose >= 95 && bestSwapAB) printf("[mergeComponents] Best merging from A->A1 and B->B1 to A->B and A1->B1\n");
+		if(inst->verbose >= 95 && !bestSwapAB) printf("[mergeComponents] Best merging from A->A1 and B->B1 to A->B1 and A1->B\n");
+		if(inst->verbose >= 95) printf("[mergeComponents] Best merging has diffC: %f\n", bestDiffC);
+
+		if(bestSwapAB){
+			succ[bestA] = bestB;
+			succ[A1] = B1;
+		} else {
+			succ[bestA] = B1;
+			succ[A1] = bestB;
+		}
+
+		int compMin = comp[bestA] < comp[bestB] ? comp[bestA] : comp[bestB];
+		int compMax = comp[bestA] < comp[bestB] ? comp[bestB] : comp[bestA];
+
+		for(int i=0;i<inst->nnodes;i++){
+			if(comp[i] == compMax)
+				comp[i] = compMin;
+			if(comp[i] > compMax)
+				comp[i]--;
+		}
+		
+		if(bestDiffC < 0) {print_error("Error: diffC < 0");}
+
+		*cost += bestDiffC;
+		
+		*ncomp = *ncomp - 1;
+
+		if(inst->verbose >= 95) printf("[mergeComponents] Best merging done. ncomp %d\n", *ncomp);
+		
+		int** result = convertSolution(succ, comp, *ncomp, inst);
+		if(inst->verbose >= 95) printf("[mergeComponents] convertSolution done.\n");
+		show_solution_comps(inst, true, result, *ncomp);
+		if(inst->verbose >= 95) printf("[mergeComponents] show_solution_comps done.\n");
+
+		for(int i=1; i<*ncomp+1; i++) free(result[i]);
+		free(result);
+	}
 }
 
 /*
