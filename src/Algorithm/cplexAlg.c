@@ -51,7 +51,7 @@ int TSPopt(instance *inst)
 	
 	build_sol(xstar, inst, succ, comp, &ncomp);
 	result = convertSolution(succ, comp, ncomp, inst);
-	show_solution_comps(inst, true, result, ncomp);
+	//show_solution_comps(inst, true, result, ncomp);
     //bestSolution(result[1], objval, inst);
 	
 	// free and close cplex model   
@@ -86,7 +86,14 @@ int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
 	for(int i=0; i<ncomp+1; i++) indexes[i] = 0;
 
 	if(inst->verbose >= 95) printf("[convertSolution] Starting converting. ncomp %d\n", ncomp);
-
+	
+	printf("\ncomp:");
+	for(int i=0; i<inst->nnodes; i++) printf("%i - %d\n", i, comp[i]);
+	printf("\nsucc:");
+	for(int i=0; i<inst->nnodes; i++) printf("%i - %d\n", i, succ[i]);
+	printf("\n");
+	printf("\n");
+	
     for(int i=0; i<inst->nnodes; i++){
 		if(indexes[comp[i]] == 0){
 			result[comp[i]][0] = i;
@@ -94,9 +101,14 @@ int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
 			int next = succ[i];
 
 			while(next != i){
+				//printf("1) next: %d --- i: %d\n", next, i);
+				
 				result[comp[i]][indexes[comp[i]]] = next;
 				indexes[comp[i]]++;
 				next = succ[next];
+
+				//printf("2) next: %d --- i: %d\n\n", next, i);
+				//int f = getchar();
 			}
 		}
 	}
@@ -233,7 +245,7 @@ int bendersLoop(instance *inst)
 		if(inst->best_lb > objval)
 			inst->best_lb = objval;
 		
-		printf("[Benders] before build_sol\n");
+		if(inst->verbose >= 80) printf("[Benders] before build_sol\n");
 		
 		// compute connected components
 		build_sol(xstar, inst, succ, comp, &ncomp);
@@ -243,20 +255,24 @@ int bendersLoop(instance *inst)
 		// if there is only 1 connected compotent the solution is found
 		if(ncomp == 1) break;
 
+		// otherwise add sub-tour elimination contraint
+		add_SEC(inst, env, lp, ncomp, comp);
+
 		// merge components
-		mergeComponents(inst, &ncomp, comp, succ, &objval);
-		int** result = convertSolution(succ, comp, ncomp, inst);
+		//mergeComponents(inst, &ncomp, comp, succ, &objval);
+		/*int** result = convertSolution(succ, comp, ncomp, inst);
+
+		printf("[Benders] result: ");
+		for(int i=0; i<inst->nnodes && result[1][i] != -1; i++) printf("%d, ", result[1][i]);
+		printf("\n");
 
 		if(objval < inst->zbest)
 			bestSolution(result[1], objval, inst);
 		
 		for(int i=1; i<ncomp+1; i++) free(result[i]);
-		free(result);
+		free(result);*/
 
 		if(inst->verbose >= 80) printf("[Benders] Merged solution has cost %f\n", objval);
-
-		// otherwise add sub-tour elimination contraint
-		add_SEC(inst, env, lp, ncomp, comp);
 
 		//check time
 		end = clock();
@@ -286,7 +302,7 @@ int bendersLoop(instance *inst)
 
 		if(objval < inst->zbest)
 			bestSolution(result[0], objval, inst);
-		show_solution_comps(inst, true, result, ncomp);
+		//show_solution_comps(inst, true, result, ncomp);
 
 		for(int i=1; i<ncomp+1; i++) free(result[i]);
 		free(result);
@@ -380,19 +396,23 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
 	char **cname = (char **) calloc(1, sizeof(char *));
 	cname[0] = (char *) calloc(100, sizeof(char));
 
-	for(int k=1; k<ncomp; k++){
+	printf("a %d\n", ncols);
+	for(int k=1; k<=ncomp; k++){
+		printf("b\n");
 		int nnz = 0; // number of non zero
 		char sense = 'L'; // <=
 		double rhs = -1.0; // right hand side of contraint
 		sprintf(cname[0], "component(%d)", k+1); 
 		
 		// aggiungo vincolo per component #k
-		for(int i=0; i<ncols; i++){
+		for(int i=0; i<inst->nnodes; i++){
 			if(comp[i] != k) continue;
+			printf("c\n");
 			rhs += 1;
 			
-			for(int j=i+1; j<ncols-1; j++){
+			for(int j=i+1; j<inst->nnodes; j++){
 				if(comp[j] != k) continue;
+				printf("d\n");
 					
 				index[nnz] = xpos(i,j, inst);
 				value[nnz] = 1.0;
@@ -400,11 +420,18 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
 			}
 		}
 		
-		CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, &cname[0]);
+		printf("e\n\n");
+		if(CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, cname)!=0)
+			printf("[addSec] CPXaddrows error\n\n");
+		printf("f\n\n");
 	}
+
+	printf("g\n");
 
 	free(index);
 	free(value);
+	free(cname[0]);
+	free(cname);
 }
 
 void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *cost){
@@ -428,28 +455,18 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
 		// find best swap
 		int bestA = -1, bestB = -1;
 		double bestDiffC = DBL_MAX;
-		bool bestSwapAB = false;
-		for(int A=0;A<inst->nnodes;A++){
+		for(int A=0;A<inst->nnodes-1;A++){
 			for(int B=A+1;B<inst->nnodes;B++){
 				if(comp[A] == comp[B])
 					continue;
 				
 				int A1 = succ[A], B1 = succ[B];
-				double diffC = 0;
-				bool swapAB = false;
-				if(dist(inst, A, B) + dist(inst, A1, B1) < dist(inst, A, B1) + dist(inst, A1, B)){
-					diffC = - dist(inst, A, A1) - dist(inst, B, B1) + dist(inst, A, B) + dist(inst, A1, B1);
-					swapAB = true;
-				}else{
-					diffC = - dist(inst, A, A1) - dist(inst, B, B1) + dist(inst, A, B1) + dist(inst, A1, B);
-					swapAB = false;
-				}
+				double diffC = - dist(inst, A, A1) - dist(inst, B, B1) + dist(inst, A, B1) + dist(inst, B, A1);
 				
 				if(diffC < bestDiffC){
 					bestDiffC = diffC;
 					bestA = A;
 					bestB = B;
-					bestSwapAB = swapAB;
 				}
 			}
 		}
@@ -459,25 +476,26 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
 		int A1 = succ[bestA], B1 = succ[bestB];
 		
 		if(inst->verbose >= 95) printf("[mergeComponents] Best merging found: A: %d\tA1: %d\tB: %d\tB1: %d\n", bestA, A1, bestB, B1);
-		if(inst->verbose >= 95 && bestSwapAB) printf("[mergeComponents] Best merging from A->A1 and B->B1 to A->B and A1->B1\n");
-		if(inst->verbose >= 95 && !bestSwapAB) printf("[mergeComponents] Best merging from A->A1 and B->B1 to A->B1 and A1->B\n");
+		if(inst->verbose >= 95) printf("[mergeComponents] Best merging from A->A1 and B->B1 to A->B1 and B->A1\n");
 		if(inst->verbose >= 95) printf("[mergeComponents] Best merging has diffC: %f\n", bestDiffC);
 
-		if(bestSwapAB){
-			succ[bestA] = bestB;
-			succ[A1] = B1;
-		} else {
-			succ[bestA] = B1;
-			succ[A1] = bestB;
-		}
+		succ[bestA] = B1;
+		succ[bestB] = A1;
 
-		int compMin = comp[bestA] < comp[bestB] ? comp[bestA] : comp[bestB];
-		int compMax = comp[bestA] < comp[bestB] ? comp[bestB] : comp[bestA];
+		int compMin = -1, compMax = -1;
+
+		if(comp[bestA] < comp[bestB]){
+			compMin = comp[bestA];
+			compMax = comp[bestB];
+		} else {
+			compMin = comp[bestB];
+			compMax = comp[bestA];
+		}
 
 		for(int i=0;i<inst->nnodes;i++){
 			if(comp[i] == compMax)
 				comp[i] = compMin;
-			if(comp[i] > compMax)
+			else if(comp[i] > compMax)
 				comp[i]--;
 		}
 		
@@ -489,13 +507,13 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
 
 		if(inst->verbose >= 95) printf("[mergeComponents] Best merging done. ncomp %d\n", *ncomp);
 		
-		int** result = convertSolution(succ, comp, *ncomp, inst);
-		if(inst->verbose >= 95) printf("[mergeComponents] convertSolution done.\n");
-		show_solution_comps(inst, true, result, *ncomp);
-		if(inst->verbose >= 95) printf("[mergeComponents] show_solution_comps done.\n");
+		//int** result = convertSolution(succ, comp, *ncomp, inst);
+		//if(inst->verbose >= 95) printf("[mergeComponents] convertSolution done.\n");
+		//show_solution_comps(inst, true, result, *ncomp);
+		//if(inst->verbose >= 95) printf("[mergeComponents] show_solution_comps done.\n");
 
-		for(int i=1; i<*ncomp+1; i++) free(result[i]);
-		free(result);
+		//for(int i=1; i<*ncomp+1; i++) free(result[i]);
+		//free(result);
 	}
 }
 

@@ -70,4 +70,6 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp);
 
 void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *cost);
 
+int bendersLoop(instance *inst);
+
 #endif /* CPLEXALG_H */
