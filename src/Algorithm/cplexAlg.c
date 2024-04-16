@@ -392,13 +392,12 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
 	int izero = 0;
 	int ncols = CPXgetnumcols(env, lp);
 	int* index = (int*) calloc(ncols, sizeof(int)); // indici delle variabili con coefficiente diverso da zero 
-	double* value = (double*) calloc(ncols, sizeof(int)); // valore dei coefficienti della sommatoria
+	double* value = (double*) calloc(ncols, sizeof(double)); // valore dei coefficienti della sommatoria
 	char **cname = (char **) calloc(1, sizeof(char *));
 	cname[0] = (char *) calloc(100, sizeof(char));
 
 	printf("a %d\n", ncols);
 	for(int k=1; k<=ncomp; k++){
-		printf("b\n");
 		int nnz = 0; // number of non zero
 		char sense = 'L'; // <=
 		double rhs = -1.0; // right hand side of contraint
@@ -407,12 +406,10 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
 		// aggiungo vincolo per component #k
 		for(int i=0; i<inst->nnodes; i++){
 			if(comp[i] != k) continue;
-			printf("c\n");
 			rhs += 1;
 			
 			for(int j=i+1; j<inst->nnodes; j++){
 				if(comp[j] != k) continue;
-				printf("d\n");
 					
 				index[nnz] = xpos(i,j, inst);
 				value[nnz] = 1.0;
@@ -428,10 +425,12 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
 
 	printf("g\n");
 
-	free(index);
-	free(value);
 	free(cname[0]);
 	free(cname);
+	free(index);
+	free(value);
+
+	printf("h\n");
 }
 
 void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *cost){
