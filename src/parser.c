@@ -1,10 +1,7 @@
 #include "parser.h"
 
-int parse_args(int argc, char** argv, instance* inst)
+void initialization(instance* inst)
 {
-	int n = 0;
-	int help = 0;
-
 	// default   
 	strcpy(inst->algorithm_name, "NULL");
     strcpy(inst->opt_name, "NULL");
@@ -23,9 +20,17 @@ int parse_args(int argc, char** argv, instance* inst)
 
 	inst->available_memory = 12000;   	// available memory, in MB, for Cplex execution (e.g., 12000)
 	inst->max_nodes = -1; 				// max n. of branching nodes in the final run (-1 unlimited)        
+}
 
+int parse_args(int argc, char** argv, instance* inst)
+{
+	int n = 0;
+	int help = 0;
 	int model_type = 0;
 	int opt_type = 0;
+
+	// default  
+	initialization(inst); 
 
 	for ( int i = 1; i < argc; i++ ) 
 	{ 
@@ -143,20 +148,24 @@ int intToModelName(instance* inst, int type)
 {
 	switch (type)
 	{
-		case 0:
+		case 1:
 			strcpy(inst->algorithm_name, "Random");
 			break;
 
-		case 1:
+		case 2:
 			strcpy(inst->algorithm_name, "Nearest Neighbor");
 			break;
 
-		case 2:
+		case 3:
 			strcpy(inst->algorithm_name, "CPLEX");
 			break;
 
-		case 3:
+		case 4:
 			strcpy(inst->algorithm_name, "Benders' Loop");
+			break;
+
+		case 5:
+			strcpy(inst->algorithm_name, "Glued Benders' Loop");
 			break;
 
 		default:
@@ -194,43 +203,6 @@ void print_error(const char *err)
     printf("\n\n ERROR: %s \n\n", err);
     fflush(NULL);
     exit(1);
-}
-
-char *getFileName(const char *filePath)
-{
-    const char *fileName = strrchr(filePath, '/');
-    if (fileName != NULL)
-	{
-        fileName++;
-	} else 
-	{
-        fileName = filePath;
-    }
-
-    // Check if the file name ends with ".tsp"
-    const char *extension = ".tsp";
-    size_t lenFileName = strlen(fileName);
-    size_t lenExtension = strlen(extension);
-
-    if (lenFileName > lenExtension && strcmp(fileName + lenFileName - lenExtension, extension) == 0)
-	{
-        lenFileName -= lenExtension;
-        while (lenFileName > 0 && fileName[lenFileName - 1] == '.')
-		{
-            lenFileName--;
-        }
-    }
-
-    char *result = malloc(lenFileName + 1);
-    if (result == NULL)
-	{
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(EXIT_FAILURE);
-    }
-
-    strncpy(result, fileName, lenFileName);
-    result[lenFileName] = '\0';
-    return result;
 }
 
 const char* getTimeLimitString(double time_limit)

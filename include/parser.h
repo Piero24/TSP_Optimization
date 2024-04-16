@@ -13,6 +13,15 @@
 #include "menu.h"
 
 /**
+ * @brief Initializes the instance structure with default values.
+ * 
+ * This function initializes the instance structure with default values for various parameters.
+ * 
+ * @param inst Pointer to the instance structure to be initialized.
+ */
+void initialization(instance* inst);
+
+/**
  * @brief Parses command-line arguments to initialize the instance structure.
  * 
  * @param argc The number of command-line arguments.
@@ -69,15 +78,6 @@ int intToOptName(instance* inst, int type);
  * @param err The error message to be printed.
  */
 void print_error(const char *err);
-
-/**
- * @brief Returns the filename from a given file path.
- * 
- * @param filePath The file path from which to extract the filename.
- * 
- * @return The filename extracted from the file path.
- */
-char *getFileName(const char *filePath);
 
 /**
  * @brief Return the time limit in string format.

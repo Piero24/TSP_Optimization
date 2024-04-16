@@ -1,5 +1,5 @@
 #include "tsp.h"
-#include "parser.h"
+
 
 #ifdef _WIN32
     #define popen _popen
@@ -284,4 +284,41 @@ char* fileGenerator(int n)
     strcpy(dynamic_file_name, file_name);
 
     return dynamic_file_name;
+}
+
+char *getFileName(const char *filePath)
+{
+    const char *fileName = strrchr(filePath, '/');
+    if (fileName != NULL)
+	{
+        fileName++;
+	} else 
+	{
+        fileName = filePath;
+    }
+
+    // Check if the file name ends with ".tsp"
+    const char *extension = ".tsp";
+    size_t lenFileName = strlen(fileName);
+    size_t lenExtension = strlen(extension);
+
+    if (lenFileName > lenExtension && strcmp(fileName + lenFileName - lenExtension, extension) == 0)
+	{
+        lenFileName -= lenExtension;
+        while (lenFileName > 0 && fileName[lenFileName - 1] == '.')
+		{
+            lenFileName--;
+        }
+    }
+
+    char *result = malloc(lenFileName + 1);
+    if (result == NULL)
+	{
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    strncpy(result, fileName, lenFileName);
+    result[lenFileName] = '\0';
+    return result;
 }

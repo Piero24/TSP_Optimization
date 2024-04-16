@@ -86,14 +86,7 @@ int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
 	for(int i=0; i<ncomp+1; i++) indexes[i] = 0;
 
 	if(inst->verbose >= 95) printf("[convertSolution] Starting converting. ncomp %d\n", ncomp);
-	
-	printf("\ncomp:");
-	for(int i=0; i<inst->nnodes; i++) printf("%i - %d\n", i, comp[i]);
-	printf("\nsucc:");
-	for(int i=0; i<inst->nnodes; i++) printf("%i - %d\n", i, succ[i]);
-	printf("\n");
-	printf("\n");
-	
+
     for(int i=0; i<inst->nnodes; i++){
 		if(indexes[comp[i]] == 0){
 			result[comp[i]][0] = i;
@@ -101,14 +94,9 @@ int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
 			int next = succ[i];
 
 			while(next != i){
-				//printf("1) next: %d --- i: %d\n", next, i);
-				
 				result[comp[i]][indexes[comp[i]]] = next;
 				indexes[comp[i]]++;
 				next = succ[next];
-
-				//printf("2) next: %d --- i: %d\n\n", next, i);
-				//int f = getchar();
 			}
 		}
 	}
@@ -210,117 +198,6 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 	free(cname);
 }
 
-int bendersLoop(instance *inst)
-{  
-	if(inst->verbose >= 60) printf("[Benders] Initializing algorithm...\n");
-
-	// open and build CPLEX model
-	int error, ncomp;
-	CPXENVptr env = CPXopenCPLEX(&error);
-	CPXLPptr lp = CPXcreateprob(env, &error, "TSP"); 
-	build_model(inst, env, lp);
-
-	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
-    double objval = 0;
-	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
-	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
-	double *xstar = (double *) calloc(ncols, sizeof(double));
-
-	if(inst->verbose >= 60) printf("[Benders] Algorithm initialized, starting processing...\n");
-	
-	//first check of time
-	clock_t end = clock();
-    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
-	
-	do{
-		//set time limit
-		CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit - time);
-
-		//compute solution
-		if ( CPXmipopt(env,lp) ) print_error("CPXmipopt() error");
-		CPXgetbestobjval(env, lp, &objval);
-		CPXgetx(env, lp, xstar, 0, ncols - 1);
-
-		//save lower bound
-		if(inst->best_lb > objval)
-			inst->best_lb = objval;
-		
-		if(inst->verbose >= 80) printf("[Benders] before build_sol\n");
-		
-		// compute connected components
-		build_sol(xstar, inst, succ, comp, &ncomp);
-
-		if(inst->verbose >= 80) printf("[Benders] Found solution with %d components with cost %f\n", ncomp, objval);
-		
-		// if there is only 1 connected compotent the solution is found
-		if(ncomp == 1) break;
-
-		// otherwise add sub-tour elimination contraint
-		add_SEC(inst, env, lp, ncomp, comp);
-
-		// merge components
-		//mergeComponents(inst, &ncomp, comp, succ, &objval);
-		/*int** result = convertSolution(succ, comp, ncomp, inst);
-
-		printf("[Benders] result: ");
-		for(int i=0; i<inst->nnodes && result[1][i] != -1; i++) printf("%d, ", result[1][i]);
-		printf("\n");
-
-		if(objval < inst->zbest)
-			bestSolution(result[1], objval, inst);
-		
-		for(int i=1; i<ncomp+1; i++) free(result[i]);
-		free(result);*/
-
-		if(inst->verbose >= 80) printf("[Benders] Merged solution has cost %f\n", objval);
-
-		//check time
-		end = clock();
-        time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
-	}while(time < inst->time_limit);
-	
-    // print solution
-    if(inst->verbose >= 100){
-        printf("costs:%f\n", objval);
-
-        for ( int i = 0; i < inst->nnodes; i++ )
-        {
-            for ( int j = i+1; j < inst->nnodes; j++ )
-            {
-				// print the selected edges
-                if ( xstar[xpos(i,j,inst)] > 0.5 ) 
-				{
-					// xstar itìs never 0 o 1 precisely
-					printf("x(%3d,%3d) = 1\n", i+1,j+1);
-				}
-            }
-        }
-    }
-
-	if(ncomp == 1){
-		int** result = convertSolution(succ, comp, ncomp, inst);
-
-		if(objval < inst->zbest)
-			bestSolution(result[0], objval, inst);
-		//show_solution_comps(inst, true, result, ncomp);
-
-		for(int i=1; i<ncomp+1; i++) free(result[i]);
-		free(result);
-	}else if(inst->verbose >= 60){
-		printf("[cplex - Benders' loop] solution not found");
-	}
-	
-	// free and close cplex model   
-    free(xstar);
-	free(succ);
-	free(comp);
-	CPXfreeprob(env, &lp);
-	CPXcloseCPLEX(&env); 
-
-	return 0; // or an appropriate nonzero error code
-
-}
-
 void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *ncomp) // build succ() and comp() wrt xstar()...
 {   
 
@@ -396,7 +273,6 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
 	char **cname = (char **) calloc(1, sizeof(char *));
 	cname[0] = (char *) calloc(100, sizeof(char));
 
-	printf("a %d\n", ncols);
 	for(int k=1; k<=ncomp; k++){
 		int nnz = 0; // number of non zero
 		char sense = 'L'; // <=
@@ -417,35 +293,16 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
 			}
 		}
 		
-		printf("e\n\n");
-		if(CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, cname)!=0)
-			printf("[addSec] CPXaddrows error\n\n");
-		printf("f\n\n");
+		CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, cname);
 	}
-
-	printf("g\n");
 
 	free(cname[0]);
 	free(cname);
 	free(index);
 	free(value);
-
-	printf("h\n");
 }
 
 void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *cost){
-	/*
-	data una coppia di nodi A e B tali che comp[A] != comp[B] prendiamo anche i successivi A1 = succ[A] e B1 = succ[B]
-
-	troviamo il miglior modo di unire comp[A] con comp[B] (da scegliere se unire A con B o con succ[B] e quindi A1 con succ[B] o B)
-
-	la differenza di costo data da questa unione è
-	diffC = - dist(A, A1) - dist(B, B1) + dist(A, B) + dist(A1, B1)
-	oppure
-	diffC = - dist(A, A1) - dist(B, B1) + dist(A, B1) + dist(A1, B)
-
-	la coppia di nodi da scegliere è quella con diffC minimo
-	*/
 	if(inst->verbose >= 90) printf("[mergeComponents] Starting the merge of %d components\n", *ncomp);
 
 	while(*ncomp > 1){
@@ -514,6 +371,134 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
 		//for(int i=1; i<*ncomp+1; i++) free(result[i]);
 		//free(result);
 	}
+}
+
+int bendersLoop(instance *inst, bool gluing)
+{  
+	if(inst->verbose >= 60) printf("[Benders] Initializing algorithm...\n");
+
+	// open and build CPLEX model
+	int error, ncomp;
+	CPXENVptr env = CPXopenCPLEX(&error);
+	CPXLPptr lp = CPXcreateprob(env, &error, "TSP"); 
+	build_model(inst, env, lp);
+
+	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
+    double objval = 0;
+	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
+	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
+	double *xstar = (double *) calloc(ncols, sizeof(double));
+
+	if(inst->verbose >= 60) printf("[Benders] Algorithm initialized, starting processing...\n");
+	
+	//first check of time
+	clock_t end = clock();
+    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+	
+	do{
+		//set time limit
+		CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit - time);
+
+		//compute solution
+		if ( CPXmipopt(env,lp) ) print_error("CPXmipopt() error");
+		CPXgetbestobjval(env, lp, &objval);
+		CPXgetx(env, lp, xstar, 0, ncols - 1);
+
+		//save lower bound
+		if(inst->best_lb > objval)
+			inst->best_lb = objval;
+		
+		if(inst->verbose >= 80) printf("[Benders] before build_sol\n");
+		
+		// compute connected components
+		build_sol(xstar, inst, succ, comp, &ncomp);
+
+		if(inst->verbose >= 80) printf("[Benders] Found solution with %d components with cost %f\n", ncomp, objval);
+		
+		// if there is only 1 connected compotent the solution is found
+		if(ncomp == 1) break;
+
+		// otherwise add sub-tour elimination contraint
+		add_SEC(inst, env, lp, ncomp, comp);
+
+		// merge components
+		if(gluing){
+			mergeComponents(inst, &ncomp, comp, succ, &objval);
+			int** result = convertSolution(succ, comp, ncomp, inst);
+			gluing2Opt(inst, result[1], objval);
+
+			if(objval < inst->zbest)
+				bestSolution(result[1], objval, inst);
+		
+			for(int i=1; i<ncomp+1; i++) free(result[i]);
+			free(result);
+		}
+
+		if(inst->verbose >= 80) printf("[Benders] Merged solution has cost %f\n", objval);
+
+		//check time
+		end = clock();
+        time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+	}while(time < inst->time_limit);
+	
+    // print solution
+    if(inst->verbose >= 100){
+        printf("costs:%f\n", objval);
+
+        for ( int i = 0; i < inst->nnodes; i++ )
+        {
+            for ( int j = i+1; j < inst->nnodes; j++ )
+            {
+				// print the selected edges
+                if ( xstar[xpos(i,j,inst)] > 0.5 ) 
+				{
+					// xstar itìs never 0 o 1 precisely
+					printf("x(%3d,%3d) = 1\n", i+1,j+1);
+				}
+            }
+        }
+    }
+
+	if(ncomp == 1){
+		int** result = convertSolution(succ, comp, ncomp, inst);
+
+		if(objval < inst->zbest)
+			bestSolution(result[1], objval, inst);
+		//show_solution_comps(inst, true, result, ncomp);
+
+		for(int i=1; i<ncomp+1; i++) free(result[i]);
+		free(result);
+	}else if(inst->verbose >= 60){
+		printf("[cplex - Benders' loop] solution not found");
+	}
+	
+	// free and close cplex model   
+    free(xstar);
+	free(succ);
+	free(comp);
+	CPXfreeprob(env, &lp);
+	CPXcloseCPLEX(&env); 
+
+	return 0; // or an appropriate nonzero error code
+
+}
+
+int gluing2Opt(instance* inst, int* result, double cost)
+{   
+    inst->plotCosts = NULL;
+    point* costs;
+    int nCosts = 0, xIndex = 0;
+    bool plotFlag = false;
+
+    if (inst->verbose >= 90) printf("[Gluing - 2opt] Starting optimization.\n");
+
+    twoOptLoop(inst, result, &cost, costs, &nCosts, &xIndex, false, false);
+
+    if (inst->verbose >= 90) printf("[Gluing - 2opt] Optimization completed.\n\n");
+
+    bestSolution(result, cost, inst);
+    
+    return 0;
 }
 
 /*

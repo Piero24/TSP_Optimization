@@ -173,7 +173,6 @@ int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCo
 
     } while (counter < inst->nnodes);
 
-    free(costs);
     return 0;
 }
 
@@ -194,9 +193,6 @@ int twoOpt(instance* inst)
     int nCosts = 0, xIndex = 0;
     bool plotFlag = false;
 
-    clock_t end;
-    double time;
-    
     if (inst->verbose >= 80) printf("[2opt] Initialization completed, starting optimization.\n");
 
     twoOptLoop(inst, result, &cost, costs, &nCosts, &xIndex, false, false);
@@ -205,6 +201,7 @@ int twoOpt(instance* inst)
 
     bestSolution(result, cost, inst);
     free(result);
+    free(costs);
     
     return 0;
 }

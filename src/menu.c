@@ -1,32 +1,12 @@
 #include "menu.h"
 
-// MACOS: Se tolti VSCode da errore ma compila ugualmente
-// Ci sono anche su menu.h
-#include "tsp.h"
-#include "parser.h"
-#include <cplex.h> //CPX_INFBOUND
 
 int manage_menu(instance *inst)
 {
     int n = 0;
+    
     // default   
-    strcpy(inst->algorithm_name, "NULL");
-    strcpy(inst->opt_name, "NULL");
-    inst->show_gnuplot = -1;
-	inst->plotSolution = NULL;
-	inst->plotCosts = NULL;
-	inst->old_benders = 0;
-	strcpy(inst->input_file, "NULL");
-	inst->random_seed = 93846529; 
-	inst->num_threads = 0;
-	inst->time_limit = CPX_INFBOUND; 	// If Cplex is not installed in your machine use DBL_MAX
-	inst->cutoff = CPX_INFBOUND; 		// If Cplex is not installed in your machine use DBL_MAX
-	inst->integer_costs = 0;
-	inst->verbose = 0;
-
-	inst->available_memory = 12000;   	// available memory, in MB, for Cplex execution (e.g., 12000)
-	inst->max_nodes = -1; 				// max n. of branching nodes in the final run (-1 unlimited)        
-
+    initialization(inst);
     
     file_menu(inst->input_file, &n);
     clearScreen();
@@ -181,6 +161,14 @@ int algorithm_menu(char *algorithm_name)
             
             case 3:
                 strcpy(algorithm_name, "CPLEX");
+                return 0;
+            
+            case 4:
+                strcpy(algorithm_name, "Benders' Loop");
+                return 0;
+            
+            case 5:
+                strcpy(algorithm_name, "Glued Benders' Loop");
                 return 0;
 
             case 9:

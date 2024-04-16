@@ -64,7 +64,11 @@ int algorithmSelector(instance* inst)
 
     } else if (strcmp(inst->algorithm_name, "Benders' Loop") == 0)
     {
-        bendersLoop(inst);
+        bendersLoop(inst, false);
+
+    } else if (strcmp(inst->algorithm_name, "Glued Benders' Loop") == 0)
+    {
+        bendersLoop(inst, true);
 
     } else 
     {
