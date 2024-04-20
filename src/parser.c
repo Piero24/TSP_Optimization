@@ -8,6 +8,7 @@ void initialization(instance* inst)
 	inst->show_gnuplot = -1;
 	inst->plotSolution = NULL;
 	inst->plotCosts = NULL;
+	inst->output_csv = NULL;
 
 	inst->old_benders = 0;
 	strcpy(inst->input_file, "NULL");
@@ -19,7 +20,8 @@ void initialization(instance* inst)
 	inst->verbose = 0;
 
 	inst->available_memory = 12000;   	// available memory, in MB, for Cplex execution (e.g., 12000)
-	inst->max_nodes = -1; 				// max n. of branching nodes in the final run (-1 unlimited)        
+	inst->max_nodes = -1; 				// max n. of branching nodes in the final run (-1 unlimited)
+
 }
 
 int parse_args(int argc, char** argv, instance* inst)

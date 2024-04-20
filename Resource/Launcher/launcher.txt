@@ -1,6 +1,6 @@
 // -file Resource/pr10v1.tsp -model 1 -opt 1 -v 50 
 // -file Resource/pr10v1.tsp -model 1 -opt 1 -v 40 
 // -g 50 -model 0 -opt 1 -v 60 -s 1
--g 50 -model 1 -opt 2 -v 60 -s 1
--g 50 -model 1 -opt 3 -v 60 -s 1
+-g 50 -model 1 -opt 2 -v 10
+-g 50 -model 1 -opt 3 -v 10
 
