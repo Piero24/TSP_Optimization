@@ -408,8 +408,6 @@ int bendersLoop(instance *inst, bool gluing)
 		if(inst->best_lb > objval)
 			inst->best_lb = objval;
 		
-		if(inst->verbose >= 80) printf("[Benders] before build_sol\n");
-		
 		// compute connected components
 		build_sol(xstar, inst, succ, comp, &ncomp);
 
@@ -427,14 +425,14 @@ int bendersLoop(instance *inst, bool gluing)
 			int** result = convertSolution(succ, comp, ncomp, inst);
 			gluing2Opt(inst, result[1], objval);
 
+			if(inst->verbose >= 80) printf("[Benders - Gluing] Merged solution has cost %f\n", objval);
+
 			if(objval < inst->zbest)
 				bestSolution(result[1], objval, inst);
 		
 			for(int i=1; i<ncomp+1; i++) free(result[i]);
 			free(result);
 		}
-
-		if(inst->verbose >= 80) printf("[Benders] Merged solution has cost %f\n", objval);
 
 		//check time
 		end = clock();
@@ -486,13 +484,11 @@ int bendersLoop(instance *inst, bool gluing)
 int gluing2Opt(instance* inst, int* result, double cost)
 {   
     inst->plotCosts = NULL;
-    point* costs;
     int nCosts = 0, xIndex = 0;
-    bool plotFlag = false;
 
     if (inst->verbose >= 90) printf("[Gluing - 2opt] Starting optimization.\n");
 
-    twoOptLoop(inst, result, &cost, costs, &nCosts, &xIndex, false, false);
+    twoOptLoop(inst, result, &cost, NULL, &nCosts, &xIndex, false, false);
 
     if (inst->verbose >= 90) printf("[Gluing - 2opt] Optimization completed.\n\n");
 
