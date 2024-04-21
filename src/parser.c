@@ -98,7 +98,7 @@ int parse_args(int argc, char** argv, instance* inst)
 	intToModelName(inst, model_type);
 	intToOptName(inst, opt_type);
 
-	parameterPrint(inst);
+	// parameterPrint(inst);
 
     return 0;
 }
@@ -119,16 +119,16 @@ void parameterPrint(instance* inst)
 	printCentered(info_2, ' ');
 	printf("\n");
 
-	char *file_name = getFileName(inst->input_file);
-	printf("- File Name:              %s\n", file_name);
-	printf("- File Comment:           %s\n", inst->file_comment);
-	printf("- Total N° of nodes:      %d\n\n", inst->nnodes);
+	char *file_name = getFileName(inst->input_file, ".tsp");
+	printf("- File Name:               %s\n", file_name);
+	printf("- File Comment:            %s\n", inst->file_comment);
+	printf("- Total N° of nodes:       %d\n\n", inst->nnodes);
 
-	printf("- Algorithm Name:         %s\n", inst->algorithm_name);
-	printf("- Optimization Name:      %s\n\n", inst->opt_name);
+	printf("- Algorithm Name:          %s\n", inst->algorithm_name);
+	printf("- Optimization Name:       %s\n\n", inst->opt_name);
 	
 	const char* time_limit_string = getTimeLimitString(inst->time_limit);
-	printf("- Time Limit:             %s\n", time_limit_string);
+	printf("- Time Limit:              %s\n", time_limit_string);
 
 	// printf("-old_benders %d\n", inst->old_benders);  
 	// printf("-threads %d\n", inst->num_threads);  
@@ -139,10 +139,30 @@ void parameterPrint(instance* inst)
 	// printf("-cutoff %lf\n", inst->cutoff); 
 	// printf("\nenter -help or --help for help\n");
 
-	printf("- Seed:                   %d\n\n", inst->random_seed);
+	printf("- Seed:                    %d\n\n", inst->random_seed);
 
-	printf("- Verbose:                %d\n", inst->verbose);
-	printf("- Show Real Time Plot:    %d\n", inst->show_gnuplot);
+	printf("- Verbose:                 %d\n", inst->verbose);
+	printf("- Show Real Time Plot:     %d\n\n", inst->show_gnuplot);
+
+	char *out_name = getFileName(inst->name_csv, ".csv");
+	printf("- Output Csv File Name:    %s\n", out_name);
+
+	char *env_value;
+	// Get the value of the VIRTUAL_ENV environment variable
+	env_value = getenv("VIRTUAL_ENV");
+
+	if (env_value != NULL)
+	{
+		printf("- Plot Comparision:        True\n");
+
+	} else
+	{
+		printf("- Plot Comparision:        False\n\n\n");
+
+		printf("[ INFO ]: No virtual environment is currently active.\n");
+		printf("If you want to plot a final comparision between the different run you must start a python venv as follow:\n");
+		printf("$ python3 -m venv env     $ pip3 install matplotlib     $ . env/bin/activate\n\n");
+	}
 
 	printf("\n");
 	printHorizontalLine('*');

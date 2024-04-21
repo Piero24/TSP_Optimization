@@ -86,10 +86,11 @@ void generateDataFile(const char* filename, instance* inst);
  * @brief Returns the filename from a given file path.
  * 
  * @param filePath The file path from which to extract the filename.
+ * @param extension The extension to be removed from the filename.
  * 
  * @return The filename extracted from the file path.
  */
-char *getFileName(const char *filePath);
+char *getFileName(const char *filePath, const char *extension);
 
 /**
  * @brief Prints the solution to the standard output or generates a plot using Gnuplot, 

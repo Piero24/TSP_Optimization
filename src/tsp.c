@@ -173,7 +173,7 @@ void save_solution(instance* inst)
     strftime(date_str, sizeof(date_str), "%y-%m-%d", tm); // Format: YY-MM-DD
     // strftime(date_str, sizeof(date_str), "%y-%m-%d_%H:%M", tm); // Format: YY-MM-DD HH:MM
 
-    char *file_name = getFileName(inst->input_file);
+    char *file_name = getFileName(inst->input_file, ".tsp");
 
     // Modify the output file paths to include the "Archive/Image" and the "Archive/Svg" directories
     char pngPath[100];
@@ -286,7 +286,7 @@ char* fileGenerator(int n)
     return dynamic_file_name;
 }
 
-char *getFileName(const char *filePath)
+char *getFileName(const char *filePath, const char *extension)
 {
     const char *fileName = strrchr(filePath, '/');
     if (fileName != NULL)
@@ -298,7 +298,7 @@ char *getFileName(const char *filePath)
     }
 
     // Check if the file name ends with ".tsp"
-    const char *extension = ".tsp";
+    //const char *extension = ".tsp";
     size_t lenFileName = strlen(fileName);
     size_t lenExtension = strlen(extension);
 

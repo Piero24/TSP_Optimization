@@ -37,4 +37,11 @@ int manage_launcher(instance *inst, const char *filename);
  */
 int execute_workflow(instance *inst);
 
+/**
+ * @brief 
+ * 
+ * @return 
+ */
+int runPythonScript();
+
 #endif /* LAUNCHER_H */

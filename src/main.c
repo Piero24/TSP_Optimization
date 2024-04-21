@@ -54,3 +54,12 @@ int main(int argc, char** argv)
     execute_workflow(&inst);
     return 0;
 }
+
+/*
+
+char txt[100];
+sprintf(txt, "Random: %d\n", inst->best_sol[i]);
+fputs(txt, inst->output_csv);
+
+
+*/

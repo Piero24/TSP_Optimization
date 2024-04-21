@@ -12,10 +12,19 @@ int manage_launcher(instance *inst, const char *filename)
     }
 
     char line[256];
+    char tmp_csv_name[50];
     char header_names[MAX_HEADER_LENGTH];
     strcpy(header_names, "");
     
     int nonEmptyLines = 0;
+
+    char csv_path[50];
+    char date_str[20];
+
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+    strftime(date_str, sizeof(date_str), "%y-%m-%d_%H-%M", tm); // Format: YY-MM-DD_HH-MM
+    sprintf(csv_path, "Archive/Csv/%s.csv", date_str);
 
     while (fgets(line, sizeof(line), file))
     {
@@ -41,7 +50,7 @@ int manage_launcher(instance *inst, const char *filename)
             parse_args(argc, words, inst);
 
             strncat(header_names, inst->algorithm_name, MAX_HEADER_LENGTH - strlen(header_names) - 1);
-            strncat(header_names, " ", MAX_HEADER_LENGTH - strlen(header_names) - 1);
+            strncat(header_names, " - ", MAX_HEADER_LENGTH - strlen(header_names) - 1);
             strncat(header_names, inst->opt_name, MAX_HEADER_LENGTH - strlen(header_names) - 1);
             strncat(header_names, "; ", MAX_HEADER_LENGTH - strlen(header_names) - 1);
 
@@ -51,7 +60,11 @@ int manage_launcher(instance *inst, const char *filename)
                 mkdir("Archive", 0777);
                 mkdir("Archive/Csv", 0777);
 
+                strcpy(inst->name_csv, csv_path);
+                parameterPrint(inst);
+
                 strcpy(inst->name_csv, "Archive/Csv/tmp.csv");
+                strcpy(tmp_csv_name, "Archive/Csv/tmp.csv");
                 inst->output_csv = fopen(inst->name_csv, "a");
             }
 
@@ -60,19 +73,7 @@ int manage_launcher(instance *inst, const char *filename)
         }
     }
 
-    // Change inst->name_csv and inst->output_csv because execute_workflow(inst); make a free_instance(inst);
-
-    fflush(inst->output_csv);
-    fclose(inst->output_csv);
     fclose(file);
-
-    char csv_path[50];
-    char date_str[20];
-
-    time_t t = time(NULL);
-    struct tm *tm = localtime(&t);
-    strftime(date_str, sizeof(date_str), "%y-%m-%d_%H-%M", tm); // Format: YY-MM-DD_HH-MM
-    sprintf(csv_path, "Archive/Csv/%s.csv", date_str);
 
     if (strlen(header_names) >= 2)
         header_names[strlen(header_names) - 2] = '\n';
@@ -87,23 +88,22 @@ int manage_launcher(instance *inst, const char *filename)
 
     // Max length of header_names + max length of nonEmptyLines + separator length
     char header_and_lines[MAX_HEADER_LENGTH + 20];
-    printf("Header: %s\n", header_names);
     sprintf(header_and_lines, "%d; %s", nonEmptyLines, header_names);
 
     // Write header_and_lines to the CSV file
     fprintf(final_csv, "%s", header_and_lines);
 
-    inst->output_csv = fopen(inst->name_csv, "r");
+    FILE *tmp_file = fopen(tmp_csv_name, "r");
 
-    if (!inst->output_csv)
+    if (!tmp_file)
     {
-        fprintf(stderr, "Error: Could not open file %s\n", inst->name_csv);
+        fprintf(stderr, "Error: Could not open file %s\n", tmp_csv_name);
         return 1;
     }
 
-    // Copy rows from output_csv to final_csv
+    // Copy rows from tmp_file to final_csv
     char row[256]; // Assuming max length of a row
-    while (fgets(row, sizeof(row), inst->output_csv))
+    while (fgets(row, sizeof(row), tmp_file))
     {
         fprintf(final_csv, "%s", row);
     }
@@ -111,14 +111,15 @@ int manage_launcher(instance *inst, const char *filename)
     fflush(final_csv);
     fclose(final_csv);
 
-    fflush(inst->output_csv);
-    fclose(inst->output_csv);
+    fflush(tmp_file);
+    fclose(tmp_file);
 
-    if (remove(inst->name_csv) != 0)
+    if (remove(tmp_csv_name) != 0)
     {
-        printf("Error: Unable to delete the file %s.\n", inst->name_csv);
+        printf("Error: Unable to delete the file %s.\n", tmp_csv_name);
     }
 
+    runPythonScript();
     return 0;
 }
 
@@ -157,8 +158,9 @@ int execute_workflow(instance *inst)
         // Header
         fprintf(inst->output_csv, "1; %s %s\n", inst->algorithm_name, inst->opt_name);
         fflush(inst->output_csv);
+
+        parameterPrint(inst);
     }
-    // fprintf(file, "John, 25, New York\n");
 
     read_input(inst);
     apply_algorithm(inst);
@@ -169,5 +171,27 @@ int execute_workflow(instance *inst)
     fclose(inst->output_csv);
     
     free_instance(inst);
+    return 0;
+}
+
+int runPythonScript()
+{
+    char *env_value;
+    // Get the value of the VIRTUAL_ENV environment variable
+    env_value = getenv("VIRTUAL_ENV");
+
+    // Check if the environment variable is set
+    if (env_value != NULL)
+    {
+        // printf("A virtual environment is active: %s\n", env_value);
+        printf("Python Script here\n");
+        // if (system("python3 Documents/HW_Plot/perfprof.py -D , -T 3600 -S 2 -M 20 Documents/HW_Plot/lagr.csv pp.pdf -P 'all instances, shift 2 sec.s'") != 0)
+        // {
+        //     printf("Failed to run the command.\n");
+        //     return 1;
+        // }
+
+    }
+    
     return 0;
 }
