@@ -61,3 +61,5 @@ creationdate.lua
 main.log
 pdfa.xmpi
 Debug/
+Csv/
+tmp/

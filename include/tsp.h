@@ -64,6 +64,8 @@ typedef struct {
     int show_gnuplot;
 	FILE *plotSolution;
 	FILE *plotCosts;
+
+	char name_csv[250];
 	FILE *output_csv;
 	
 	char file_name[50];

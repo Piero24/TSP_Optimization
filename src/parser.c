@@ -8,6 +8,8 @@ void initialization(instance* inst)
 	inst->show_gnuplot = -1;
 	inst->plotSolution = NULL;
 	inst->plotCosts = NULL;
+
+	strcpy(inst->name_csv, "NULL");
 	inst->output_csv = NULL;
 
 	inst->old_benders = 0;

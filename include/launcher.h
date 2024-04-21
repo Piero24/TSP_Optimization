@@ -35,6 +35,6 @@ int manage_launcher(instance *inst, const char *filename);
  * 
  * @return
  */
-const char* execute_workflow(instance *inst);
+int execute_workflow(instance *inst);
 
 #endif /* LAUNCHER_H */
