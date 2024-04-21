@@ -20,6 +20,7 @@ void initialization(instance* inst)
 	inst->cutoff = CPX_INFBOUND; 		// If Cplex is not installed in your machine use DBL_MAX
 	inst->integer_costs = 0;
 	inst->verbose = 0;
+	inst->zbest = DBL_MAX;
 
 	inst->available_memory = 12000;   	// available memory, in MB, for Cplex execution (e.g., 12000)
 	inst->max_nodes = -1; 				// max n. of branching nodes in the final run (-1 unlimited)

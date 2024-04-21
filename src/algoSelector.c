@@ -23,6 +23,7 @@ void Random(instance* inst)
         inst->zbest += dist(inst, inst->best_sol[i], inst->best_sol[i-1]);
     }
     inst->zbest += dist(inst, inst->best_sol[0], inst->best_sol[inst->nnodes-1]);
+    inst->tbest = clock();
 }
 
 int apply_algorithm(instance* inst)
@@ -38,8 +39,12 @@ int apply_algorithm(instance* inst)
         printCentered(info, '*');
 	    printf("\n");
 
-        printf("\nSelected Algorithm: %s\t\t\tStarting Node: %d\t\t\tTime: %f sec.\t\t\tCost: %f\t\t\n", inst->algorithm_name, inst->start, time, inst->zbest);
-        printf("\n");
+        printf("\nSelected Algorithm: %s\t\t\t", inst->algorithm_name);
+        
+        if (strcmp(inst->algorithm_name, "Nearest Neighbor") == 0)
+            printf("Starting Node: %d\t\t\t", inst->start);
+        
+        printf("Time: %f sec.\t\t\tCost: %f\t\t\n\n", time, inst->zbest);
 
         printHorizontalLine('*');
     }
