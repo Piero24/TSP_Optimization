@@ -429,7 +429,7 @@ int bendersLoop(instance *inst, bool gluing)
 
 			if(objval < inst->zbest)
 				bestSolution(result[1], objval, inst);
-		
+			
 			for(int i=1; i<ncomp+1; i++) free(result[i]);
 			free(result);
 		}
@@ -460,14 +460,13 @@ int bendersLoop(instance *inst, bool gluing)
 	if(ncomp == 1){
 		int** result = convertSolution(succ, comp, ncomp, inst);
 
-		if(objval < inst->zbest)
-			bestSolution(result[1], objval, inst);
+		bestSolution(result[1], objval, inst);
 		//show_solution_comps(inst, true, result, ncomp);
 
 		for(int i=1; i<ncomp+1; i++) free(result[i]);
 		free(result);
 	}else if(inst->verbose >= 60){
-		printf("[cplex - Benders' loop] solution not found");
+		printf("[Benders] solution not found");
 	}
 	
 	// free and close cplex model   
