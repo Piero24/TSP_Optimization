@@ -165,7 +165,9 @@ int execute_workflow(instance *inst)
     read_input(inst);
     apply_algorithm(inst);
 
-    //show_solution(inst, true);
+    if (strcmp(inst->algorithm_name, "Random") == 0 || strcmp(inst->algorithm_name, "Nearest Neighbor") == 0)
+        show_solution(inst, true);
+    
     save_solution(inst);
     fflush(inst->output_csv);
     fclose(inst->output_csv);

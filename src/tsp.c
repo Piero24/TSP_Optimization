@@ -82,17 +82,17 @@ void show_solution_comps(instance* inst, bool useGnuplot, int** result, int ncom
             fprintf(inst->plotSolution, "set grid\n");
             fprintf(inst->plotSolution, "set term qt persist font \"Arial\"\n"); // Set font to Arial
             fprintf(inst->plotSolution, "set pointsize 0.1\n"); // Set font to Arial
-            fprintf(inst->plotSolution, "set datafile separator \"\t\"");
-            fprintf(inst->plotSolution, "plot '-' with linespoints pointtype 7\n");
+            fflush(inst->plotSolution);
         }
 
+        fprintf(inst->plotSolution, "plot [-10:10010] [-10:10010] '-' with linespoints pointtype 7\n");
         for(int j=1; j<ncomp+1; j++){
             for(int i=0; i<inst->nnodes && result[j][i] != -1; i++)
             {
                 fprintf(inst->plotSolution, "%f %f\n", inst->coord[result[j][i]].x, inst->coord[result[j][i]].y);
             }
-            if(result[j][0] != -1 && result[j][0] != -1)
-                fprintf(inst->plotSolution, "%f %f\n", inst->coord[result[j][0]].x, inst->coord[result[j][0]].y);
+            if(result[j][0] != -1)
+                fprintf(inst->plotSolution, "%f %f\n\n", inst->coord[result[j][0]].x, inst->coord[result[j][0]].y);
         }
 
         fprintf(inst->plotSolution, "e\n");

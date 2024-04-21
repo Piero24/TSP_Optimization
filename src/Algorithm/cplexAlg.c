@@ -51,7 +51,7 @@ int TSPopt(instance *inst)
 	
 	build_sol(xstar, inst, succ, comp, &ncomp);
 	result = convertSolution(succ, comp, ncomp, inst);
-	//show_solution_comps(inst, true, result, ncomp);
+	show_solution_comps(inst, true, result, ncomp);
     //bestSolution(result[1], objval, inst);
 	
 	// free and close cplex model   
@@ -304,7 +304,7 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
 
 void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *cost){
 	if(inst->verbose >= 90) printf("[mergeComponents] Starting the merge of %d components\n", *ncomp);
-
+	int count = 0;
 	while(*ncomp > 1){
 		if(inst->verbose >= 95) printf("[mergeComponents] Current #components: %d\n", *ncomp);
 
@@ -355,11 +355,12 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
 				comp[i]--;
 		}
 		
-		if(bestDiffC < 0) {print_error("Error: diffC < 0");}
+		if(bestDiffC < 0 && count == 0) {printf("[mergeComponents] Error: diffC < 0 diffC: %f\n", bestDiffC);exit(0);}
 
 		*cost += bestDiffC;
 		
 		*ncomp = *ncomp - 1;
+		count ++;
 
 		if(inst->verbose >= 95) printf("[mergeComponents] Best merging done. ncomp %d\n", *ncomp);
 		
@@ -421,9 +422,36 @@ int bendersLoop(instance *inst, bool gluing)
 
 		// merge components
 		if(gluing){
+			int** result;
+
+			if(inst->show_gnuplot > -1){
+				if(inst->show_gnuplot > 0)
+					sleep_ms(inst->show_gnuplot*1000);
+				
+				result = convertSolution(succ, comp, ncomp, inst);
+				show_solution_comps(inst, true, result, ncomp);
+				
+				for(int i=1; i<ncomp+1; i++) free(result[i]);
+				free(result);
+			}
+
 			mergeComponents(inst, &ncomp, comp, succ, &objval);
-			int** result = convertSolution(succ, comp, ncomp, inst);
+			result = convertSolution(succ, comp, ncomp, inst);
+
+			if(inst->show_gnuplot > -1){
+				if(inst->show_gnuplot > 0)
+					sleep_ms(inst->show_gnuplot*1000);
+
+				show_solution_comps(inst, true, result, ncomp);
+
+				if(inst->show_gnuplot > 0)
+					sleep_ms(inst->show_gnuplot*1000);
+			}
+			
 			gluing2Opt(inst, result[1], objval);
+
+			if(inst->show_gnuplot > -1)
+				show_solution_comps(inst, true, result, ncomp);
 
 			if(inst->verbose >= 80) printf("[Benders - Gluing] Merged solution has cost %f\n", objval);
 
@@ -432,6 +460,9 @@ int bendersLoop(instance *inst, bool gluing)
 			
 			for(int i=1; i<ncomp+1; i++) free(result[i]);
 			free(result);
+		} else {
+			int** result = convertSolution(succ, comp, ncomp, inst);
+			show_solution_comps(inst, true, result, ncomp);
 		}
 
 		//check time
@@ -461,7 +492,7 @@ int bendersLoop(instance *inst, bool gluing)
 		int** result = convertSolution(succ, comp, ncomp, inst);
 
 		bestSolution(result[1], objval, inst);
-		//show_solution_comps(inst, true, result, ncomp);
+		show_solution_comps(inst, true, result, ncomp);
 
 		for(int i=1; i<ncomp+1; i++) free(result[i]);
 		free(result);
