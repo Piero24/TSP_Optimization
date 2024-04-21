@@ -44,7 +44,14 @@ int apply_algorithm(instance* inst)
         if (strcmp(inst->algorithm_name, "Nearest Neighbor") == 0)
             printf("Starting Node: %d\t\t\t", inst->start);
         
-        printf("Time: %f sec.\t\t\tCost: %f\t\t\n\n", time, inst->zbest);
+        printf("Time: %f sec.\t\t\t", time);
+        
+        if (strcmp(inst->algorithm_name, "CPLEX") != 0)
+            printf("Cost: %f\t\t", inst->zbest);
+        else
+            printf("Lower bound: %f\t\t", inst->best_lb);
+        
+        printf("\n\n");
 
         printHorizontalLine('*');
     }

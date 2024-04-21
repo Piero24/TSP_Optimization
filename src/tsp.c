@@ -47,7 +47,7 @@ void show_solution(instance* inst, bool useGnuplot)
             fflush(inst->plotSolution);
         }
 
-        fprintf(inst->plotSolution, "plot '-' with linespoints pointtype 7\n");
+        fprintf(inst->plotSolution, "plot [-10:10010] [-10:10010] '-' with linespoints pointtype 7\n");
 
         for(int i=0; i<inst->nnodes; i++)
         {
@@ -82,6 +82,7 @@ void show_solution_comps(instance* inst, bool useGnuplot, int** result, int ncom
             fprintf(inst->plotSolution, "set grid\n");
             fprintf(inst->plotSolution, "set term qt persist font \"Arial\"\n"); // Set font to Arial
             fprintf(inst->plotSolution, "set pointsize 0.1\n"); // Set font to Arial
+
             fflush(inst->plotSolution);
         }
 
@@ -191,7 +192,7 @@ void save_solution(instance* inst)
     fprintf(plotPNG, "set xlabel \"X Axis\"\n");
     fprintf(plotPNG, "set ylabel \"Y Axis\"\n");
     fprintf(plotPNG, "set grid\n");
-    fprintf(plotPNG, "plot '-' with linespoints\n");
+    fprintf(plotPNG, "plot [-10:10010] [-10:10010] '-' with linespoints\n");
 
     // Send Gnuplot commands directly for SVG
     fprintf(plotSVG, "set terminal svg\n");
@@ -200,7 +201,7 @@ void save_solution(instance* inst)
     fprintf(plotSVG, "set xlabel \"X Axis\"\n");
     fprintf(plotSVG, "set ylabel \"Y Axis\"\n");
     fprintf(plotSVG, "set grid\n");
-    fprintf(plotSVG, "plot '-' with linespoints\n");
+    fprintf(plotSVG, "plot [-10:10010] [-10:10010] '-' with linespoints\n");
 
     for(int i = 0; i < inst->nnodes; i++) {
         fprintf(plotPNG, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);

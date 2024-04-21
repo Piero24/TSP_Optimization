@@ -48,11 +48,13 @@ int TSPopt(instance *inst)
 	int ncomp;
 	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
 	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
+
+	inst->tbest = clock();
+	inst->best_lb = objval;
 	
 	build_sol(xstar, inst, succ, comp, &ncomp);
 	result = convertSolution(succ, comp, ncomp, inst);
 	show_solution_comps(inst, true, result, ncomp);
-    //bestSolution(result[1], objval, inst);
 	
 	// free and close cplex model   
     for(int i=1; i<ncomp+1; i++) free(result[i]);
@@ -460,9 +462,12 @@ int bendersLoop(instance *inst, bool gluing)
 			
 			for(int i=1; i<ncomp+1; i++) free(result[i]);
 			free(result);
-		} else {
+		} else if(inst->show_gnuplot > -1){
 			int** result = convertSolution(succ, comp, ncomp, inst);
 			show_solution_comps(inst, true, result, ncomp);
+
+			if(inst->show_gnuplot > 0)
+				sleep_ms(inst->show_gnuplot*1000);
 		}
 
 		//check time
