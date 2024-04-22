@@ -159,6 +159,26 @@ char* fileGenerator(int n);
  */
 double dist(instance* inst, int a, int b);
 
+/**
+ * @brief Prints the solution to the standard output or generates a plot using Gnuplot, 
+ * depending on the specified flag. Works with multiple components solutions.
+ * 
+ * @param inst A pointer to the instance structure containing the solution data.
+ * @param useGnuplot A boolean flag indicating whether to generate a plot 
+ * using Gnuplot (true) or print the solution to the standard output (false).
+ * @param result A pointer to the array of paths (aka array of array of nodes).
+ * @param ncomp The number of components.
+ */
 void show_solution_comps(instance* inst, bool useGnuplot, int** result, int ncomp);
+
+/**
+ * @brief Print the formatted string if inst->verbose >= vMin.
+ * 
+ * @param inst A pointer to the instance structure.
+ * @param vMin Minimum verbosity required for printing.
+ * @param format The format string.
+ * @param ... The list of arguments of the format string.
+ */
+void verbose_print(instance *inst, int vMin, const char* format, ...);
 
 #endif /* TSP_H */

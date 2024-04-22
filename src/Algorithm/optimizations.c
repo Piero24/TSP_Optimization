@@ -114,19 +114,16 @@ int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCo
             double distAA1 = dist(inst, *A, *A1);
             double distBB1 = dist(inst, *B, *B1);
 
-            if (inst->verbose >= 100){
-                printf("[2optLoop] A: %f - %f\n", inst->coord[*A].x, inst->coord[*A].y);
-                printf("[2optLoop] A1: %f - %f\n", inst->coord[*A1].x, inst->coord[*A1].y);
-                printf("[2optLoop] B: %f - %f\n", inst->coord[*B].x, inst->coord[*B].y);
-                printf("[2optLoop] B1: %f - %f\n", inst->coord[*B1].x, inst->coord[*B1].y);
-                printf("[2optLoop] Trying to swap edges %d-%d and %d-%d with %d-%d and %d-%d\n", *A1, *A, *B, *B1,*A1, *B1, *B, *A);
-                printf("[2optLoop] Distances: A1B1: %f, AB: %f, AA1: %f, BB1: %f\n\n", distA1B1, distAB, distAA1, distBB1);
-            }
+            verbose_print(inst, 100, "[2optLoop] A: %f - %f\n", inst->coord[*A].x, inst->coord[*A].y);
+            verbose_print(inst, 100, "[2optLoop] A1: %f - %f\n", inst->coord[*A1].x, inst->coord[*A1].y);
+            verbose_print(inst, 100, "[2optLoop] B: %f - %f\n", inst->coord[*B].x, inst->coord[*B].y);
+            verbose_print(inst, 100, "[2optLoop] B1: %f - %f\n", inst->coord[*B1].x, inst->coord[*B1].y);
+            verbose_print(inst, 100, "[2optLoop] Trying to swap edges %d-%d and %d-%d with %d-%d and %d-%d\n", *A1, *A, *B, *B1,*A1, *B1, *B, *A);
+            verbose_print(inst, 100, "[2optLoop] Distances: A1B1: %f, AB: %f, AA1: %f, BB1: %f\n\n", distA1B1, distAB, distAA1, distBB1);
 
             if (distAB + distA1B1 < distAA1 + distBB1)
             {
-                if (inst->verbose >= 90) 
-                    printf("[2optLoop] Swapping edges %d-%d and %d-%d with %d-%d and %d-%d\n", *A, *A1, *B, *B1, *A1, *B1, *B, *A);
+                verbose_print(inst, 90, "[2optLoop] Swapping edges %d-%d and %d-%d with %d-%d and %d-%d\n", *A, *A1, *B, *B1, *A1, *B1, *B, *A);
 
                 // Reverse the sub-array from A to B
                 reverseSubvector(A1, B);
@@ -137,8 +134,7 @@ int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCo
                 // update official solution
                 if(*cost < inst->zbest){
                     if(bestSolution(result, *cost, inst) != 0 && VNS){
-                        if (inst->verbose >= 60) 
-                            printf("[2optLoop] Optimization NOT completed, time limit reached.\n\n");
+                        verbose_print(inst, 60, "[2optLoop] Optimization NOT completed, time limit reached.\n\n");
                         free(result);
                         return 1;
                     }
@@ -178,7 +174,7 @@ int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCo
 
 int twoOpt(instance* inst)
 {
-    if (inst->verbose >= 80) printf("[2opt] Starting initialization.\n");
+    verbose_print(inst, 80, "[2opt] Starting initialization.\n");
 
     int* result = (int*) calloc(inst->nnodes, sizeof(int));
     double cost = inst->zbest;
@@ -193,11 +189,11 @@ int twoOpt(instance* inst)
     int nCosts = 0, xIndex = 0;
     bool plotFlag = false;
 
-    if (inst->verbose >= 80) printf("[2opt] Initialization completed, starting optimization.\n");
+    verbose_print(inst, 80, "[2opt] Initialization completed, starting optimization.\n");
 
     twoOptLoop(inst, result, &cost, costs, &nCosts, &xIndex, false, false);
 
-    if (inst->verbose >= 80) printf("[2opt] Optimization completed.\n\n");
+    verbose_print(inst, 80, "[2opt] Optimization completed.\n\n");
 
     bestSolution(result, cost, inst);
     free(result);
@@ -208,7 +204,7 @@ int twoOpt(instance* inst)
 
 int tabuSearch(instance* inst)
 {
-    if (inst->verbose >= 80) printf("[Tabu' Search] Starting initialization.\n");
+    verbose_print(inst, 80, "[Tabu' Search] Starting initialization.\n");
 
     // Copying result vector
     int* result = (int*) calloc(inst->nnodes, sizeof(int));
@@ -236,7 +232,7 @@ int tabuSearch(instance* inst)
     clock_t end;
     double time;
     
-    if (inst->verbose >= 80) printf("[Tabu' Search] Initialization completed, starting optimization.\n");
+    verbose_print(inst, 80, "[Tabu' Search] Initialization completed, starting optimization.\n");
 
     do
     {
@@ -283,8 +279,8 @@ int tabuSearch(instance* inst)
                 // if is the first non-tabù solution, save it as current candidate
                 if(bestCost == -1 || new < old)
                 {
-                    if (bestCost == -1 && inst->verbose >= 80) 
-                        printf("[Tabu' Search] First feasible solution found, saving it\n");
+                    if (bestCost == -1)
+                        verbose_print(inst, 80, "[Tabu' Search] First feasible solution found, saving it\n");
                     
                     // copy current solution
                     copyArray(result, bestSol, inst->nnodes);
@@ -296,8 +292,7 @@ int tabuSearch(instance* inst)
                     // save swapped node
                     swappedNode = result[A];
 
-                    if (inst->verbose >= 90)
-                        printf("[Tabu' Search] Swapping nodes %d and %d. New cost is %f\n", result[A], result[B], bestCost);
+                    verbose_print(inst, 90, "[Tabu' Search] Swapping nodes %d and %d. New cost is %f\n", result[A], result[B], bestCost);
                 }
             }
         }
@@ -318,20 +313,17 @@ int tabuSearch(instance* inst)
             if(tabuPos > tenure)
                 tabuPos = 0;
 
-            if (inst->verbose >= 80) 
-                printf("[Tabu' Search] The new solution is worse, adding it to tabu' list\n");
+            verbose_print(inst, 80, "[Tabu' Search] The new solution is worse, adding it to tabu' list\n");
         }
 
-        if (inst->verbose >= 80) 
-            printf("[Tabu' Search] Updating new 'current' solution. Old cost: %f, New cost: %f\n", cost, bestCost);
+        verbose_print(inst, 80, "[Tabu' Search] Updating new 'current' solution. Old cost: %f, New cost: %f\n", cost, bestCost);
         
         copyArray(bestSol, result, inst->nnodes);
         cost = bestCost;
 
         if(cost < inst->zbest)
         {
-            if (inst->verbose >= 80) 
-                printf("[Tabu' Search] Updating best official solution.\n");
+            verbose_print(inst, 80, "[Tabu' Search] Updating best official solution.\n");
         
             // update official solution
             bestSolution(result, cost, inst);
@@ -364,13 +356,13 @@ int tabuSearch(instance* inst)
         end = clock();
         time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
-        if (inst->verbose >= 80) printf("[Tabu' Search] time: %f, limit:%f\n", time, inst->time_limit);
+        verbose_print(inst, 80, "[Tabu' Search] time: %f, limit:%f\n", time, inst->time_limit);
 
         //system("pause");
 
     }while(time < inst->time_limit);
 
-    if (inst->verbose >= 80) printf("[Tabu' Search] Optimization completed.\n\n");
+    verbose_print(inst, 80, "[Tabu' Search] Optimization completed.\n\n");
 
     free(result);
     free(tabuList);
@@ -386,7 +378,7 @@ int variableNeighborhoodSearch(instance* inst)
     double time;
 
     //result vector initialization
-    if (inst->verbose >= 80) printf("[VNS] Starting initialization.\n");
+    verbose_print(inst, 80, "[VNS] Starting initialization.\n");
     
     int* result = (int*) calloc(inst->nnodes, sizeof(int));
     double cost = inst->zbest;
@@ -398,7 +390,7 @@ int variableNeighborhoodSearch(instance* inst)
     int nCosts = 0, xIndex = 0;
     bool plotFlag = false;
 
-    if (inst->verbose >= 80) printf("[VNS] Initialization completed, starting optimization.\n");
+    verbose_print(inst, 80, "[VNS] Initialization completed, starting optimization.\n");
 
     // cicle 2opt + kick
     do{
@@ -407,7 +399,7 @@ int variableNeighborhoodSearch(instance* inst)
 
         twoOptLoop(inst, result, &cost, costs, &nCosts, &xIndex, true, false);
 
-        if (inst->verbose >= 80) printf("[VNS - 2opt] Optimization completed, cost: %f, kicking the solution.\n", cost);
+        verbose_print(inst, 80, "[VNS - 2opt] Optimization completed, cost: %f, kicking the solution.\n", cost);
 
         // KICKS SECTION
         int nkicks = (rand() % 9) + 2; // range 2-10
@@ -432,13 +424,13 @@ int variableNeighborhoodSearch(instance* inst)
             costs = tmp;
         }
 
-        if (inst->verbose >= 80) printf("[VNS - 2opt] Kicks done, cost: %f.\n\n", cost);
+        verbose_print(inst, 80, "[VNS - 2opt] Kicks done, cost: %f.\n\n", cost);
 
         // TIME CHECK
         end = clock();
         time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
-        if (inst->verbose >= 90) printf("[VNS] time: %f, limit:%f\n", time, inst->time_limit);
+        verbose_print(inst, 90, "[VNS] time: %f, limit:%f\n", time, inst->time_limit);
 
     }while(time < inst->time_limit);
     

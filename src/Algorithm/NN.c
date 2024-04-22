@@ -17,8 +17,7 @@ int NNFromEachNode(instance* inst)
         nearestNeighbor(inst, firstNode, result, &cost);
 
         if(bestCost == -1 || bestCost > cost){
-            if(inst->verbose >= 80) 
-                printf("[NNFromEachNode] New best solution founded starting from %d with cost %f\n", firstNode, cost);
+            verbose_print(inst, 80, "[NNFromEachNode] New best solution founded starting from %d with cost %f\n", firstNode, cost);
 
             bestCost = cost;
             bestFirst = firstNode;
@@ -26,7 +25,7 @@ int NNFromEachNode(instance* inst)
             inst->start = firstNode;
 
             if(bestSolution(result, cost, inst) != 0){
-                if (inst->verbose >= 60) printf("[NNFromEachNode] Algorithm NOT completed, time limit reached.\n\n");
+                verbose_print(inst, 60, "[NNFromEachNode] Algorithm NOT completed, time limit reached.\n\n");
                 free(result);
                 return 1;
             }
@@ -49,8 +48,7 @@ int NNFromEachNode(instance* inst)
         }
     }
 
-    if(inst->verbose >= 60) 
-        printf("[NNFromEachNode] Best solution founded starting from %d with cost %f\n\n", bestFirst, bestCost);
+    verbose_print(inst, 60, "[NNFromEachNode] Best solution founded starting from %d with cost %f\n\n", bestFirst, bestCost);
     
     return 0;
 }
@@ -64,7 +62,7 @@ int nearestNeighbor(instance* inst, int firstNode, int* result, double* cost)
         return 1;
     }
 
-    if(inst->verbose > 80) printf("[Nearest Neighbor] Starting initialization\n");
+    verbose_print(inst, 80, "[Nearest Neighbor] Starting initialization\n");
 
     *cost = 0;
     for(int i=0; i<inst->nnodes; i++)
@@ -75,11 +73,11 @@ int nearestNeighbor(instance* inst, int firstNode, int* result, double* cost)
     result[0] = firstNode;
     result[firstNode] = 0;
 
-    if(inst->verbose > 80) printf("[Nearest Neighbor] Initialization completed, starting the algorithm\n");
+    verbose_print(inst, 80, "[Nearest Neighbor] Initialization completed, starting the algorithm\n");
 
     for(int current=0; current<inst->nnodes-1; current++)
     {
-        if(inst->verbose > 95) printf("[Nearest Neighbor] Current node: %d\n", result[current]);
+        verbose_print(inst, 95, "[Nearest Neighbor] Current node: %d\n", result[current]);
 
         double minDist = dist(inst, result[current], result[current+1]);
         int nearest = current+1;
@@ -98,13 +96,13 @@ int nearestNeighbor(instance* inst, int firstNode, int* result, double* cost)
         result[nearest] = tmp;
 
         *cost += dist(inst, result[current], result[nearest]);
-        if(inst->verbose > 95) printf("[Nearest Neighbor] Current cost: %f\n", *cost);
+        verbose_print(inst, 95, "[Nearest Neighbor] Current cost: %f\n", *cost);
     }
 
     *cost += dist(inst, result[0], result[inst->nnodes-1]);
-    if(inst->verbose > 95) printf("[Nearest Neighbor] Current cost: %f\n", *cost);
+    verbose_print(inst, 95, "[Nearest Neighbor] Current cost: %f\n", *cost);
 
-    if(inst->verbose > 80) printf("[Nearest Neighbor] Algorithm finished\n\n");
+    verbose_print(inst, 80, "[Nearest Neighbor] Algorithm finished\n\n");
     
     return 0;
 }

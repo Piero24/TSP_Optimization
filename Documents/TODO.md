@@ -2,9 +2,6 @@
 
 ## add input flag for cost-itaration function plot + add cplex plot
 
-## assert instead of printError
-
-
 
 
 

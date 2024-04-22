@@ -136,8 +136,7 @@ int bestSolution(int* result, double cost, instance* inst)
     
     int time = (int)(((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC);
     
-    if(inst->verbose >= 50)
-        printf("Best solution updated. Its cost is %f, it was founded after %d seconds\n", cost, time);
+    verbose_print(inst, 50, "Best solution updated. Its cost is %f, it was founded after %d seconds\n", cost, time);
     
     if(inst->show_gnuplot > -1){
         if(inst->show_gnuplot > 0)

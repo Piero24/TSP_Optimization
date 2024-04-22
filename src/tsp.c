@@ -12,6 +12,15 @@ double dist(instance* inst, int a, int b)
     return inst->distances[a][b];
 }
 
+void verbose_print(instance *inst, int vMin, const char* format, ...) {
+	if(inst->verbose >= vMin){
+		va_list args;
+		va_start(args, format);
+		vprintf(format, args);
+	    va_end(args);
+	}
+}
+
 void generateDataFile(const char* filename, instance* inst)
 {
     FILE* file = fopen("data.txt", "w");

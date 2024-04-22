@@ -5,6 +5,7 @@
 #include "parser.h"
 #include "algoSelector.h"
 #include <cplex.h>
+#include <assert.h>
 
 /**
  * @brief Solves the Traveling Salesman Problem (TSP) using CPLEX optimization.
