@@ -182,6 +182,7 @@ int execute_workflow(instance *inst)
 
 int runPythonScript(instance *inst, char* csv_path)
 {
+    
     char *env_value;
     // Get the value of the VIRTUAL_ENV environment variable
     env_value = getenv("VIRTUAL_ENV");
