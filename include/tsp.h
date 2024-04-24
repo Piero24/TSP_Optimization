@@ -66,7 +66,6 @@ typedef struct {
 	FILE *plotCosts;
 
 	char name_csv[250];
-	FILE *output_csv;
 	
 	char file_name[50];
 	char file_comment[50];

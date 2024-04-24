@@ -10,7 +10,6 @@ void initialization(instance* inst)
 	inst->plotCosts = NULL;
 
 	strcpy(inst->name_csv, "NULL");
-	inst->output_csv = NULL;
 
 	inst->old_benders = 0;
 	strcpy(inst->input_file, "NULL");
@@ -129,7 +128,7 @@ void parameterPrint(instance* inst)
 	printf("- Optimization Name:       %s\n\n", inst->opt_name);
 	
 	const char* time_limit_string = getTimeLimitString(inst->time_limit);
-	printf("- Time Limit:              %s\n", time_limit_string);
+	printf("- Time Limit:              %s seconds\n", time_limit_string);
 
 	// printf("-old_benders %d\n", inst->old_benders);  
 	// printf("-threads %d\n", inst->num_threads);  
