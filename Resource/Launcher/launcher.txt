@@ -1,5 +1,19 @@
 // -file Resource/pr10v1.tsp -model 1 -opt 1 -v 50 
 // -file Resource/pr10v1.tsp -model 1 -opt 1 -v 40 
 // -g 50 -model 0 -opt 1 -v 60 -s 1
--g 50 -model 1 -opt 2 -v 10 -t 5
--g 50 -model 1 -opt 3 -v 10 -t 5
+// -g 50 -model 1 -opt 2 -v 10 -t 5
+// -g 50 -model 1 -opt 3 -v 10 -t 5
+
+// files:
+-f Resource/pr10v1.tsp
+-f Resource/pr10v2.tsp
+-g 50
+
+
+// algos
+-model 2 -opt 1
+-model 1 -opt 2
+-model 1
+
+// parameters:
+-v 10 -t 15

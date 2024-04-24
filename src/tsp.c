@@ -262,7 +262,7 @@ char* fileGenerator(int n)
     snprintf(file_name, sizeof(file_name), "Resource/pr%d-%s.tsp", n, date_str);
 
     // Open the file
-    printf("%s\n",file_name);
+    // printf("%s\n",file_name);
     FILE *fp = fopen(file_name, "w");
     if (fp == NULL)
     {

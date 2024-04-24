@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 
     } else if (argc == 3 && strcmp(argv[1], "-launcher") == 0)
     {
-        manage_launcher(&inst, argv[2]);
+        manageLauncher(&inst, argv[2]);
         return 0;
 
     } else
@@ -52,14 +52,6 @@ int main(int argc, char** argv)
     }
 
     execute_workflow(&inst);
+    free_instance(&inst);
     return 0;
 }
-
-/*
-
-char txt[100];
-sprintf(txt, "Random: %d\n", inst->best_sol[i]);
-fputs(txt, inst->output_csv);
-
-
-*/

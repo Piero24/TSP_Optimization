@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-
 #ifdef _WIN32
     #include <Windows.h>
 #endif
@@ -18,6 +17,22 @@
 #include "algoSelector.h"
 
 
+#define MAX_FILES 10
+#define MAX_HEADER_LENGTH 350
+
+typedef struct {
+	char algorithm[50];
+    char optimizer[50];
+} Tuple;
+
+/**
+ * @brief 
+ * 
+ * @param inst
+ * @param line
+ */
+void instExtractor(instance *inst, char *line);
+
 /**
  * @brief 
  * 
@@ -26,7 +41,7 @@
  * 
  * @return 
  */
-int manage_launcher(instance *inst, const char *filename);
+int manageLauncher(instance *inst, const char *filename);
 
 /**
  * @brief 
@@ -40,8 +55,11 @@ int execute_workflow(instance *inst);
 /**
  * @brief 
  * 
+ * @param inst
+ * @param csv_path
+ * 
  * @return 
  */
-int runPythonScript();
+int runPythonScript(instance *inst, char* csv_path);
 
 #endif /* LAUNCHER_H */
