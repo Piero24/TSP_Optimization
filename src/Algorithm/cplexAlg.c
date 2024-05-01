@@ -101,7 +101,7 @@ int bendersLoop(instance *inst, bool gluing)
 	clock_t end = clock();
     double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 	
-	do{
+	do {
 		//set time limit
 		CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit - time);
 
@@ -168,7 +168,9 @@ int bendersLoop(instance *inst, bool gluing)
 			
 			for(int i=1; i<ncomp+1; i++) free(result[i]);
 			free(result);
-		} else if(inst->show_gnuplot > -1){
+
+		} else if(inst->show_gnuplot > -1)
+		{
 			int** result = convertSolution(succ, comp, ncomp, inst);
 			show_solution_comps(inst, true, result, ncomp);
 
@@ -179,10 +181,12 @@ int bendersLoop(instance *inst, bool gluing)
 		//check time
 		end = clock();
         time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
-	}while(time < inst->time_limit);
+
+	} while(time < inst->time_limit);
 	
     // print solution
-    if(inst->verbose >= 100){
+    if(inst->verbose >= 100)
+	{
         printf("costs:%f\n", objval);
 
         for ( int i = 0; i < inst->nnodes; i++ )
@@ -199,7 +203,8 @@ int bendersLoop(instance *inst, bool gluing)
         }
     }
 
-	if(ncomp == 1){
+	if(ncomp == 1)
+	{
 		int** result = convertSolution(succ, comp, ncomp, inst);
 
 		bestSolution(result[1], objval, inst);
@@ -207,6 +212,7 @@ int bendersLoop(instance *inst, bool gluing)
 
 		for(int i=1; i<ncomp+1; i++) free(result[i]);
 		free(result);
+
 	}else 
 		verbose_print(inst, 60, "[Benders] solution not found");
 	
@@ -218,7 +224,6 @@ int bendersLoop(instance *inst, bool gluing)
 	CPXcloseCPLEX(&env); 
 
 	return 0; // or an appropriate nonzero error code
-
 }
 
 int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
@@ -226,10 +231,12 @@ int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
 	verbose_print(inst, 95, "[convertSolution] Creating result array.\n");
 
 	int** result = (int **) calloc(ncomp+1, sizeof(int*));
-	for(int i=1; i<ncomp+1; i++){
+	for(int i=1; i<ncomp+1; i++)
+	{
 		result[i] = (int *) calloc(inst->nnodes, sizeof(int));
 
-		for(int j=0; j<inst->nnodes; j++){
+		for(int j=0; j<inst->nnodes; j++)
+		{
 			result[i][j] = -1;
 		}
 	}
@@ -241,13 +248,16 @@ int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
 
 	verbose_print(inst, 95, "[convertSolution] Starting converting. ncomp %d\n", ncomp);
 
-    for(int i=0; i<inst->nnodes; i++){
-		if(indexes[comp[i]] == 0){
+    for(int i=0; i<inst->nnodes; i++)
+	{
+		if(indexes[comp[i]] == 0)
+		{
 			result[comp[i]][0] = i;
 			indexes[comp[i]]++;
 			int next = succ[i];
 
-			while(next != i){
+			while(next != i)
+			{
 				result[comp[i]][indexes[comp[i]]] = next;
 				indexes[comp[i]]++;
 				next = succ[next];
@@ -256,9 +266,11 @@ int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
 	}
 
 	if(inst->verbose >= 95)
-		for(int i=1; i<ncomp; i++){
+		for(int i=1; i<ncomp; i++)
+		{
 			printf("[convertSolution]");
-			for(int j=0; j<inst->nnodes && result[i][j] != -1; j++){
+			for(int j=0; j<inst->nnodes && result[i][j] != -1; j++)
+			{
 				printf(" result[%d][%d] %d\t", i, j, result[i][j]);
 			}
 			printf("\n");
@@ -269,7 +281,8 @@ int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
 	return result;
 }
 
-void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *cost){
+void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *cost)
+{
 	verbose_print(inst, 90, "[mergeComponents] Starting the merge of %d components\n", *ncomp);
 	int count = 0;
 	while(*ncomp > 1){
@@ -278,15 +291,18 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
 		// find best swap
 		int bestA = -1, bestB = -1;
 		double bestDiffC = DBL_MAX;
-		for(int A=0;A<inst->nnodes-1;A++){
-			for(int B=A+1;B<inst->nnodes;B++){
+		for(int A=0;A<inst->nnodes-1;A++)
+		{
+			for(int B=A+1;B<inst->nnodes;B++)
+			{
 				if(comp[A] == comp[B])
 					continue;
 				
 				int A1 = succ[A], B1 = succ[B];
 				double diffC = - dist(inst, A, A1) - dist(inst, B, B1) + dist(inst, A, B1) + dist(inst, B, A1);
 				
-				if(diffC < bestDiffC){
+				if(diffC < bestDiffC)
+				{
 					bestDiffC = diffC;
 					bestA = A;
 					bestB = B;

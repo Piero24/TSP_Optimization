@@ -33,6 +33,13 @@ int apply_algorithm(instance* inst);
 int algorithmSelector(instance* inst);
 
 /**
+ * @brief Randomly generates a solution for the TSP instance.
+ * 
+ * @param inst Pointer to the instance structure.
+ */
+void sleep_ms(int milliseconds);
+
+/**
  * @brief Substitute the path of the old best solution with the path of 
  * new solution.
  * 

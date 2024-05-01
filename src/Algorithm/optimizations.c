@@ -432,7 +432,7 @@ int variableNeighborhoodSearch(instance* inst)
 
         verbose_print(inst, 90, "[VNS] time: %f, limit:%f\n", time, inst->time_limit);
 
-    }while(time < inst->time_limit);
+    } while(time < inst->time_limit);
     
     free(result);
     
