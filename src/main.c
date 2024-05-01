@@ -39,7 +39,7 @@ int main(int argc, char** argv)
     
     if(argc<2)
     {
-        manage_menu(&inst);
+        manageMenu(&inst);
 
     } else if (argc == 3 && strcmp(argv[1], "-launcher") == 0)
     {
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
         parse_args(argc, argv, &inst);
     }
 
-    execute_workflow(&inst);
+    executeWorkflow(&inst);
     free_instance(&inst);
     return 0;
 }

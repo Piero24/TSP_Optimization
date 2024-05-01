@@ -45,6 +45,7 @@ void reverseSubvector(int* from, int* to);
  *  Will contain the optimized solution after the function ends.
  * @param cost Pointer to the variable to store the cost of the solution.
  * @param inst Pointer to the instance structure.
+ * 
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
 int twoOpt(instance* inst);
@@ -63,6 +64,7 @@ int twoOpt(instance* inst);
  * 
  * @param VNS True if the caller function is VNS, false otherwise.
  * @param plotFlag True if the costs function should be plotted, false otherwise.
+ * 
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
 int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCosts, int* xIndex, bool VNS, bool plotFlag);
@@ -76,6 +78,7 @@ int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCo
  * @param node Pointer to the node to be checked.
  * @param list Pointer to the list of nodes.
  * @param listLength Length of the list.
+ * 
  * @return Returns true if the node exists in the list, otherwise false.
  */
 bool nodeInList(int* node, int* list, int listLength);
@@ -102,6 +105,7 @@ void copyArray(int* from, int* to, int length);
  *  Will contain the optimized solution after the function ends.
  * @param cost Pointer to the variable to store the cost of the solution.
  * @param inst Pointer to the instance structure.
+ * 
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
 int tabuSearch(instance* inst);
@@ -110,6 +114,7 @@ int tabuSearch(instance* inst);
  * @brief 2opt moves with kicks when the best solution gets stuck in local minimum
  * 
  * @param inst Pointer to the instance structure.
+ * 
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
 int variableNeighborhoodSearch(instance* inst);

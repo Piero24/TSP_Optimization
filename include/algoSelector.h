@@ -16,6 +16,7 @@
  * the results to the standard output.
  * 
  * @param inst Pointer to the instance structure.
+ * 
  * @return 0 if the algorithm runs successfully.
  */
 int apply_algorithm(instance* inst);
@@ -26,6 +27,7 @@ int apply_algorithm(instance* inst);
  * 
  * @param inst Pointer to the instance structure.
  * @param firstNode The starting node for the algorithm.
+ * 
  * @return 0 if the algorithm runs successfully.
  */
 int algorithmSelector(instance* inst);
@@ -38,6 +40,7 @@ int algorithmSelector(instance* inst);
  * @param cost Cost of the best solution.
  * @param inst Pointer to the instance structure that contain the information
  * of the new best solution.
+ * 
  * @return 0 if the time limit isn't violated yet, 1 otherwise
  */
 int bestSolution(int* result, double cost, instance* inst);

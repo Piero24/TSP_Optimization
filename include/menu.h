@@ -23,9 +23,10 @@
  * based on user inputs through menus.
  * 
  * @param inst A pointer to the instance structure to be initialized.
+ * 
  * @return Returns 0 upon successful execution.
  */
-int manage_menu(instance *inst);
+int manageMenu(instance *inst);
 
 /**
  * @brief Clears the console screen.
@@ -45,6 +46,7 @@ void clearScreen();
  * @param file_name The name of the input file to be selected.
  * @param n A pointer to an integer representing the number of points 
  * for a generated input file.
+ * 
  * @return Returns 0 upon successful execution.
  */
 int file_menu(char *file_name, int *n);
@@ -57,6 +59,7 @@ int file_menu(char *file_name, int *n);
  * 
  * @param algorithm_name A pointer to a character array where the 
  * selected algorithm name will be stored.
+ * 
  * @return Returns 0 upon successful execution.
  */
 int algorithm_menu(char *algorithm_name);
@@ -69,6 +72,7 @@ int algorithm_menu(char *algorithm_name);
  * 
  * @param opt_name A pointer to a character array where the 
  * selected optimizer name will be stored.
+ * 
  * @return Returns 0 upon successful execution.
  */
 int optimization_menu(char *opt_name);
@@ -83,6 +87,7 @@ int optimization_menu(char *opt_name);
  * @param time_limit A pointer to a double representing the time limit.
  * @param random_seed A pointer to an integer representing the random seed.
  * @param show_gnuplot A pointer to an integer indicating whether to show with gnuplot.
+ * 
  * @return Returns 0 upon successful execution.
  */
 int options_menu(int *verbose, double *time_limit, int *random_seed, int *show_gnuplot);

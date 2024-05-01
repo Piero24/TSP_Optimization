@@ -11,6 +11,7 @@
  * @brief Applies the nearest neighbor algorithm for every possible starting node.
  * 
  * @param inst Pointer to the instance structure.
+ * 
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
 int NNFromEachNode(instance* inst);
@@ -22,6 +23,7 @@ int NNFromEachNode(instance* inst);
  * @param firstNode The starting node for the algorithm.
  * @param result Pointer to the result vector.
  * @param cost Cost of the solution founded.
+ * 
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
 int nearestNeighbor(instance* inst, int firstNode, int* result, double* cost);

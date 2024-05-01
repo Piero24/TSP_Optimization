@@ -52,6 +52,7 @@ void parameterPrint(instance* inst);
  * 
  * @param inst Pointer to the instance structure.
  * @param type The type of the model.
+ * 
  * @return Returns 0 upon successful assignment.
  */
 int intToModelName(instance* inst, int type);
@@ -68,6 +69,7 @@ int intToModelName(instance* inst, int type);
  * 
  * @param inst Pointer to the instance structure.
  * @param type The type of the optimization.
+ * 
  * @return Returns 0 upon successful assignment.
  */
 int intToOptName(instance* inst, int type);

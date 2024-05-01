@@ -1,7 +1,4 @@
-## Make compose csv + use python script
-
 ## add input flag for cost-itaration function plot + add cplex plot
-
 
 
 

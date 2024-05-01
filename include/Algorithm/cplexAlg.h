@@ -27,6 +27,7 @@ int TSPopt(instance *inst);
  * @param comp Pointer to the component array.
  * @param ncomp The number of components in the solution.
  * @param inst Pointer to the instance structure.
+ * 
  * @return Returns a 2D array representing the solution.
  */
 int** convertSolution(int *succ, int *comp, int ncomp, instance* inst);
@@ -107,6 +108,7 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
  * 
  * @param inst Pointer to the instance structure.
  * @param gluing Says whether or not the function should do gluing at each iteration.
+ * 
  * @return Returns 0 if the algorithm completes successfully, or an appropriate nonzero error code.
  */
 int bendersLoop(instance *inst, bool gluing);
@@ -118,6 +120,7 @@ int bendersLoop(instance *inst, bool gluing);
  * @param inst Pointer to the instance structure.
  * @param result Pointer to the array representing the solution.
  * @param cost The cost of the provided solution.
+ * 
  * @return Returns 0 if the optimization completes successfully, or an appropriate nonzero error code.
  */
 int gluing2Opt(instance* inst, int* result, double cost);

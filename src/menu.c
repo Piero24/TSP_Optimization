@@ -1,7 +1,7 @@
 #include "menu.h"
 
 
-int manage_menu(instance *inst)
+int manageMenu(instance *inst)
 {
     int n = 0;
     

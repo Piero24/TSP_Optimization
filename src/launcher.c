@@ -43,8 +43,8 @@ void headerGenerator(char *header_and_lines, int tuple_count, Tuple *tuples)
     sprintf(header_and_lines, " %d, %s", tuple_count, header_names);
 }
 
-void finalGenerator(char *csv_path) {
-
+void csvGenerator(char *csv_path)
+{
     char date_str[20];
 
     time_t t = time(NULL);
@@ -84,18 +84,21 @@ int manageLauncher(instance *inst, const char *filename)
         {
             instExtractor(inst, line);
 
-            if (strcmp(inst->input_file, "NULL") != 0 && file_count < MAX_FILES) {
+            if (strcmp(inst->input_file, "NULL") != 0 && file_count < MAX_FILES)
+            {
                 files[file_count] = strdup(inst->input_file);
                 file_count++;
             }
 
-            if (strcmp(inst->algorithm_name, "Undefined") != 0 && tuple_count < MAX_FILES*5) {
+            if (strcmp(inst->algorithm_name, "Undefined") != 0 && tuple_count < MAX_FILES*5)
+            {
                 strcpy(tuples[tuple_count].algorithm, inst->algorithm_name);
                 strcpy(tuples[tuple_count].optimizer, inst->opt_name);
                 tuple_count++;
             }
 
-            if (strcmp(inst->input_file, "NULL") == 0 && strcmp(inst->algorithm_name, "Undefined") == 0) {
+            if (strcmp(inst->input_file, "NULL") == 0 && strcmp(inst->algorithm_name, "Undefined") == 0)
+            {
                 strcpy(parameters, line);
             }
         }
@@ -104,7 +107,7 @@ int manageLauncher(instance *inst, const char *filename)
     fclose(file);
 
     char csv_path[50];
-    finalGenerator(csv_path);
+    csvGenerator(csv_path);
 
     char header_and_lines[MAX_HEADER_LENGTH + 20];
     headerGenerator(header_and_lines, tuple_count, tuples);
@@ -142,7 +145,7 @@ int manageLauncher(instance *inst, const char *filename)
             strcpy(inst->algorithm_name, tuples[j].algorithm);
             strcpy(inst->opt_name, tuples[j].optimizer);
 
-            execute_workflow(inst);
+            executeWorkflow(inst);
 
             char zbest_str[20];
             snprintf(zbest_str, sizeof(zbest_str), "%f", inst->zbest);
@@ -166,7 +169,7 @@ int manageLauncher(instance *inst, const char *filename)
     return 0;
 }
 
-int execute_workflow(instance *inst)
+int executeWorkflow(instance *inst)
 {
     parameterPrint(inst);
 
@@ -182,7 +185,6 @@ int execute_workflow(instance *inst)
 
 int runPythonScript(instance *inst, char* csv_path)
 {
-    
     char *env_value;
     // Get the value of the VIRTUAL_ENV environment variable
     env_value = getenv("VIRTUAL_ENV");
