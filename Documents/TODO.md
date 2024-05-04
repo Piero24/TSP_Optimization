@@ -15,3 +15,7 @@
 
 ## Tools (to be used)
 - Profiler: Used to check the time that the algorithm takes to complete a certain task.
+
+
+## Note
+- Best solution of file "a280.tsp" has cost 2579 (this can be used to check if an algorithm works)

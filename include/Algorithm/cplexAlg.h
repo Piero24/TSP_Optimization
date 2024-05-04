@@ -72,7 +72,7 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp);
  * @param comp Pointer to the component array to be populated.
  * @param ncomp Pointer to store the total number of components found.
  */
-void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *ncomp);
+void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *dim, int *ncomp);
 
 /**
  * @brief Adds subtour elimination constraints (SECs) to the LP model.
@@ -128,5 +128,7 @@ int bendersLoop(instance *inst, bool gluing);
  * @return Returns 0 if the optimization completes successfully, or an appropriate nonzero error code.
  */
 int gluing2Opt(instance* inst, int* result, double cost);
+
+static int CPXPUBLIC my_callback(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle);
 
 #endif /* CPLEXALG_H */

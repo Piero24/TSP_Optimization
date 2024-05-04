@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <assert.h>
 #include <math.h>
 #include <cplex.h> //CPX_INFBOUND
 
@@ -73,13 +74,6 @@ int intToModelName(instance* inst, int type);
  * @return Returns 0 upon successful assignment.
  */
 int intToOptName(instance* inst, int type);
-
-/**
- * @brief Prints an error message to the standard output and exits the program.
- * 
- * @param err The error message to be printed.
- */
-void print_error(const char *err);
 
 /**
  * @brief Return the time limit in string format.

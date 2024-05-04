@@ -19,6 +19,11 @@ int TSPopt(instance *inst)
 	build_model(inst, env, lp);
 	CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit);
 	
+	// setting callbacks
+	CPXLONG contextid = CPX_CALLBACKCONTEXT_CANDIDATE; // lazyconstraints
+	error = CPXcallbacksetfunc(env, lp, contextid, my_callback, inst);
+	assert(error == 0);
+
 	// compute CPLEX solution
 	verbose_print(inst, 60, "[CPLEX] Getting best solution\n");
 	error = CPXmipopt(env,lp);
@@ -55,11 +60,12 @@ int TSPopt(instance *inst)
 	int ncomp;
 	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
 	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
+	int* dim = (int *) calloc(inst->nnodes, sizeof(int));
 
 	inst->tbest = clock();
 	inst->best_lb = objval;
 	
-	build_sol(xstar, inst, succ, comp, &ncomp);
+	build_sol(xstar, inst, succ, comp, dim, &ncomp);
 	result = convertSolution(succ, comp, ncomp, inst);
 	show_solution_comps(inst, true, result, ncomp);
 	
@@ -68,6 +74,7 @@ int TSPopt(instance *inst)
 	free(result);
     free(xstar);
     free(succ);
+    free(dim);
     free(comp);
 	CPXfreeprob(env, &lp);
 	CPXcloseCPLEX(&env); 
@@ -93,6 +100,7 @@ int bendersLoop(instance *inst, bool gluing)
     double objval = 0;
 	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
 	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
+	int* dim = (int *) calloc(inst->nnodes, sizeof(int));
 	double *xstar = (double *) calloc(ncols, sizeof(double));
 
 	verbose_print(inst, 60, "[Benders] Algorithm initialized, starting processing...\n");
@@ -118,7 +126,7 @@ int bendersLoop(instance *inst, bool gluing)
 			inst->best_lb = objval;
 		
 		// compute connected components
-		build_sol(xstar, inst, succ, comp, &ncomp);
+		build_sol(xstar, inst, succ, comp, dim, &ncomp);
 
 		verbose_print(inst, 80, "[Benders] Found solution with %d components with cost %f\n", ncomp, objval);
 		
@@ -220,6 +228,7 @@ int bendersLoop(instance *inst, bool gluing)
     free(xstar);
 	free(succ);
 	free(comp);
+    free(dim);
 	CPXfreeprob(env, &lp);
 	CPXcloseCPLEX(&env); 
 
@@ -366,7 +375,7 @@ int gluing2Opt(instance* inst, int* result, double cost)
 }
 
 void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
-	if(ncomp == 1) print_error("add_SEC called with ncomp=1");
+	assert(ncomp > 1);
 	
 	int izero = 0;
 	int ncols = CPXgetnumcols(env, lp);
@@ -406,8 +415,10 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
 
 int xpos(int i, int j, instance *inst)
 { 
-	if ( i == j ) print_error(" i == j in xpos" );
+	assert(i != j);
+
 	if ( i > j ) return xpos(j,i,inst);
+
 	int pos = i * inst->nnodes + j - (( i + 1 ) * ( i + 2 )) / 2;
 	return pos;
 }
@@ -433,8 +444,11 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 			double lb = 0.0;
 			double ub = 1.0;
 
-			if ( CPXnewcols(env, lp, 1, &obj, &lb, &ub, &binary, cname) ) print_error(" wrong CPXnewcols on x var.s");
-    		if ( CPXgetnumcols(env,lp)-1 != xpos(i,j, inst) ) print_error(" wrong position for x var.s");
+			int error = CPXnewcols(env, lp, 1, &obj, &lb, &ub, &binary, cname);
+			assert(error == 0); // wrong CPXnewcols on x var.s
+
+			error = CPXgetnumcols(env,lp)-1 != xpos(i,j, inst);
+			assert(error == 0); // wrong position for x var.s
 		}
 	} 
 
@@ -460,10 +474,8 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 			nnz++;
 		}
 		
-		if ( CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, &cname[0]) )
-		{
-			print_error(" wrong CPXaddrows [degree]");
-		}
+		int error = CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, &cname[0]);
+		assert(error == 0); // wrong CPXaddrows [degree]
 	} 
 
     free(value);
@@ -487,7 +499,7 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 	free(cname);
 }
 
-void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *ncomp) // build succ() and comp() wrt xstar()...
+void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *dim, int *ncomp) // build succ() and comp() wrt xstar()...
 {   
 
 #ifdef DEBUG
@@ -500,7 +512,8 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *n
 			if (fabs(xstar[k]) > EPS && fabs(xstar[k]-1.0) > EPS){
 				printf("i %d j %d xpos %d\n", i, j, k);
 				printf("fabs(xstar[k]) %f, fabs(xstar[k]-1.0) %f\n", fabs(xstar[k]), fabs(xstar[k]-1.0));
-				print_error(" wrong xstar in build_sol()");
+				printf("\n\tWrong xstar in build_sol()\n\n");
+				exit(0);
 			}
 			if (xstar[k] > 0.5) 
 			{
@@ -511,7 +524,7 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *n
 	}
 	for ( int i = 0; i < inst->nnodes; i++ )
 	{
-		if ( degree[i] != 2 ) print_error("wrong degree in build_sol()");
+		assert(degree[i] == 2); // wrong degree in build_sol()
 	}	
 	free(degree);
 #endif
@@ -521,6 +534,7 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *n
 	{
 		succ[i] = -1;
 		comp[i] = -1;
+		dim[i] = 0;
 	}
 	
 	for ( int start = 0; start < inst->nnodes; start++ )
@@ -540,6 +554,7 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *n
 				if ( i != j && xstar[xpos(i,j,inst)] > 0.5 && comp[j] == -1 ) // the edge [i,j] is selected in xstar and j was not visited before 
 				{
 					succ[i] = j;
+					dim[comp[i]] += 1;
 					i = j;
 					done = 0;
 					break;
@@ -550,6 +565,66 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *n
 		
 		// go to the next component...
 	}
+}
+
+static int CPXPUBLIC my_callback(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle)
+{ 
+	instance* inst = (instance*) userhandle;
+	int ncols = inst->nnodes*(inst->nnodes-1)/2;
+	double* xstar = (double*) malloc(ncols * sizeof(double));  
+	double objval = CPX_INFBOUND; 
+	
+	int error = CPXcallbackgetcandidatepoint(context, xstar, 0, ncols-1, &objval);
+	assert(error == 0);
+	
+	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
+	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
+	int* dim = (int *) calloc(inst->nnodes, sizeof(int));
+	int ncomp;
+	build_sol(xstar, inst, succ, comp, dim, &ncomp);
+
+	verbose_print(inst, 95, "[CPLEX callback] Found solution with %d components with cost %f\n", ncomp, objval);
+	
+	if(ncomp > 1){
+		int izero = 0;
+		int* index = (int*) calloc(ncols, sizeof(int)); // indici delle variabili con coefficiente diverso da zero 
+		double* value = (double*) calloc(ncols, sizeof(double)); // valore dei coefficienti della sommatoria
+
+		for(int k=1; k<=ncomp; k++){
+			int nnz = 0; // number of non zero
+			char sense = 'L'; // <=
+			double rhs = dim[k] - 1.0; // right hand side of contraint
+			
+			// aggiungo vincolo per component #k
+			for(int i=0; i<inst->nnodes; i++){
+				if(comp[i] != k) continue;
+				rhs += 1;
+				
+				for(int j=i+1; j<inst->nnodes; j++){
+					if(comp[j] != k) continue;
+						
+					index[nnz] = xpos(i,j, inst);
+					value[nnz] = 1.0;
+					nnz ++;
+				}
+			}
+			
+			int izero = 0;
+			error = CPXcallbackrejectcandidate(context, 1, nnz, &rhs, &sense, &izero, index, value); // reject the solution and adds one cut 
+			assert(error == 0); //CPXcallbackrejectcandidate() error
+		}
+
+		free(index);
+		free(value);
+	} else {
+		verbose_print(inst, 80, "[CPLEX callback] Found feasible solution with %d components with cost %f\n", ncomp, objval);
+	}
+	
+	free(xstar);
+	free(succ);
+	free(comp);
+	free(dim);
+	return 0; 
 }
 
 /*

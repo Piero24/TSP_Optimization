@@ -222,13 +222,6 @@ int intToOptName(instance* inst, int type)
 	return 0;
 }
 
-void print_error(const char *err)
-{
-    printf("\n\n ERROR: %s \n\n", err);
-    fflush(NULL);
-    exit(1);
-}
-
 const char* getTimeLimitString(double time_limit)
 {
 	// If Cplex is not installed in your machine use only (time_limit == DBL_MAX)
@@ -247,8 +240,7 @@ const char* getTimeLimitString(double time_limit)
 int readInputParameters(instance* inst)
 {
 	FILE *fin = fopen(inst->input_file, "r");
-	if ( fin == NULL ) 
-		print_error(" input file not found!");
+	assert(fin != NULL); // input file not found
 
 	inst->nnodes = -1;
 	strcpy(inst->file_comment, "NULL");
@@ -297,10 +289,11 @@ int readInputParameters(instance* inst)
 
 		if ( strncmp(par_name, "DIMENSION", 9) == 0 ) 
 		{
-			if ( inst->nnodes >= 0 ) print_error(" repeated DIMENSION section in input file");
+			assert(inst->nnodes < 0); // repeated DIMENSION section in input file
+
 			token1 = strtok(NULL, " :");
 			inst->nnodes = atoi(token1);
-			if ( do_print ) printf(" ... nnodes %d\n", inst->nnodes); 
+			if ( do_print ) printf("nnodes %d\n", inst->nnodes); 
 			//inst->demand = (double *) calloc(inst->nnodes, sizeof(double));
 			inst->coord = (point *) calloc(inst->nnodes, sizeof(point));
 
@@ -323,8 +316,7 @@ int read_input(instance* inst)
 {
                             
 	FILE *fin = fopen(inst->input_file, "r");
-	if ( fin == NULL ) 
-		print_error(" input file not found!");
+	assert(fin != NULL); // input file not found!
 	
 	inst->nnodes = -1;
 	inst->depot = -1;  
@@ -356,14 +348,14 @@ int read_input(instance* inst)
 		{
 			active_section = 0;   
 			token1 = strtok(NULL, "");  
-			//if ( inst->verbose >= 10 ) printf(" ... solving instance %s with model %s\n\n", token1, inst->algorithm_name);
+			//if ( inst->verbose >= 10 ) printf("solving instance %s with model %s\n\n", token1, inst->algorithm_name);
 			continue;
 		}   
 		
 		if ( strncmp(par_name, "TYPE", 4) == 0 ) 
 		{
-			token1 = strtok(NULL, " :");  
-			if ( strncmp(token1, "TSP", 3) != 0 ) print_error(" format error:  only TYPE == TSP implemented so far!!!!!!"); 
+			token1 = strtok(NULL, " :");
+			assert(strncmp(token1, "TSP", 3) == 0); // format error:  only TYPE == TSP implemented so far
 			active_section = 0;
 			continue;
 		}
@@ -371,10 +363,10 @@ int read_input(instance* inst)
 
 		if ( strncmp(par_name, "DIMENSION", 9) == 0 ) 
 		{
-			if ( inst->nnodes >= 0 ) print_error(" repeated DIMENSION section in input file");
+			assert(inst->nnodes < 0); // repeated DIMENSION section in input file
 			token1 = strtok(NULL, " :");
 			inst->nnodes = atoi(token1);
-			if ( do_print ) printf(" ... nnodes %d\n", inst->nnodes); 
+			if ( do_print ) printf("nnodes %d\n", inst->nnodes); 
 			//inst->demand = (double *) calloc(inst->nnodes, sizeof(double));
 			inst->coord = (point *) calloc(inst->nnodes, sizeof(point));
 
@@ -392,7 +384,7 @@ int read_input(instance* inst)
 		{
 			token1 = strtok(NULL, " :");
 			inst->capacity = atof(token1);
-			if ( do_print ) printf(" ... vehicle capacity %lf\n", inst->capacity); 
+			if ( do_print ) printf("vehicle capacity %lf\n", inst->capacity); 
 			active_section = 0;
 			continue;
 		}
@@ -402,7 +394,7 @@ int read_input(instance* inst)
 		{
 			token1 = strtok(NULL, " :");
 			inst->nveh = atoi(token1);
-			if ( do_print ) printf(" ... n. vehicles %d\n", inst->nveh);  
+			if ( do_print ) printf("n. vehicles %d\n", inst->nveh);  
 			active_section = 0;
 			continue;
 		}
@@ -411,14 +403,14 @@ int read_input(instance* inst)
 		if ( strncmp(par_name, "EDGE_WEIGHT_TYPE", 16) == 0 ) 
 		{
 			token1 = strtok(NULL, " :");
-			if ( strncmp(token1, "EUC_2D", 6) != 0 ) print_error(" format error:  only EDGE_WEIGHT_TYPE == EUC_2D implemented so far!!!!!!"); 
+			assert(strncmp(token1, "EUC_2D", 6) == 0); // format error:  only EDGE_WEIGHT_TYPE == EUC_2D implemented so far
 			active_section = 0;
 			continue;
 		}            
 		
 		if ( strncmp(par_name, "NODE_COORD_SECTION", 18) == 0 ) 
 		{
-			if ( inst->nnodes <= 0 ) print_error(" ... DIMENSION section should appear before NODE_COORD_SECTION section");
+			assert(inst->nnodes > 0); // DIMENSION section should appear before NODE_COORD_SECTION section
 			active_section = 1;   
 			continue;
 		}
@@ -426,7 +418,7 @@ int read_input(instance* inst)
 		/*
 		if ( strncmp(par_name, "DEMAND_SECTION", 14) == 0 ) 
 		{
-			if ( inst->nnodes <= 0 ) print_error(" ... DIMENSION section should appear before DEMAND_SECTION section");
+			if ( inst->nnodes <= 0 ) print_error("DIMENSION section should appear before DEMAND_SECTION section");
 			active_section = 2;
 			continue;
 		}
@@ -434,7 +426,7 @@ int read_input(instance* inst)
 
 		if ( strncmp(par_name, "DEPOT_SECTION", 13) == 0 )  
 		{
-			if ( inst->depot >= 0 ) print_error(" ... DEPOT_SECTION repeated??");
+			assert(inst->depot < 0); // DEPOT_SECTION repeated
 			active_section = 3;   
 			continue;
 		}
@@ -449,7 +441,7 @@ int read_input(instance* inst)
 		if ( active_section == 1 ) // within NODE_COORD_SECTION
 		{
 			int i = atoi(par_name) - 1; 
-			if ( i < 0 || i >= inst->nnodes ) print_error(" ... unknown node in NODE_COORD_SECTION section");     
+			assert(i >= 0 && i < inst->nnodes); // unknown node in NODE_COORD_SECTION section 
 			token1 = strtok(NULL, " :,");
 			token2 = strtok(NULL, " :,");
 			inst->coord[i].x = atof(token1);
@@ -460,17 +452,17 @@ int read_input(instance* inst)
 				inst->distances[j][i] = inst->distances[i][j];
 			}
 			
-			if ( do_print ) printf(" ... node %4d at coordinates ( %15.7lf , %15.7lf )\n", i+1, inst->coord[i].x, inst->coord[i].y); 
+			if ( do_print ) printf("node %4d at coordinates ( %15.7lf , %15.7lf )\n", i+1, inst->coord[i].x, inst->coord[i].y); 
 			continue;
 		}    
 		  
 		// if ( active_section == 2 ) // within DEMAND_SECTION
 		// {
 		// 	int i = atoi(par_name) - 1; 
-		// 	if ( i < 0 || i >= inst->nnodes ) print_error(" ... unknown node in NODE_COORD_SECTION section");     
+		// 	if ( i < 0 || i >= inst->nnodes ) print_error("unknown node in NODE_COORD_SECTION section");     
 		// 	token1 = strtok(NULL, " :,");
 		// 	inst->demand[i] = atof(token1);
-		// 	if ( do_print ) printf(" ... node %4d has demand %10.5lf\n", i+1, inst->demand[i]); 
+		// 	if ( do_print ) printf("node %4d has demand %10.5lf\n", i+1, inst->demand[i]); 
 		// 	continue;
 		// }  
 
@@ -478,15 +470,15 @@ int read_input(instance* inst)
 		{
 			int i = atoi(par_name) - 1; 
 			if ( i < 0 || i >= inst->nnodes ) continue;
-			if ( inst->depot >= 0 ) print_error(" ... multiple depots not supported in DEPOT_SECTION");     
+			assert(inst->depot < 0); // multiple depots not supported in DEPOT_SECTION
 			inst->depot = i;
-			if ( do_print ) printf(" ... depot node %d\n", inst->depot+1); 
+			if ( do_print ) printf("depot node %d\n", inst->depot+1); 
 			continue;
 		}  
 		
 		printf(" final active section %d\n", active_section);
-		print_error(" ... wrong format for the current simplified parser!!!!!!!!!");     
-		    
+		printf("\n\twrong format for the current simplified parser\n\n");
+		exit(0);
 	}  
 
 	inst->tstart = clock();
