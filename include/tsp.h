@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <time.h>
-
+#include <stdarg.h>
 
 #ifdef _WIN32
     #include <Windows.h>
