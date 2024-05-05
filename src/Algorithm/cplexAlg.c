@@ -19,9 +19,13 @@ int TSPopt(instance *inst)
 	CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit);
 	
 	// setting callbacks
-	CPXLONG contextid = CPX_CALLBACKCONTEXT_CANDIDATE; // lazyconstraints
-	error = CPXcallbacksetfunc(env, lp, contextid, my_callback, inst);
+	CPXLONG contextid = CPX_CALLBACKCONTEXT_CANDIDATE; // SECs for full sol.s
+	error = CPXcallbacksetfunc(env, lp, contextid, SECcallback, inst);
 	assert(error == 0);
+
+	//contextid = CPX_CALLBACKCONTEXT_RELAXATION; // SECs for fractional sol.s
+	//error = CPXcallbacksetfunc(env, lp, contextid, SECcallback, inst);
+	//assert(error == 0);
 
 	// compute CPLEX solution
 	verbose_print(inst, 60, "[CPLEX] Getting best solution\n");
@@ -568,45 +572,37 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *d
 	}
 }
 
-static int CPXPUBLIC my_callback(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle)
+static int CPXPUBLIC SECcallback(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle)
 { 
+	// get instance and cplex solution
 	instance* inst = (instance*) userhandle;
 	int ncols = inst->nnodes*(inst->nnodes-1)/2;
 	double* xstar = (double*) malloc(ncols * sizeof(double));  
 	double objval = CPX_INFBOUND; 
 	
-	int error = CPXcallbackgetcandidatepoint(context, xstar, 0, ncols-1, &objval);
+	int error = 0;
+	if(contextid == CPX_CALLBACKCONTEXT_CANDIDATE)
+		error = CPXcallbackgetcandidatepoint(context, xstar, 0, ncols-1, &objval);
+	//else if(contextid == CPX_CALLBACKCONTEXT_RELAXATION)
+	//	error = CPXcallbackgetrelaxationpoint(context, xstar, 0, ncols-1, &objval);
+	else
+		return 0;
 	assert(error == 0);
 	
+	// convert cplex solution into succ & comp
 	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
 	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
 	int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
 	int ncomp;
 	build_sol(xstar, inst, succ, comp, dim, &ncomp);
 
-	/* DEBUG
-	int** result = convertSolution(succ, comp, ncomp, inst);
-	int* trueDim = (int *) calloc(inst->nnodes + 1, sizeof(int));
-	
-	for(int i=1; i<ncomp+1; i++){
-		trueDim[i]=0;
-		for(int j=0; j<inst->nnodes && result[i][j]!=-1;j++){
-			trueDim[i]+=1;
-		}
-	}
-
-	for(int i=1; i<ncomp+1; i++)
-		assert(trueDim[i] == dim[i]);
-	
-	for(int i=1; i<ncomp+1; i++) free(result[i]);
-	free(result);
-	free(trueDim);
-	// END DEBUG */
-
 	verbose_print(inst, 95, "[CPLEX callback] Found solution with %d components with cost %f\n", ncomp, objval);
 	
+	// if cplex solution has multiple components, add SEC
 	if(ncomp > 1){
 		int izero = 0;
+		int local = 0;
+		int purgeable = CPX_USECUT_FILTER;
 		char sense = 'L'; // <=
 		int* index = (int*) calloc(ncols, sizeof(int)); // indici delle variabili con coefficiente diverso da zero 
 		double* value = (double*) calloc(ncols, sizeof(double)); // valore dei coefficienti della sommatoria
@@ -628,13 +624,20 @@ static int CPXPUBLIC my_callback(CPXCALLBACKCONTEXTptr context, CPXLONG contexti
 				}
 			}
 			
-			error = CPXcallbackrejectcandidate(context, 1, nnz, &rhs, &sense, &izero, index, value); // reject the solution and adds one cut 
-			assert(error == 0); //CPXcallbackrejectcandidate() error
+			if(contextid == CPX_CALLBACKCONTEXT_CANDIDATE)
+				error = CPXcallbackrejectcandidate(context, 1, nnz, &rhs, &sense, &izero, index, value); // reject the solution and adds one cut 
+			
+			//else if(contextid == CPX_CALLBACKCONTEXT_RELAXATION)
+			//	error = CPXcallbackaddusercuts(context, 1, nnz, &rhs, &sense, &izero, index, value, &purgeable, &local);
+			
+			assert(error == 0); //CPXcallbackaddusercuts or CPXcallbackrejectcandidate error
 		}
 
 		free(index);
 		free(value);
+
 	} else {
+		// if cplex solution has 1 component, do nothing
 		double time =((double) (clock() - inst->tstart)) / CLOCKS_PER_SEC;
 		verbose_print(inst, 80, "[CPLEX callback] Found feasible solution with cost %f after %f seconds\n", objval, time);
 
@@ -647,7 +650,7 @@ static int CPXPUBLIC my_callback(CPXCALLBACKCONTEXTptr context, CPXLONG contexti
 			free(result);
 		}
 	}
-	
+
 	free(xstar);
 	free(succ);
 	free(comp);

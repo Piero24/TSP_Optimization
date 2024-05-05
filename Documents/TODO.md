@@ -1,5 +1,5 @@
 ## Algorithms
-- Advanced topics: SECs for fractional sol.s; posting heuristic sol.s
+- SECs for fractional sol.s; posting heuristic sol.s; heuristic mipstart
 
 
 ## Features

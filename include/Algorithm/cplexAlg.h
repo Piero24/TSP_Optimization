@@ -129,6 +129,6 @@ int bendersLoop(instance *inst, bool gluing);
  */
 int gluing2Opt(instance* inst, int* result, double cost);
 
-static int CPXPUBLIC my_callback(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle);
+static int CPXPUBLIC SECcallback(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle);
 
 #endif /* CPLEXALG_H */
