@@ -1,5 +1,4 @@
 ## Algorithms
-- B&C with callbacks
 - Advanced topics: SECs for fractional sol.s; posting heuristic sol.s
 
 
@@ -17,5 +16,8 @@
 - Profiler: Used to check the time that the algorithm takes to complete a certain task.
 
 
-## Note
-- Best solution of file "a280.tsp" has cost 2579 (this can be used to check if an algorithm works)
+## Official input - solutions
+- Best solution of file "kroA100.tsp" has cost 21282 (100 nodes)
+- Best solution of file "a280.tsp" has cost 2579 (280 nodes)
+- Best solution of file "rat575.tsp" has cost 6773 (575 nodes)
+- Best solution of file "pr1002.tsp" has cost 259045 (1002 nodes)

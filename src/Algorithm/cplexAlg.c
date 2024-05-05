@@ -1,6 +1,5 @@
 #include "Algorithm/cplexAlg.h"
 
-#define DEBUG    // da commentare se non si vuole il debugging
 #define EPS 1e-5
 
 int TSPopt(instance *inst)
@@ -60,7 +59,7 @@ int TSPopt(instance *inst)
 	int ncomp;
 	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
 	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
-	int* dim = (int *) calloc(inst->nnodes, sizeof(int));
+	int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
 
 	inst->tbest = clock();
 	inst->best_lb = objval;
@@ -100,7 +99,7 @@ int bendersLoop(instance *inst, bool gluing)
     double objval = 0;
 	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
 	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
-	int* dim = (int *) calloc(inst->nnodes, sizeof(int));
+	int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
 	double *xstar = (double *) calloc(ncols, sizeof(double));
 
 	verbose_print(inst, 60, "[Benders] Algorithm initialized, starting processing...\n");
@@ -501,8 +500,8 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 
 void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *dim, int *ncomp) // build succ() and comp() wrt xstar()...
 {   
+	/* DEBUG (add a '/' to activate this section)
 
-#ifdef DEBUG
 	int *degree = (int *) calloc(inst->nnodes, sizeof(int));
 	for ( int i = 0; i < inst->nnodes-1; i++ )
 	{
@@ -527,7 +526,8 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *d
 		assert(degree[i] == 2); // wrong degree in build_sol()
 	}	
 	free(degree);
-#endif
+
+	// END DEBUG */
 
 	*ncomp = 0;
 	for ( int i = 0; i < inst->nnodes; i++ )
@@ -536,6 +536,7 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *d
 		comp[i] = -1;
 		dim[i] = 0;
 	}
+	dim[inst->nnodes] = 0;
 	
 	for ( int start = 0; start < inst->nnodes; start++ )
 	{
@@ -548,13 +549,13 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *d
 		while ( !done )  // go and visit the current component
 		{
 			comp[i] = *ncomp;
+			dim[*ncomp] += 1;
 			done = 1;
 			for ( int j = 0; j < inst->nnodes; j++ )
 			{
 				if ( i != j && xstar[xpos(i,j,inst)] > 0.5 && comp[j] == -1 ) // the edge [i,j] is selected in xstar and j was not visited before 
 				{
 					succ[i] = j;
-					dim[comp[i]] += 1;
 					i = j;
 					done = 0;
 					break;
@@ -579,26 +580,44 @@ static int CPXPUBLIC my_callback(CPXCALLBACKCONTEXTptr context, CPXLONG contexti
 	
 	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
 	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
-	int* dim = (int *) calloc(inst->nnodes, sizeof(int));
+	int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
 	int ncomp;
 	build_sol(xstar, inst, succ, comp, dim, &ncomp);
+
+	/* DEBUG
+	int** result = convertSolution(succ, comp, ncomp, inst);
+	int* trueDim = (int *) calloc(inst->nnodes + 1, sizeof(int));
+	
+	for(int i=1; i<ncomp+1; i++){
+		trueDim[i]=0;
+		for(int j=0; j<inst->nnodes && result[i][j]!=-1;j++){
+			trueDim[i]+=1;
+		}
+	}
+
+	for(int i=1; i<ncomp+1; i++)
+		assert(trueDim[i] == dim[i]);
+	
+	for(int i=1; i<ncomp+1; i++) free(result[i]);
+	free(result);
+	free(trueDim);
+	// END DEBUG */
 
 	verbose_print(inst, 95, "[CPLEX callback] Found solution with %d components with cost %f\n", ncomp, objval);
 	
 	if(ncomp > 1){
 		int izero = 0;
+		char sense = 'L'; // <=
 		int* index = (int*) calloc(ncols, sizeof(int)); // indici delle variabili con coefficiente diverso da zero 
 		double* value = (double*) calloc(ncols, sizeof(double)); // valore dei coefficienti della sommatoria
 
 		for(int k=1; k<=ncomp; k++){
 			int nnz = 0; // number of non zero
-			char sense = 'L'; // <=
 			double rhs = dim[k] - 1.0; // right hand side of contraint
 			
 			// aggiungo vincolo per component #k
 			for(int i=0; i<inst->nnodes; i++){
 				if(comp[i] != k) continue;
-				rhs += 1;
 				
 				for(int j=i+1; j<inst->nnodes; j++){
 					if(comp[j] != k) continue;
@@ -609,7 +628,6 @@ static int CPXPUBLIC my_callback(CPXCALLBACKCONTEXTptr context, CPXLONG contexti
 				}
 			}
 			
-			int izero = 0;
 			error = CPXcallbackrejectcandidate(context, 1, nnz, &rhs, &sense, &izero, index, value); // reject the solution and adds one cut 
 			assert(error == 0); //CPXcallbackrejectcandidate() error
 		}
@@ -617,7 +635,17 @@ static int CPXPUBLIC my_callback(CPXCALLBACKCONTEXTptr context, CPXLONG contexti
 		free(index);
 		free(value);
 	} else {
-		verbose_print(inst, 80, "[CPLEX callback] Found feasible solution with %d components with cost %f\n", ncomp, objval);
+		double time =((double) (clock() - inst->tstart)) / CLOCKS_PER_SEC;
+		verbose_print(inst, 80, "[CPLEX callback] Found feasible solution with cost %f after %f seconds\n", objval, time);
+
+		// plot
+		if(inst->verbose >= 90){
+			int** result = convertSolution(succ, comp, ncomp, inst);
+			show_solution_comps(inst, true, result, ncomp);
+
+			for(int i=1; i<ncomp+1; i++) free(result[i]);
+			free(result);
+		}
 	}
 	
 	free(xstar);
