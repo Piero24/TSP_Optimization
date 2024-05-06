@@ -1,4 +1,5 @@
 #include "Algorithm/cplexAlg.h"
+#include "mincut.h"
 
 #define EPS 1e-5
 
@@ -17,15 +18,45 @@ int TSPopt(instance *inst)
 	// build TSP problem
 	build_model(inst, env, lp);
 	CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit);
+	CPXsetintparam(env, CPX_PARAM_THREADS, 1);
+	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
+	inst->ncols = ncols;
+	inst->postHeu = true;
 	
 	// setting callbacks
-	CPXLONG contextid = CPX_CALLBACKCONTEXT_CANDIDATE; // SECs for full sol.s
-	error = CPXcallbacksetfunc(env, lp, contextid, SECcallback, inst);
+	CPXLONG contextid = CPX_CALLBACKCONTEXT_CANDIDATE | CPX_CALLBACKCONTEXT_RELAXATION;
+	error = CPXcallbacksetfunc(env, lp, contextid, callbackHandler, inst);
 	assert(error == 0);
 
-	//contextid = CPX_CALLBACKCONTEXT_RELAXATION; // SECs for fractional sol.s
-	//error = CPXcallbacksetfunc(env, lp, contextid, SECcallback, inst);
-	//assert(error == 0);
+	// heuristic mipstart
+	double objval = 0;
+	int firstNode = randomInt(0, inst->nnodes-1);
+
+	int* result = (int*) calloc(inst->nnodes, sizeof(int));
+	nearestNeighbor(inst, firstNode, result, &objval);
+	mipstart2Opt(inst, result, &objval);
+
+	// convert heuristic to CPLEX format
+	double *xstar = (double *) calloc(ncols, sizeof(double));
+    
+	for(int i=0; i<ncols; i++)
+		xstar[i] = 0.0;
+	
+	for(int i=0; i<inst->nnodes-1; i++)
+		xstar[xpos(result[i], result[i+1], inst)] = 1.0;
+	xstar[xpos(result[inst->nnodes-1], result[0], inst)] = 1.0;
+
+	int *ind = (int *) malloc(inst->ncols * sizeof(int));
+	for ( int j = 0; j < inst->ncols; j++ ) ind[j] = j;
+	
+	int effortlevel = CPX_MIPSTART_NOCHECK;  
+	int beg = 0;
+
+	error = CPXaddmipstarts(env, lp, 1, inst->ncols, &beg, ind, xstar, &effortlevel, NULL);
+	assert(error == 0);
+
+	free(ind);
+	free(result);
 
 	// compute CPLEX solution
 	verbose_print(inst, 60, "[CPLEX] Getting best solution\n");
@@ -33,10 +64,6 @@ int TSPopt(instance *inst)
 	assert(error == 0);
 
 	// get CPLEX solution
-	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
-	double *xstar = (double *) calloc(ncols, sizeof(double));
-    double objval = 0;
-	
     CPXgetbestobjval(env, lp, &objval);
 	CPXgetx(env, lp, xstar, 0, ncols - 1);
     
@@ -59,7 +86,7 @@ int TSPopt(instance *inst)
     }
 
 	//convert solution for plotting
-    int** result;
+    int** resultPlot;
 	int ncomp;
 	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
 	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
@@ -69,12 +96,12 @@ int TSPopt(instance *inst)
 	inst->best_lb = objval;
 	
 	build_sol(xstar, inst, succ, comp, dim, &ncomp);
-	result = convertSolution(succ, comp, ncomp, inst);
-	show_solution_comps(inst, true, result, ncomp);
+	resultPlot = convertSolution(succ, comp, ncomp, inst);
+	show_solution_comps(inst, true, resultPlot, ncomp);
 	
 	// free and close cplex model   
-    for(int i=1; i<ncomp+1; i++) free(result[i]);
-	free(result);
+    for(int i=1; i<ncomp+1; i++) free(resultPlot[i]);
+	free(resultPlot);
     free(xstar);
     free(succ);
     free(dim);
@@ -278,7 +305,7 @@ int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
 	}
 
 	if(inst->verbose >= 95)
-		for(int i=1; i<ncomp; i++)
+		for(int i=1; i<=ncomp; i++)
 		{
 			printf("[convertSolution]");
 			for(int j=0; j<inst->nnodes && result[i][j] != -1; j++)
@@ -350,7 +377,7 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
 				comp[i]--;
 		}
 		
-		if(bestDiffC < 0 && count == 0) {printf("[mergeComponents] Error: diffC < 0 diffC: %f\n", bestDiffC);exit(0);}
+		//if(bestDiffC < 0 && count == 0) {printf("[mergeComponents] Error: diffC < 0 diffC: %f\n", bestDiffC);exit(0);}
 
 		*cost += bestDiffC;
 		
@@ -368,11 +395,25 @@ int gluing2Opt(instance* inst, int* result, double cost)
 
     verbose_print(inst, 90, "[Gluing - 2opt] Starting optimization.\n");
 
-    twoOptLoop(inst, result, &cost, NULL, &nCosts, &xIndex, false, false);
+    twoOptLoop(inst, result, &cost, NULL, &nCosts, &xIndex, false, false, false);
 
     verbose_print(inst, 90, "[Gluing - 2opt] Optimization completed.\n\n");
 
     bestSolution(result, cost, inst);
+    
+    return 0;
+}
+
+int mipstart2Opt(instance* inst, int* result, double* cost)
+{   
+    inst->plotCosts = NULL;
+    int nCosts = 0, xIndex = 0;
+
+    verbose_print(inst, 90, "[mipstart - 2opt] Starting optimization.\n");
+
+    twoOptLoop(inst, result, cost, NULL, &nCosts, &xIndex, false, false, true);
+
+    verbose_print(inst, 90, "[mipstart - 2opt] Optimization completed.\n\n");
     
     return 0;
 }
@@ -572,21 +613,36 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *d
 	}
 }
 
-static int CPXPUBLIC SECcallback(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle)
-{ 
+static int CPXPUBLIC callbackHandler(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle)
+{
 	// get instance and cplex solution
 	instance* inst = (instance*) userhandle;
-	int ncols = inst->nnodes*(inst->nnodes-1)/2;
+	int error = 0;
+
+	// choose action based on context id
+	if(contextid == CPX_CALLBACKCONTEXT_CANDIDATE)
+		candidateCallback(context, inst);
+
+	else if(contextid == CPX_CALLBACKCONTEXT_RELAXATION){
+		relaxationCallback(context, inst);
+	}
+
+	else
+		return 0;
+
+	assert(error == 0);
+	return 0;
+}
+
+static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* inst)
+{ 
+	// get instance and cplex solution
+	int ncols = inst->ncols;
 	double* xstar = (double*) malloc(ncols * sizeof(double));  
 	double objval = CPX_INFBOUND; 
 	
 	int error = 0;
-	if(contextid == CPX_CALLBACKCONTEXT_CANDIDATE)
-		error = CPXcallbackgetcandidatepoint(context, xstar, 0, ncols-1, &objval);
-	//else if(contextid == CPX_CALLBACKCONTEXT_RELAXATION)
-	//	error = CPXcallbackgetrelaxationpoint(context, xstar, 0, ncols-1, &objval);
-	else
-		return 0;
+	error = CPXcallbackgetcandidatepoint(context, xstar, 0, ncols-1, &objval);
 	assert(error == 0);
 	
 	// convert cplex solution into succ & comp
@@ -601,8 +657,6 @@ static int CPXPUBLIC SECcallback(CPXCALLBACKCONTEXTptr context, CPXLONG contexti
 	// if cplex solution has multiple components, add SEC
 	if(ncomp > 1){
 		int izero = 0;
-		int local = 0;
-		int purgeable = CPX_USECUT_FILTER;
 		char sense = 'L'; // <=
 		int* index = (int*) calloc(ncols, sizeof(int)); // indici delle variabili con coefficiente diverso da zero 
 		double* value = (double*) calloc(ncols, sizeof(double)); // valore dei coefficienti della sommatoria
@@ -624,17 +678,48 @@ static int CPXPUBLIC SECcallback(CPXCALLBACKCONTEXTptr context, CPXLONG contexti
 				}
 			}
 			
-			if(contextid == CPX_CALLBACKCONTEXT_CANDIDATE)
-				error = CPXcallbackrejectcandidate(context, 1, nnz, &rhs, &sense, &izero, index, value); // reject the solution and adds one cut 
-			
-			//else if(contextid == CPX_CALLBACKCONTEXT_RELAXATION)
-			//	error = CPXcallbackaddusercuts(context, 1, nnz, &rhs, &sense, &izero, index, value, &purgeable, &local);
-			
-			assert(error == 0); //CPXcallbackaddusercuts or CPXcallbackrejectcandidate error
+			error = CPXcallbackrejectcandidate(context, 1, nnz, &rhs, &sense, &izero, index, value); // reject the solution and adds one cut 
+			assert(error == 0); // CPXcallbackrejectcandidate error
 		}
 
 		free(index);
 		free(value);
+
+		if(inst->postHeu)
+		{
+			mergeComponents(inst, &ncomp, comp, succ, &objval);
+			int** result = convertSolution(succ, comp, ncomp, inst);
+
+			inst->plotCosts = NULL;
+			int nCosts = 0, xIndex = 0;
+			twoOptLoop(inst, result[1], &objval, NULL, &nCosts, &xIndex, false, false, true);
+
+			verbose_print(inst, 95, "[Posting Heuristic - Gluing] Ended merging and gluing2Opt, objval: %f ncomp %d\n", objval, ncomp);
+		
+			int *ind = (int *) malloc(inst->ncols * sizeof(int));
+			for ( int j = 0; j < inst->ncols; j++ ) ind[j] = j;
+
+			double* xheu = (double*) calloc(ncols, sizeof(double));
+			int objheu = 0;
+
+			for (int i = 0; i < inst->nnodes-1; i++) {
+				int pos_index = xpos(result[1][i], result[1][i + 1], inst);
+				xheu[pos_index] = 1;
+				objheu += dist(inst, result[1][i], result[1][i + 1]);
+			}
+
+			xheu[xpos(result[1][inst->nnodes-1], result[1][0], inst)] = 1;
+			objheu += dist(inst, result[1][inst->nnodes-1], result[1][0]);
+
+			for(int i=1; i<ncomp+1; i++) free(result[i]);
+			free(result);
+
+			error = CPXcallbackpostheursoln(context, inst->ncols, ind, xheu, objheu, CPXCALLBACKSOLUTION_NOCHECK);
+			assert(error == 0);
+			
+			free(xheu);
+			free(ind);
+		}
 
 	} else {
 		// if cplex solution has 1 component, do nothing
@@ -649,12 +734,73 @@ static int CPXPUBLIC SECcallback(CPXCALLBACKCONTEXTptr context, CPXLONG contexti
 			for(int i=1; i<ncomp+1; i++) free(result[i]);
 			free(result);
 		}
-	}
+	}	
 
 	free(xstar);
 	free(succ);
 	free(comp);
 	free(dim);
+	return 0; 
+}
+
+int CPLEX_add_cut(double cut_value, int cut_nnodes, int* cut_index_nodes, void* userhandle) {
+	
+	cut_par cut_pars = *(cut_par*) userhandle;
+	instance* inst = cut_pars.inst;
+
+	int* index = calloc(cut_nnodes*(cut_nnodes-1)/2,sizeof(int));
+	double* value = calloc(cut_nnodes*(cut_nnodes-1)/2,sizeof(double));
+
+	int izero = 0;
+	int purgeable = CPX_USECUT_FILTER;
+	int local = 0;
+	double rhs = -1.0;
+	char sense = 'L';
+	int nnz = 0;
+
+	for(int i = 0; i<cut_nnodes;i++){
+		rhs++;
+		for(int j =i+1;j < cut_nnodes; j++){
+			index[nnz]=xpos(cut_index_nodes[i], cut_index_nodes[j], inst);
+			value[nnz]=1.0;
+			nnz++;
+		}
+	}	
+	
+	int error = CPXcallbackaddusercuts(cut_pars.context, 1, nnz, &rhs, &sense, &izero, index, value, &purgeable, &local);
+	assert(error == 0);// CPXcallbackaddusercuts error
+
+	free(index);
+	free(value);
+	return 0; 
+}
+
+static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance* inst)
+{ 
+	// get instance and cplex solution
+	int ncols = inst->ncols;
+	double* xstar = (double*) malloc(ncols * sizeof(double));  
+	double objval = CPX_INFBOUND; 
+	
+	int error = 0;
+	error = error = CPXcallbackgetrelaxationpoint(context, xstar, 0, ncols-1, &objval);
+	assert(error == 0);
+	
+	int* elist = (int*) malloc(2*ncols*sizeof(int));  
+	int ncomp = -1;
+
+	int k=0;
+	for(int i = 0;i<inst->nnodes;i++){
+		for(int j=i+1;j<inst->nnodes;j++){
+			elist[k]=i;
+			elist[++k]=j;
+			k++;
+		}
+	}
+	
+	cut_par user_handle= {context,inst};
+	error = CCcut_violated_cuts(inst->nnodes,ncols,elist,xstar,1.9,CPLEX_add_cut,(void*) &user_handle);
+
 	return 0; 
 }
 

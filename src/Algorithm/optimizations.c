@@ -92,7 +92,7 @@ void kick(double* cost, int* result, instance* inst){
     }
 }
 
-int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCosts, int* xIndex, bool VNS, bool plotFlag){
+int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCosts, int* xIndex, bool VNS, bool plotFlag, bool mipstart){
     int counter = 0; // conts from how many cicles we haven't swapped two nodes
 
     do 
@@ -132,7 +132,7 @@ int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCo
                 counter = 0;
 
                 // update official solution
-                if(*cost < inst->zbest){
+                if(*cost < inst->zbest && !mipstart){
                     if(bestSolution(result, *cost, inst) != 0 && VNS){
                         verbose_print(inst, 60, "[2optLoop] Optimization NOT completed, time limit reached.\n\n");
                         free(result);
@@ -191,7 +191,7 @@ int twoOpt(instance* inst)
 
     verbose_print(inst, 80, "[2opt] Initialization completed, starting optimization.\n");
 
-    twoOptLoop(inst, result, &cost, costs, &nCosts, &xIndex, false, false);
+    twoOptLoop(inst, result, &cost, costs, &nCosts, &xIndex, false, false, false);
 
     verbose_print(inst, 80, "[2opt] Optimization completed.\n\n");
 
@@ -397,7 +397,7 @@ int variableNeighborhoodSearch(instance* inst)
             
         // 2OPT SECTION
 
-        twoOptLoop(inst, result, &cost, costs, &nCosts, &xIndex, true, false);
+        twoOptLoop(inst, result, &cost, costs, &nCosts, &xIndex, true, false, false);
 
         verbose_print(inst, 80, "[VNS - 2opt] Optimization completed, cost: %f, kicking the solution.\n", cost);
 

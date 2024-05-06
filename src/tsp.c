@@ -9,6 +9,9 @@
 
 double dist(instance* inst, int a, int b)
 {
+	// rounding used by official solutions, use this to test on them
+	//return (int)(inst->distances[a][b] + 0.5); 
+	
 	return inst->distances[a][b];
 }
 
@@ -246,6 +249,20 @@ void free_instance(instance* inst)
 double randomDouble(double min, double max)
 {
 	return min + (rand() / (double)RAND_MAX) * (max - min);
+}
+
+int randomInt(int min, int max)
+{
+	double randD = randomDouble(min, max);
+
+	if(randD >= (int)randD + 0.5)
+		return (int)randD + 1;
+	return (int)randD;
+}
+
+bool randomBool()
+{
+	return randomInt(0, 1) == 0 ? false : true;
 }
 
 char* fileGenerator(int n)

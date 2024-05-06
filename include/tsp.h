@@ -27,6 +27,7 @@ typedef struct {
 	int depot;
 	double capacity; 
 	int nveh;
+	bool postHeu;
 
 	// parameters 
 	int old_benders;
@@ -40,6 +41,7 @@ typedef struct {
 	double cutoff; 							// cutoff (upper bound) for master
 	int integer_costs;
 	int verbose;							// range 0-100
+	int ncols;								// cplex number of columns
 
 	//global data
 	double tstart;							// starting time		
@@ -136,6 +138,23 @@ void free_instance(instance* inst);
  * @return A random double between min and max.
  */
 double randomDouble(double min, double max);
+
+/**
+ * @brief Generate a random int between min and max
+ * 
+ * @param min The minimum value of the random number.
+ * @param max The maximum value of the random number.
+ * 
+ * @return A random int between min and max.
+ */
+int randomInt(int min, int max);
+
+/**
+ * @brief Generate a random bool
+ * 
+ * @return A random bool
+ */
+bool randomBool();
 
 /**
  * @brief Generate a .tsp file with n random nodes.
