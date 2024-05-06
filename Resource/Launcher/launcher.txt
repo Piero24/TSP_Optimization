@@ -12,8 +12,8 @@
 
 // algos
 -model 2 -opt 1
--model 1 -opt 2
+-model 1 -opt 1
 -model 1
 
 // parameters:
--v 10 -t 15
+-v 10
