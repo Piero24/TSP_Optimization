@@ -4,12 +4,18 @@
 #include "tsp.h"
 #include "parser.h"
 #include "algoSelector.h"
+#include "Algorithm/NN.h"
 
 #include <cplex.h>
 #include <assert.h>
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+
+typedef struct {
+    CPXCALLBACKCONTEXTptr context;
+    instance* inst;
+} cut_par;
 
 /**
  * @brief Solves the Traveling Salesman Problem (TSP) using CPLEX optimization.
@@ -129,6 +135,48 @@ int bendersLoop(instance *inst, bool gluing);
  */
 int gluing2Opt(instance* inst, int* result, double cost);
 
-static int CPXPUBLIC my_callback(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle);
+/**
+ * @brief Performs the 2-opt optimization on the given solution.
+ * 
+ * @param inst Pointer to the instance structure.
+ * @param result Pointer to the array representing the solution.
+ * @param cost Pointer to cost of the provided solution.
+ * 
+ * @return Returns 0 if the optimization completes successfully, or an appropriate nonzero error code.
+ */
+int mipstart2Opt(instance* inst, int* result, double* cost);
+
+/**
+ * @brief Manages the CPLEX callbacks for each possible context id
+ * 
+ * @param context CPLEX context data structure.
+ * @param contextid CPLEX context identifier.
+ * @param userhandle Pointer to the instance structure.
+ * 
+ * @return Returns 0 if the callback functions were called correctly, non-zero otherwise.
+ */
+static int CPXPUBLIC callbackHandler(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle);
+
+/**
+ * @brief CPLEX callback for candidate proposal. This function adds SEC when the candidate solution has more
+ * than 1 component.
+ * 
+ * @param context CPLEX context data structure.
+ * @param inst Pointer to the instance structure.
+ * 
+ * @return Returns 0 if the callback function works correctly, non-zero otherwise.
+ */
+static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* inst);
+
+/**
+ * @brief CPLEX callback for fractional solutions. This function adds some randomly chosen Comb inequalities
+ * based on the fractional solution.
+ * 
+ * @param context CPLEX context data structure.
+ * @param inst Pointer to the instance structure.
+ * 
+ * @return Returns 0 if the callback function works correctly, non-zero otherwise.
+ */
+static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance* inst);
 
 #endif /* CPLEXALG_H */

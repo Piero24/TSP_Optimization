@@ -14,6 +14,7 @@
 // *** Windows
 // *** cmake . -B build --fresh && cmake --build build --clean-first
 // *** Debug\TSP_Optimization.exe -g 100 -model 1 -opt 3 -s 0 -v 60 -tl 10
+// *** for /L %i in (1,1,10) do @echo. & if %i==5 (Debug\TSP_Optimization.exe -g 100 -model 3 -v 95)
 // *** Debug\TSP_Optimization.exe -g 100 -model 3 -v 95
 // ***
 // *** Linux

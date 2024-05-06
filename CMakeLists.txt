@@ -39,6 +39,7 @@ add_executable(TSP_Optimization
     src/Algorithm/optimizations.c
     src/menu.c
     src/launcher.c
+    src/mincut.c
 )
 
 target_link_libraries( ${PROJECT_NAME} PRIVATE ${OpenCV_LIBS} ${Boost_FILESYSTEM_LIBRARY} ${CPLEX_LIB})
