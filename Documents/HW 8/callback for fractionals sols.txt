@@ -1,0 +1,4 @@
+Alg 8: 
+ - SECs for fractional sol.s
+ - posting heuristic sol.s
+ - heuristic mipstart

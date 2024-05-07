@@ -624,7 +624,7 @@ static int CPXPUBLIC callbackHandler(CPXCALLBACKCONTEXTptr context, CPXLONG cont
 		candidateCallback(context, inst);
 
 	else if(contextid == CPX_CALLBACKCONTEXT_RELAXATION){
-		relaxationCallback(context, inst);
+		//relaxationCallback(context, inst);
 	}
 
 	else
@@ -658,8 +658,8 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 	if(ncomp > 1){
 		int izero = 0;
 		char sense = 'L'; // <=
-		int* index = (int*) calloc(ncols, sizeof(int)); // indici delle variabili con coefficiente diverso da zero 
-		double* value = (double*) calloc(ncols, sizeof(double)); // valore dei coefficienti della sommatoria
+		int* index = (int*) calloc(ncols, sizeof(int)); // index of vars with coeff non-zero 
+		double* value = (double*) calloc(ncols, sizeof(double)); // coeff values
 
 		for(int k=1; k<=ncomp; k++){
 			int nnz = 0; // number of non zero
@@ -682,17 +682,32 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 			assert(error == 0); // CPXcallbackrejectcandidate error
 		}
 
-		free(index);
 		free(value);
+		free(index);
 
+		// post heuristic with gluing
 		if(inst->postHeu)
 		{
+			int** result;
+			
+			/* DEBUG PLOTTING - before gluing
+			result = convertSolution(succ, comp, ncomp, inst);
+			show_solution_comps(inst, true, result, ncomp);
+			sleep_ms(1000);
+			free(result);
+			//*/
+
 			mergeComponents(inst, &ncomp, comp, succ, &objval);
-			int** result = convertSolution(succ, comp, ncomp, inst);
+			result = convertSolution(succ, comp, ncomp, inst);
 
 			inst->plotCosts = NULL;
 			int nCosts = 0, xIndex = 0;
 			twoOptLoop(inst, result[1], &objval, NULL, &nCosts, &xIndex, false, false, true);
+
+			/* DEBUG PLOTTING - after gluing
+			show_solution_comps(inst, true, result, ncomp);
+			sleep_ms(1000);
+			//*/
 
 			verbose_print(inst, 95, "[Posting Heuristic - Gluing] Ended merging and gluing2Opt, objval: %f ncomp %d\n", objval, ncomp);
 		
@@ -736,15 +751,15 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 		}
 	}	
 
-	free(xstar);
-	free(succ);
-	free(comp);
 	free(dim);
+	free(comp);
+	free(succ);
+	free(xstar);
 	return 0; 
 }
 
-int CPLEX_add_cut(double cut_value, int cut_nnodes, int* cut_index_nodes, void* userhandle) {
-	
+int add_cut(double cut_value, int cut_nnodes, int* cut_index_nodes, void* userhandle)
+{	
 	cut_par cut_pars = *(cut_par*) userhandle;
 	instance* inst = cut_pars.inst;
 
@@ -799,64 +814,13 @@ static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance*
 	}
 	
 	cut_par user_handle= {context,inst};
-	error = CCcut_violated_cuts(inst->nnodes,ncols,elist,xstar,1.9,CPLEX_add_cut,(void*) &user_handle);
+	error = CCcut_violated_cuts(inst->nnodes, ncols, elist, xstar, 1.9, add_cut, (void*) &user_handle);
 
 	return 0; 
 }
 
 /*
-**** LAZY CONTRAINTS ****
-
-Ex: MZT formulation with directed-arc variables x_ij and x_ji --> xpos_compact(i,j,inst)
-
-...
-
-	int izero = 0;
-	int index[3]; 
-	double value[3];
-
-	// add lazy constraints  1.0 * u_i - 1.0 * u_j + M * x_ij <= M - 1, for each arc (i,j) not touching node 0	
-	double big_M = inst->nnodes - 1.0;
-	double rhs = big_M -1.0;
-	char sense = 'L';
-	int nnz = 3;
-	for ( int i = 1; i < inst->nnodes; i++ ) // excluding node 0
-	{
-		for ( int j = 1; j < inst->nnodes; j++ ) // excluding node 0 
-		{
-			if ( i == j ) continue;
-			sprintf(cname[0], "u-consistency for arc (%d,%d)", i+1, j+1);
-			index[0] = upos(i,inst);	
-			value[0] = 1.0;	
-			index[1] = upos(j,inst);
-			value[1] = -1.0;
-			index[2] = xpos_compact(i,j,inst);
-			value[2] = big_M;
-			if ( CPXaddlazyconstraints(env, lp, 1, nnz, &rhs, &sense, &izero, index, value, cname) ) print_error("wrong CPXlazyconstraints() for u-consistency");
-		}
-	}
-	
-	// add lazy constraints 1.0 * x_ij + 1.0 * x_ji <= 1, for each arc (i,j) with i < j
-	rhs = 1.0; 
-	char sense = 'L';
-	nnz = 2;
-	for ( int i = 0; i < inst->nnodes; i++ ) 
-	{
-		for ( int j = i+1; j < inst->nnodes; j++ ) 
-		{
-			sprintf(cname[0], "SEC on node pair (%d,%d)", i+1, j+1);
-			index[0] = xpos_compact(i,j,inst);
-			value[0] = 1.0;
-			index[1] = xpos_compact(j,i,inst);
-			value[1] = 1.0;
-			if ( CPXaddlazyconstraints(env, lp, 1, nnz, &rhs, &sense, &izero, index, value, cname) ) print_error("wrong CPXlazyconstraints on 2-node SECs");
-		}
-	}
-
-...
-
 *** SOME CPLEX'S PARAMETERS ***
-
 
 	// increased precision for big-M models
 	CPXsetdblparam(env, CPX_PARAM_EPINT, 0.0);		// very important if big-M is present

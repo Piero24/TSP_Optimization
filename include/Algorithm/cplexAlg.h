@@ -178,5 +178,6 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
  * @return Returns 0 if the callback function works correctly, non-zero otherwise.
  */
 static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance* inst);
+int add_cut(double cut_value, int cut_nnodes, int* cut_index_nodes, void* userhandle);
 
 #endif /* CPLEXALG_H */
