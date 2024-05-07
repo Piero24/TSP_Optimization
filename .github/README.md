@@ -82,3 +82,4 @@ make -C build && clear && ./TSP_Optimization -file Resource/pr10v1.tsp -model 1 
 - **-cplexOpt** or **-c**: CPLEX options
 - **-show** or **-plot** or **-gnuplot** or **-s**: Plot with gnuplot
 - **-help** or **--help** or **-h**: Help
+
