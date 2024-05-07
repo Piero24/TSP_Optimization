@@ -136,6 +136,17 @@ int bendersLoop(instance *inst, bool gluing);
 int gluing2Opt(instance* inst, int* result, double cost);
 
 /**
+ * @brief Adds heuristic mipstart to CPLEX.
+ * 
+ * @param inst Pointer to the instance structure.
+ * @param env Pointer to the CPLEX environment.
+ * @param lp Pointer to the CPLEX problem.
+ * 
+ * @return Returns 0 if the operation completes successfully, or an appropriate nonzero error code.
+ */
+int addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp);
+
+/**
  * @brief Performs the 2-opt optimization on the given solution.
  * 
  * @param inst Pointer to the instance structure.

@@ -6,6 +6,7 @@
     - If comp==1 violated_cuts
     - else for each component addUserCut
 - do relaxation only 10% of the time
+- do relaxation posting
 
 
 ## Features

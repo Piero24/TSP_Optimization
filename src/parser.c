@@ -32,6 +32,7 @@ int parse_args(int argc, char** argv, instance* inst)
 	int help = 0;
 	int model_type = 0;
 	int opt_type = 0;
+	char cplexOpt[10] = "";
 
 	// default  
 	initialization(inst); 
@@ -63,10 +64,14 @@ int parse_args(int argc, char** argv, instance* inst)
 		else if ( strcmp(argv[i],"-generate") == 0 ) n = abs(atoi(argv[++i]));							// generated file
 		else if ( strcmp(argv[i],"-g") == 0 ) n = abs(atoi(argv[++i]));									// generated file
 		
-		else if ( strcmp(argv[i],"-show") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// generated file
-		else if ( strcmp(argv[i],"-plot") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// generated file
-		else if ( strcmp(argv[i],"-gnuplot") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));			// generated file
-		else if ( strcmp(argv[i],"-s") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// generated file
+		//1:mipstart, 2:callback base, 3:callback relax, 4:posting base, 5:posting relax
+		else if ( strcmp(argv[i],"-cplexOpt") == 0 )  strcpy(cplexOpt,argv[++i]);						// CPLEX options
+		else if ( strcmp(argv[i],"-c") == 0 ) strcpy(cplexOpt,argv[++i]);								// CPLEX options
+		
+		else if ( strcmp(argv[i],"-show") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// plot with gnuplot
+		else if ( strcmp(argv[i],"-plot") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// plot with gnuplot
+		else if ( strcmp(argv[i],"-gnuplot") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));			// plot with gnuplot
+		else if ( strcmp(argv[i],"-s") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// plot with gnuplot
 
 		// else if ( strcmp(argv[i],"-old_benders") == 0 ) inst->old_benders = atoi(argv[++i]); 		// old benders
 		// else if ( strcmp(argv[i],"-threads") == 0 ) inst->num_threads = atoi(argv[++i]); 			// n. threads
@@ -90,6 +95,10 @@ int parse_args(int argc, char** argv, instance* inst)
 		free(name);
 	}
 
+	if(strcmp(cplexOpt, "") != 0){
+		setCPLEXoption(inst, cplexOpt);
+	}
+
 	if (help)
 	{
 		showHelpMenu(5);
@@ -101,6 +110,49 @@ int parse_args(int argc, char** argv, instance* inst)
 	// parameterPrint(inst);
 
     return 0;
+}
+
+void setCPLEXoption(instance* inst, char cplexOpt[]){
+	
+	//1:mipstart, 2:callback base, 3:callback relax, 4:posting base, 5:posting relax
+
+	if(strstr(cplexOpt, "1") != NULL){
+		inst->mipstart = true;
+	} else {
+		inst->mipstart = false;
+	}
+
+	if(strstr(cplexOpt, "2") != NULL){
+		inst->callback_base = true;
+	} else {
+		inst->callback_base = false;
+	}
+
+	if(strstr(cplexOpt, "3") != NULL){
+		inst->callback_relax = true;
+	} else {
+		inst->callback_relax = false;
+	}
+
+	if(strstr(cplexOpt, "4") != NULL){
+		inst->posting_base = true;
+	
+		if(!inst->callback_base)
+			verbose_print(inst, 50, "Ignoring CPLEX option 'posting base' because 'callback base' was not active.\n");
+		
+	} else {
+		inst->posting_base = false;
+	}
+
+	if(strstr(cplexOpt, "5") != NULL){
+		inst->posting_relax = true;
+	
+		if(!inst->callback_base)
+			verbose_print(inst, 50, "Ignoring CPLEX option 'posting relaxation' because 'callback relaxation' was not active.\n");
+		
+	} else {
+		inst->posting_relax = false;
+	}
 }
 
 void parameterPrint(instance* inst)
@@ -126,6 +178,41 @@ void parameterPrint(instance* inst)
 
 	printf("- Algorithm Name:          %s\n", inst->algorithm_name);
 	printf("- Optimization Name:       %s\n\n", inst->opt_name);
+
+	if (inst->mipstart || inst->callback_base || inst->callback_relax || inst->posting_base || inst->posting_relax)
+	{
+		int OPTION_LENGHT = 7;
+		char options_selected[OPTION_LENGHT];
+    	strcpy(options_selected, "- CPLEX Options:           ");
+
+		if (inst->mipstart)
+		{
+			strncat(options_selected, "Mipstart, ", OPTION_LENGHT - strlen(options_selected) - 1);
+		}
+		
+		if (inst->mipstart)
+		{
+			strncat(options_selected, "Callback Base, ", OPTION_LENGHT - strlen(options_selected) - 1);
+		}
+
+		if (inst->mipstart)
+		{
+			strncat(options_selected, "Callback Relax, ", OPTION_LENGHT - strlen(options_selected) - 1);
+		}
+
+		if (inst->mipstart)
+		{
+			strncat(options_selected, "Posting Base, ", OPTION_LENGHT - strlen(options_selected) - 1);
+		}
+
+		if (inst->mipstart)
+		{
+			strncat(options_selected, "Posting Relax, ", OPTION_LENGHT - strlen(options_selected) - 1);
+		}
+
+		options_selected[strlen(options_selected) - 2] = '\n';
+		printf("%s\n", options_selected);
+	}
 	
 	const char* time_limit_string = getTimeLimitString(inst->time_limit);
 	printf("- Time Limit:              %s seconds\n", time_limit_string);

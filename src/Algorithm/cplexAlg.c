@@ -21,49 +21,24 @@ int TSPopt(instance *inst)
 	CPXsetintparam(env, CPX_PARAM_THREADS, 1);
 	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
 	inst->ncols = ncols;
-	inst->postHeu = true;
 	
 	// setting callbacks
 	CPXLONG contextid = CPX_CALLBACKCONTEXT_CANDIDATE | CPX_CALLBACKCONTEXT_RELAXATION;
 	error = CPXcallbacksetfunc(env, lp, contextid, callbackHandler, inst);
 	assert(error == 0);
 
-	// heuristic mipstart
-	double objval = 0;
-	int firstNode = randomInt(0, inst->nnodes-1);
-
-	int* result = (int*) calloc(inst->nnodes, sizeof(int));
-	nearestNeighbor(inst, firstNode, result, &objval);
-	mipstart2Opt(inst, result, &objval);
-
-	// convert heuristic to CPLEX format
-	double *xstar = (double *) calloc(ncols, sizeof(double));
-    
-	for(int i=0; i<ncols; i++)
-		xstar[i] = 0.0;
+	// add mipstart
+	if(inst->mipstart)
+		addMipstart(inst, env, lp);
 	
-	for(int i=0; i<inst->nnodes-1; i++)
-		xstar[xpos(result[i], result[i+1], inst)] = 1.0;
-	xstar[xpos(result[inst->nnodes-1], result[0], inst)] = 1.0;
-
-	int *ind = (int *) malloc(inst->ncols * sizeof(int));
-	for ( int j = 0; j < inst->ncols; j++ ) ind[j] = j;
-	
-	int effortlevel = CPX_MIPSTART_NOCHECK;  
-	int beg = 0;
-
-	error = CPXaddmipstarts(env, lp, 1, inst->ncols, &beg, ind, xstar, &effortlevel, NULL);
-	assert(error == 0);
-
-	free(ind);
-	free(result);
-
 	// compute CPLEX solution
 	verbose_print(inst, 60, "[CPLEX] Getting best solution\n");
 	error = CPXmipopt(env,lp);
 	assert(error == 0);
 
 	// get CPLEX solution
+	double *xstar = (double *) calloc(ncols, sizeof(double));
+	double objval = 0;
     CPXgetbestobjval(env, lp, &objval);
 	CPXgetx(env, lp, xstar, 0, ncols - 1);
     
@@ -78,7 +53,7 @@ int TSPopt(instance *inst)
 				// print the selected edges
                 if ( xstar[xpos(i,j,inst)] > 0.5 ) 
 				{
-					// xstar itìs never 0 o 1 precisely
+					// xstar it's never 0 o 1 precisely
 					printf("[CPLEX] x(%3d,%3d) = 1\n", i+1,j+1);
 				}
             }
@@ -109,6 +84,42 @@ int TSPopt(instance *inst)
 	CPXfreeprob(env, &lp);
 	CPXcloseCPLEX(&env); 
 
+	return 0;
+}
+
+int addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp)
+{
+	// heuristic mipstart
+	double objval = 0;
+	int firstNode = randomInt(0, inst->nnodes-1);
+
+	int* result = (int*) calloc(inst->nnodes, sizeof(int));
+	nearestNeighbor(inst, firstNode, result, &objval);
+	mipstart2Opt(inst, result, &objval);
+
+	// convert heuristic to CPLEX format
+	double *xstar = (double *) calloc(inst->ncols, sizeof(double));
+	
+	for(int i=0; i<inst->ncols; i++)
+		xstar[i] = 0.0;
+	
+	for(int i=0; i<inst->nnodes-1; i++)
+		xstar[xpos(result[i], result[i+1], inst)] = 1.0;
+	xstar[xpos(result[inst->nnodes-1], result[0], inst)] = 1.0;
+
+	int *ind = (int *) malloc(inst->ncols * sizeof(int));
+	for ( int j = 0; j < inst->ncols; j++ ) ind[j] = j;
+	
+	int effortlevel = CPX_MIPSTART_NOCHECK;  
+	int beg = 0;
+
+	// add solution to cplex as mipstart
+	int error = CPXaddmipstarts(env, lp, 1, inst->ncols, &beg, ind, xstar, &effortlevel, NULL);
+	assert(error == 0);
+
+	free(ind);
+	free(xstar);
+	free(result);
 	return 0;
 }
 
@@ -304,7 +315,7 @@ int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
 		}
 	}
 
-	if(inst->verbose >= 95)
+	if(inst->verbose >= 100)
 		for(int i=1; i<=ncomp; i++)
 		{
 			printf("[convertSolution]");
@@ -620,11 +631,11 @@ static int CPXPUBLIC callbackHandler(CPXCALLBACKCONTEXTptr context, CPXLONG cont
 	int error = 0;
 
 	// choose action based on context id
-	if(contextid == CPX_CALLBACKCONTEXT_CANDIDATE)
+	if(contextid == CPX_CALLBACKCONTEXT_CANDIDATE && inst->callback_base)
 		candidateCallback(context, inst);
 
-	else if(contextid == CPX_CALLBACKCONTEXT_RELAXATION){
-		//relaxationCallback(context, inst);
+	else if(contextid == CPX_CALLBACKCONTEXT_RELAXATION && inst->callback_relax){
+		relaxationCallback(context, inst);
 	}
 
 	else
@@ -686,10 +697,10 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 		free(index);
 
 		// post heuristic with gluing
-		if(inst->postHeu)
+		if(inst->posting_base)
 		{
 			// DEBUG PLOTTING (before gluing) Warning: this is not tread safe
-			if(inst->verbose >= 100){
+			if(inst->verbose >= 99){
 				int** result1 = convertSolution(succ, comp, ncomp, inst);
 				
 				show_solution_comps(inst, true, result1, ncomp);
@@ -718,7 +729,7 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 			twoOptLoop(inst, trip, &objval, NULL, &nCosts, &xIndex, false, false, true);
 
 			// DEBUG PLOTTING (after gluing & 2opt) Warning: this is not tread safe
-			if(inst->verbose >= 100){
+			if(inst->verbose >= 99){
 				int** result2 = convertSolution(succ, comp, ncomp, inst);
 				
 				show_solution_mono(inst, true, trip);
@@ -828,8 +839,12 @@ static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance*
 		}
 	}
 	
-	cut_par user_handle= {context,inst};
+	cut_par user_handle = {context,inst};
 	error = CCcut_violated_cuts(inst->nnodes, ncols, elist, xstar, 1.9, add_cut, (void*) &user_handle);
+
+	if(inst->posting_relax){
+		// TODO
+	}
 
 	return 0; 
 }
