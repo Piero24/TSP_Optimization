@@ -95,10 +95,8 @@ int parse_args(int argc, char** argv, instance* inst)
 		free(name);
 	}
 
-	if(strcmp(cplexOpt, "") != 0){
-		setCPLEXoption(inst, cplexOpt);
-	}
-
+	setCPLEXoption(inst, cplexOpt);
+	
 	if (help)
 	{
 		showHelpMenu(5);
@@ -135,21 +133,27 @@ void setCPLEXoption(instance* inst, char cplexOpt[]){
 	}
 
 	if(strstr(cplexOpt, "4") != NULL){
-		inst->posting_base = true;
-	
-		if(!inst->callback_base)
+
+		if(!inst->callback_base){
 			verbose_print(inst, 50, "Ignoring CPLEX option 'posting base' because 'callback base' was not active.\n");
-		
+			inst->posting_base = false;
+		} else {
+			inst->posting_base = true;
+		}
+
 	} else {
 		inst->posting_base = false;
 	}
 
 	if(strstr(cplexOpt, "5") != NULL){
-		inst->posting_relax = true;
-	
-		if(!inst->callback_base)
+
+		if(!inst->callback_relax){
 			verbose_print(inst, 50, "Ignoring CPLEX option 'posting relaxation' because 'callback relaxation' was not active.\n");
-		
+			inst->posting_relax = false;
+		} else {
+			inst->posting_relax = true;
+		}
+
 	} else {
 		inst->posting_relax = false;
 	}
@@ -181,8 +185,8 @@ void parameterPrint(instance* inst)
 
 	if (inst->mipstart || inst->callback_base || inst->callback_relax || inst->posting_base || inst->posting_relax)
 	{
-		int OPTION_LENGHT = 7;
-		char options_selected[OPTION_LENGHT];
+		int OPTION_LENGHT = 100;
+		char options_selected[100];
     	strcpy(options_selected, "- CPLEX Options:           ");
 
 		if (inst->mipstart)
@@ -190,22 +194,22 @@ void parameterPrint(instance* inst)
 			strncat(options_selected, "Mipstart, ", OPTION_LENGHT - strlen(options_selected) - 1);
 		}
 		
-		if (inst->mipstart)
+		if (inst->callback_base)
 		{
 			strncat(options_selected, "Callback Base, ", OPTION_LENGHT - strlen(options_selected) - 1);
 		}
 
-		if (inst->mipstart)
+		if (inst->callback_relax)
 		{
 			strncat(options_selected, "Callback Relax, ", OPTION_LENGHT - strlen(options_selected) - 1);
 		}
 
-		if (inst->mipstart)
+		if (inst->posting_base)
 		{
 			strncat(options_selected, "Posting Base, ", OPTION_LENGHT - strlen(options_selected) - 1);
 		}
 
-		if (inst->mipstart)
+		if (inst->posting_relax)
 		{
 			strncat(options_selected, "Posting Relax, ", OPTION_LENGHT - strlen(options_selected) - 1);
 		}
