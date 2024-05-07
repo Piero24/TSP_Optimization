@@ -27,7 +27,6 @@ typedef struct {
 	int depot;
 	double capacity; 
 	int nveh;
-	bool postHeu;
 
 	// parameters 
 	int old_benders;
@@ -71,6 +70,12 @@ typedef struct {
 	
 	char file_name[50];
 	char file_comment[50];
+
+	bool mipstart;
+	bool callback_base;
+	bool callback_relax; 
+	bool posting_base;
+	bool posting_relax;
 
 } instance;
 

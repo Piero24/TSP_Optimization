@@ -64,7 +64,23 @@ void show_solution_mono(instance* inst, bool useGnuplot, int* result)
 			fflush(inst->plotSolution);
 		}
 
-		fprintf(inst->plotSolution, "plot [-10:10010] [-10:10010] '-' with linespoints pointtype 7\n");
+		int max = -10, min = 10000;
+		for(int i=0; i<inst->nnodes; i++)
+		{
+			if(inst->coord[result[i]].x > max)
+				max = inst->coord[result[i]].x;
+			if(inst->coord[result[i]].y > max)
+				max = inst->coord[result[i]].y;
+			
+			if(inst->coord[result[i]].x < min)
+				min = inst->coord[result[i]].x;
+			if(inst->coord[result[i]].y < min)
+				min = inst->coord[result[i]].y;
+		}
+		min -= 10;
+		max += 10;
+
+		fprintf(inst->plotSolution, "plot [%d:%d] [%d:%d] '-' with linespoints pointtype 7\n", min, max, min, max);
 
 		for(int i=0; i<inst->nnodes; i++)
 		{
@@ -103,7 +119,25 @@ void show_solution_comps(instance* inst, bool useGnuplot, int** result, int ncom
 			fflush(inst->plotSolution);
 		}
 
-		fprintf(inst->plotSolution, "plot [-10:10010] [-10:10010] '-' with linespoints pointtype 7\n");
+		int max = -10, min = 10000;
+		for(int j=1; j<ncomp+1; j++){
+			for(int i=0; i<inst->nnodes && result[j][i] != -1; i++)
+			{
+				if(inst->coord[result[j][i]].x > max)
+					max = inst->coord[result[j][i]].x;
+				if(inst->coord[result[j][i]].y > max)
+					max = inst->coord[result[j][i]].y;
+				
+				if(inst->coord[result[j][i]].x < min)
+					min = inst->coord[result[j][i]].x;
+				if(inst->coord[result[j][i]].y < min)
+					min = inst->coord[result[j][i]].y;
+			}
+		}
+		min -= 10;
+		max += 10;
+
+		fprintf(inst->plotSolution, "plot [%d:%d] [%d:%d] '-' with linespoints pointtype 7\n", min, max, min, max);
 		for(int j=1; j<ncomp+1; j++){
 			for(int i=0; i<inst->nnodes && result[j][i] != -1; i++)
 			{

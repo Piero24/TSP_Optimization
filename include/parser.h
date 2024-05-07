@@ -33,6 +33,8 @@ void initialization(instance* inst);
  */
 int parse_args(int argc, char** argv, instance* inst);
 
+void setCPLEXoption(instance* inst, char cplexOpt[]);
+
 /**
  * @brief Prints the selected parameters of an instance.
  * 
