@@ -688,48 +688,61 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 		// post heuristic with gluing
 		if(inst->postHeu)
 		{
-			int** result;
-			
 			/* DEBUG PLOTTING - before gluing
-			result = convertSolution(succ, comp, ncomp, inst);
-			show_solution_comps(inst, true, result, ncomp);
+			int** result1 = convertSolution(succ, comp, ncomp, inst);
+			
+			show_solution_comps(inst, true, result1, ncomp);
 			sleep_ms(1000);
-			free(result);
+			
+			for(int i=1; i<ncomp+1; i++) free(result1[i]);
+			free(result1);
 			//*/
 
+			// glue components together
 			mergeComponents(inst, &ncomp, comp, succ, &objval);
-			result = convertSolution(succ, comp, ncomp, inst);
 
+			// convert to one-trip array
+			int* trip = (int*) calloc(inst->nnodes, sizeof(int));
+			int pos = 0;
+			trip[0] = 0;
+
+			for(int i=1;i<inst->nnodes;i++){
+				trip[i] = succ[pos];
+				pos = succ[pos];
+			}
+
+			// apply 2-opt
 			inst->plotCosts = NULL;
 			int nCosts = 0, xIndex = 0;
-			twoOptLoop(inst, result[1], &objval, NULL, &nCosts, &xIndex, false, false, true);
+			twoOptLoop(inst, trip, &objval, NULL, &nCosts, &xIndex, false, false, true);
 
 			/* DEBUG PLOTTING - after gluing
-			show_solution_comps(inst, true, result, ncomp);
+			int** result2 = convertSolution(succ, comp, ncomp, inst);
+			
+			show_solution_mono(inst, true, trip);
 			sleep_ms(1000);
+
+			for(int i=1; i<ncomp+1; i++) free(result2[i]);
+			free(result2);
 			//*/
 
 			verbose_print(inst, 95, "[Posting Heuristic - Gluing] Ended merging and gluing2Opt, objval: %f ncomp %d\n", objval, ncomp);
-		
+
+			// convert trip to cplex format
 			int *ind = (int *) malloc(inst->ncols * sizeof(int));
 			for ( int j = 0; j < inst->ncols; j++ ) ind[j] = j;
 
 			double* xheu = (double*) calloc(ncols, sizeof(double));
-			int objheu = 0;
 
 			for (int i = 0; i < inst->nnodes-1; i++) {
-				int pos_index = xpos(result[1][i], result[1][i + 1], inst);
+				int pos_index = xpos(trip[i], trip[i + 1], inst);
 				xheu[pos_index] = 1;
-				objheu += dist(inst, result[1][i], result[1][i + 1]);
 			}
 
-			xheu[xpos(result[1][inst->nnodes-1], result[1][0], inst)] = 1;
-			objheu += dist(inst, result[1][inst->nnodes-1], result[1][0]);
+			xheu[xpos(trip[inst->nnodes-1], trip[0], inst)] = 1;
 
-			for(int i=1; i<ncomp+1; i++) free(result[i]);
-			free(result);
-
-			error = CPXcallbackpostheursoln(context, inst->ncols, ind, xheu, objheu, CPXCALLBACKSOLUTION_NOCHECK);
+			// post solution
+			error = CPXcallbackpostheursoln(context, inst->ncols, ind, xheu, objval, CPXCALLBACKSOLUTION_NOCHECK);
 			assert(error == 0);
 			
 			free(xheu);

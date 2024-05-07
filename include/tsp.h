@@ -190,6 +190,17 @@ double dist(instance* inst, int a, int b);
 void show_solution_comps(instance* inst, bool useGnuplot, int** result, int ncomp);
 
 /**
+ * @brief Prints the solution to the standard output or generates a plot using Gnuplot, 
+ * depending on the specified flag. Works with one single component that is not in the instance struct.
+ * 
+ * @param inst A pointer to the instance structure containing the solution data.
+ * @param useGnuplot A boolean flag indicating whether to generate a plot 
+ * using Gnuplot (true) or print the solution to the standard output (false).
+ * @param result A pointer to the array of nodes.
+ */
+void show_solution_mono(instance* inst, bool useGnuplot, int* result);
+
+/**
  * @brief Print the formatted string if inst->verbose >= vMin.
  * 
  * @param inst A pointer to the instance structure.

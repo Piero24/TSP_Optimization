@@ -44,6 +44,11 @@ void generateDataFile(const char* filename, instance* inst)
 
 void show_solution(instance* inst, bool useGnuplot)
 {    
+	show_solution_mono(inst, useGnuplot, inst->best_sol);
+}
+
+void show_solution_mono(instance* inst, bool useGnuplot, int* result)
+{
 	if(useGnuplot)
 	{
 		if(inst->plotSolution == NULL){
@@ -63,9 +68,9 @@ void show_solution(instance* inst, bool useGnuplot)
 
 		for(int i=0; i<inst->nnodes; i++)
 		{
-			fprintf(inst->plotSolution, "%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
+			fprintf(inst->plotSolution, "%f %f\n", inst->coord[result[i]].x, inst->coord[result[i]].y);
 		}
-		fprintf(inst->plotSolution, "%f %f\n", inst->coord[inst->best_sol[0]].x, inst->coord[inst->best_sol[0]].y);
+		fprintf(inst->plotSolution, "%f %f\n", inst->coord[result[0]].x, inst->coord[result[0]].y);
 
 		fprintf(inst->plotSolution, "e\n");
 
@@ -75,7 +80,7 @@ void show_solution(instance* inst, bool useGnuplot)
 	{
 		for(int i=0; i<inst->nnodes; i++)
 		{
-			printf("%f %f\n", inst->coord[inst->best_sol[i]].x, inst->coord[inst->best_sol[i]].y);
+			printf("%f %f\n", inst->coord[result[i]].x, inst->coord[result[i]].y);
 		}
 	}
 }

@@ -6,7 +6,6 @@
     - If comp==1 violated_cuts
     - else for each component addUserCut
 - do relaxation only 10% of the time
-- !! do not convert to result for heuristic posting, use succ !!
 
 
 ## Features
