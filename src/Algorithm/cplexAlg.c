@@ -665,7 +665,7 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 			int nnz = 0; // number of non zero
 			double rhs = dim[k] - 1.0; // right hand side of contraint
 			
-			// aggiungo vincolo per component #k
+			// add constraint for component #k
 			for(int i=0; i<inst->nnodes; i++){
 				if(comp[i] != k) continue;
 				
@@ -688,15 +688,16 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 		// post heuristic with gluing
 		if(inst->postHeu)
 		{
-			/* DEBUG PLOTTING - before gluing
-			int** result1 = convertSolution(succ, comp, ncomp, inst);
-			
-			show_solution_comps(inst, true, result1, ncomp);
-			sleep_ms(1000);
-			
-			for(int i=1; i<ncomp+1; i++) free(result1[i]);
-			free(result1);
-			//*/
+			// DEBUG PLOTTING (before gluing) Warning: this is not tread safe
+			if(inst->verbose >= 100){
+				int** result1 = convertSolution(succ, comp, ncomp, inst);
+				
+				show_solution_comps(inst, true, result1, ncomp);
+				sleep_ms(1000);
+				
+				for(int i=1; i<ncomp+1; i++) free(result1[i]);
+				free(result1);
+			}
 
 			// glue components together
 			mergeComponents(inst, &ncomp, comp, succ, &objval);
@@ -716,15 +717,16 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 			int nCosts = 0, xIndex = 0;
 			twoOptLoop(inst, trip, &objval, NULL, &nCosts, &xIndex, false, false, true);
 
-			/* DEBUG PLOTTING - after gluing
-			int** result2 = convertSolution(succ, comp, ncomp, inst);
-			
-			show_solution_mono(inst, true, trip);
-			sleep_ms(1000);
+			// DEBUG PLOTTING (after gluing & 2opt) Warning: this is not tread safe
+			if(inst->verbose >= 100){
+				int** result2 = convertSolution(succ, comp, ncomp, inst);
+				
+				show_solution_mono(inst, true, trip);
+				sleep_ms(1000);
 
-			for(int i=1; i<ncomp+1; i++) free(result2[i]);
-			free(result2);
-			//*/
+				for(int i=1; i<ncomp+1; i++) free(result2[i]);
+				free(result2);
+			}
 
 			verbose_print(inst, 95, "[Posting Heuristic - Gluing] Ended merging and gluing2Opt, objval: %f ncomp %d\n", objval, ncomp);
 

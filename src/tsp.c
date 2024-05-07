@@ -60,7 +60,7 @@ void show_solution_mono(instance* inst, bool useGnuplot, int* result)
 			fprintf(inst->plotSolution, "set ylabel \"Y Axis\"\n");
 			fprintf(inst->plotSolution, "set grid\n");
 			fprintf(inst->plotSolution, "set term qt persist font \"Arial\"\n"); // Set font to Arial
-			fprintf(inst->plotSolution, "set pointsize 0.1\n"); // Set font to Arial
+			fprintf(inst->plotSolution, "set pointsize 0.1\n");
 			fflush(inst->plotSolution);
 		}
 
@@ -98,7 +98,7 @@ void show_solution_comps(instance* inst, bool useGnuplot, int** result, int ncom
 			fprintf(inst->plotSolution, "set ylabel \"Y Axis\"\n");
 			fprintf(inst->plotSolution, "set grid\n");
 			fprintf(inst->plotSolution, "set term qt persist font \"Arial\"\n"); // Set font to Arial
-			fprintf(inst->plotSolution, "set pointsize 0.1\n"); // Set font to Arial
+			fprintf(inst->plotSolution, "set pointsize 0.1\n");
 
 			fflush(inst->plotSolution);
 		}
