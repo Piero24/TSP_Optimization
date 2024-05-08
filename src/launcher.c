@@ -29,10 +29,27 @@ void headerGenerator(char *header_and_lines, int tuple_count, Tuple *tuples)
     for (int i = 0; i < tuple_count; i++)
     {
         strncat(header_names, tuples[i].algorithm, MAX_HEADER_LENGTH - strlen(header_names) - 1);
-        strncat(header_names, " - ", MAX_HEADER_LENGTH - strlen(header_names) - 1);
 
         if (strcmp(tuples[i].optimizer, "None") != 0)
+        {
+            strncat(header_names, " - ", MAX_HEADER_LENGTH - strlen(header_names) - 1);
             strncat(header_names, tuples[i].optimizer, MAX_HEADER_LENGTH - strlen(header_names) - 1);
+        }
+
+        if (tuples[i].mipstart)
+            strncat(header_names, " - MIPStart", MAX_HEADER_LENGTH - strlen(header_names) - 1);
+        
+        if (tuples[i].callback_base)
+            strncat(header_names, " - CallbackBase", MAX_HEADER_LENGTH - strlen(header_names) - 1);
+        
+        if (tuples[i].callback_relax)
+            strncat(header_names, " - CallbackRelax", MAX_HEADER_LENGTH - strlen(header_names) - 1);
+        
+        if (tuples[i].posting_base)
+            strncat(header_names, " - PostingBase", MAX_HEADER_LENGTH - strlen(header_names) - 1);
+        
+        if (tuples[i].posting_relax)
+            strncat(header_names, " - PostingRelax", MAX_HEADER_LENGTH - strlen(header_names) - 1);
 
         strncat(header_names, ", ", MAX_HEADER_LENGTH - strlen(header_names) - 1);
     }
@@ -70,6 +87,8 @@ int manageLauncher(instance *inst, const char *filename)
 
     char parameters[256];
 
+    bool some_heuristic = false;
+
     FILE *file = fopen(filename, "r");
     if (!file)
     {
@@ -92,8 +111,52 @@ int manageLauncher(instance *inst, const char *filename)
 
             if (strcmp(inst->algorithm_name, "Undefined") != 0 && tuple_count < MAX_FILES*5)
             {
+                if (strcmp(inst->algorithm_name, "Random") == 0 || strcmp(inst->algorithm_name, "Nearest Neighbor") == 0)
+                    some_heuristic = true;
+
                 strcpy(tuples[tuple_count].algorithm, inst->algorithm_name);
                 strcpy(tuples[tuple_count].optimizer, inst->opt_name);
+
+                if(inst->mipstart)
+                {
+                    tuples[tuple_count].mipstart = true;
+
+                } else {
+                    tuples[tuple_count].mipstart = false;
+                }
+
+                if(inst->callback_base)
+                {
+                    tuples[tuple_count].callback_base = true;
+
+                } else {
+                    tuples[tuple_count].callback_base = false;
+                }
+
+                if(inst->callback_relax)
+                {
+                    tuples[tuple_count].callback_relax = true;
+
+                } else {
+                    tuples[tuple_count].callback_relax = false;
+                }
+
+                if(inst->posting_base)
+                {
+                    tuples[tuple_count].posting_base = true;
+
+                } else {
+                    tuples[tuple_count].posting_base = false;
+                }
+
+                if(inst->posting_relax)
+                {
+                    tuples[tuple_count].posting_relax = true;
+
+                } else {
+                    tuples[tuple_count].posting_relax = false;
+                }
+
                 tuple_count++;
             }
 
@@ -144,12 +207,26 @@ int manageLauncher(instance *inst, const char *filename)
         {
             strcpy(inst->algorithm_name, tuples[j].algorithm);
             strcpy(inst->opt_name, tuples[j].optimizer);
+            inst->mipstart = tuples[j].mipstart;
+            inst->callback_base = tuples[j].callback_base;
+            inst->callback_relax = tuples[j].callback_relax;
+            inst->posting_base = tuples[j].posting_base;
+            inst->posting_relax = tuples[j].posting_relax;
 
             executeWorkflow(inst);
 
-            char zbest_str[20];
-            snprintf(zbest_str, sizeof(zbest_str), "%f", inst->zbest);
-            strncat(row, zbest_str, MAX_HEADER_LENGTH - strlen(row) - 1);
+            char score_str[20];
+            
+            if (some_heuristic)
+            {
+                snprintf(score_str, sizeof(score_str), "%f", inst->zbest);
+
+            } else {
+                double time_score =((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC;
+                snprintf(score_str, sizeof(score_str), "%f", time_score);
+            }
+            
+            strncat(row, score_str, MAX_HEADER_LENGTH - strlen(row) - 1);
             strncat(row, ", ", MAX_HEADER_LENGTH - strlen(row) - 1);
         }
         
@@ -198,7 +275,7 @@ int runPythonScript(instance *inst, char* csv_path)
         char *out_file_name = getFileName(csv_path, ".csv");
 
         char sys_call[350];
-        sprintf(sys_call, "python3 src/Comparator/perfprof.py -D , -T 3600 -S 2 -M 20 %s Archive/Pdf/%s.pdf -P 'all instances, shift 2 sec.s'", csv_path, out_file_name);
+        sprintf(sys_call, "python3 src/Comparator/perfprof.py -D , -T 3600 -S 2 -M 20 %s Archive/Pdf/%s.pdf -P 'Performance Profile'", csv_path, out_file_name);
 
         if (system(sys_call) != 0)
         {

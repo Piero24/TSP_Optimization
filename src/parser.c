@@ -185,8 +185,9 @@ void parameterPrint(instance* inst)
 
 	if (inst->mipstart || inst->callback_base || inst->callback_relax || inst->posting_base || inst->posting_relax)
 	{
-		int OPTION_LENGHT = 100;
-		char options_selected[100];
+		  int OPTION_LENGHT = 100;
+		  char options_selected[100];
+    
     	strcpy(options_selected, "- CPLEX Options:           ");
 
 		if (inst->mipstart)

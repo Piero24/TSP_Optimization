@@ -76,7 +76,7 @@ int TSPopt(instance *inst)
 	
 	build_sol(xstar, inst, succ, comp, dim, &ncomp);
 	resultPlot = convertSolution(succ, comp, ncomp, inst);
-	show_solution_comps(inst, true, resultPlot, ncomp);
+	// show_solution_comps(inst, true, resultPlot, ncomp);
 	
 	// free and close cplex model   
     for(int i=1; i<ncomp+1; i++) free(resultPlot[i]);
