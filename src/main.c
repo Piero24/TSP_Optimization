@@ -13,7 +13,7 @@
 // ***
 // *** Windows
 // *** cmake . -B build --fresh && cmake --build build --clean-first
-// *** Debug\TSP_Optimization.exe -g 100 -model 3 -v 60 -c 124
+// *** Debug\TSP_Optimization.exe -g 100 -model 3 -v 90 -c 124
 // *** Debug\TSP_Optimization.exe -f Resource/a280.tsp -model 3 -v 60
 // ***
 // *** Linux

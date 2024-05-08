@@ -69,6 +69,10 @@ int TSPopt(instance *inst)
 
 	inst->tbest = clock();
 	inst->best_lb = objval;
+
+	if(inst->callback_base || inst->callback_relax){
+		inst->zbest = objval;
+	}
 	
 	build_sol(xstar, inst, succ, comp, dim, &ncomp);
 	resultPlot = convertSolution(succ, comp, ncomp, inst);

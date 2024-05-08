@@ -46,7 +46,7 @@ int apply_algorithm(instance* inst)
         
         printf("Time: %f sec.\t\t\t", time);
         
-        if (strcmp(inst->algorithm_name, "CPLEX") != 0)
+        if (strcmp(inst->algorithm_name, "CPLEX") != 0 || inst->callback_base || inst->callback_relax)
             printf("Cost: %f\t\t", inst->zbest);
         else
             printf("Lower bound: %f\t\t", inst->best_lb);
