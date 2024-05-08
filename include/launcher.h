@@ -17,12 +17,17 @@
 #include "algoSelector.h"
 
 
-#define MAX_FILES 10
+#define MAX_FILES 100
 #define MAX_HEADER_LENGTH 350
 
 typedef struct {
 	char algorithm[50];
     char optimizer[50];
+    bool mipstart;
+	bool callback_base;
+	bool callback_relax; 
+	bool posting_base;
+	bool posting_relax;
 } Tuple;
 
 /**

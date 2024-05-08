@@ -181,7 +181,7 @@ void parameterPrint(instance* inst)
 
 	if (inst->mipstart || inst->callback_base || inst->callback_relax || inst->posting_base || inst->posting_relax)
 	{
-		int OPTION_LENGHT = 7;
+		int OPTION_LENGHT = 45;
 		char options_selected[OPTION_LENGHT];
     	strcpy(options_selected, "- CPLEX Options:           ");
 
@@ -190,22 +190,22 @@ void parameterPrint(instance* inst)
 			strncat(options_selected, "Mipstart, ", OPTION_LENGHT - strlen(options_selected) - 1);
 		}
 		
-		if (inst->mipstart)
+		if (inst->callback_base)
 		{
 			strncat(options_selected, "Callback Base, ", OPTION_LENGHT - strlen(options_selected) - 1);
 		}
 
-		if (inst->mipstart)
+		if (inst->callback_relax)
 		{
 			strncat(options_selected, "Callback Relax, ", OPTION_LENGHT - strlen(options_selected) - 1);
 		}
 
-		if (inst->mipstart)
+		if (inst->posting_base)
 		{
 			strncat(options_selected, "Posting Base, ", OPTION_LENGHT - strlen(options_selected) - 1);
 		}
 
-		if (inst->mipstart)
+		if (inst->posting_relax)
 		{
 			strncat(options_selected, "Posting Relax, ", OPTION_LENGHT - strlen(options_selected) - 1);
 		}
