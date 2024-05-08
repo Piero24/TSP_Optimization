@@ -5,19 +5,19 @@
 // -g 50 -model 1 -opt 3 -v 10 -t 5
 
 // files:
-// -g 50
-// -g 100
-// -g 150
-// -g 200
-// -g 250
-// -f Resource/a280.tsp
-// -g 300
-// -g 350
-// -g 400
-// -g 450
-// -g 500
-// -f Resource/rat575.tsp
-// -g 600
+-g 50
+-g 100
+-g 150
+-g 200
+-g 250
+-f Resource/a280.tsp
+-g 300
+-g 350
+-g 400
+-g 450
+-g 500
+-f Resource/rat575.tsp
+-g 600
 -g 650
 -g 700
 -g 750

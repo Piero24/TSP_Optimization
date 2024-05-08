@@ -169,6 +169,8 @@ int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCo
 
     } while (counter < inst->nnodes);
 
+    // add check
+
     return 0;
 }
 
