@@ -69,6 +69,10 @@ int TSPopt(instance *inst)
 
 	inst->tbest = clock();
 	inst->best_lb = objval;
+
+	if(inst->callback_base || inst->callback_relax){
+		inst->zbest = objval;
+	}
 	
 	build_sol(xstar, inst, succ, comp, dim, &ncomp);
 	resultPlot = convertSolution(succ, comp, ncomp, inst);
@@ -345,12 +349,14 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
 		{
 			for(int B=A+1;B<inst->nnodes;B++)
 			{
+				// search for two nodes that are not in the same component
 				if(comp[A] == comp[B])
 					continue;
 				
 				int A1 = succ[A], B1 = succ[B];
 				double diffC = - dist(inst, A, A1) - dist(inst, B, B1) + dist(inst, A, B1) + dist(inst, B, A1);
 				
+				// choose the swap with minimum difference
 				if(diffC < bestDiffC)
 				{
 					bestDiffC = diffC;
@@ -371,8 +377,8 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
 		succ[bestA] = B1;
 		succ[bestB] = A1;
 
+		// put al the nodes of both components into the same component
 		int compMin = -1, compMax = -1;
-
 		if(comp[bestA] < comp[bestB]){
 			compMin = comp[bestA];
 			compMax = comp[bestB];
@@ -388,6 +394,7 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
 				comp[i]--;
 		}
 		
+		// DEBUG CHECK - check if the difference was greather than zero (only true in Benders' loop)
 		//if(bestDiffC < 0 && count == 0) {printf("[mergeComponents] Error: diffC < 0 diffC: %f\n", bestDiffC);exit(0);}
 
 		*cost += bestDiffC;
@@ -663,7 +670,7 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 	int ncomp;
 	build_sol(xstar, inst, succ, comp, dim, &ncomp);
 
-	verbose_print(inst, 95, "[CPLEX callback] Found solution with %d components with cost %f\n", ncomp, objval);
+	verbose_print(inst, 90, "[CPLEX callback] Found solution with %d components with cost %f\n", ncomp, objval);
 	
 	// if cplex solution has multiple components, add SEC
 	if(ncomp > 1){
