@@ -123,7 +123,7 @@ int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCo
 
             if (distAB + distA1B1 < distAA1 + distBB1)
             {
-                verbose_print(inst, 90, "[2optLoop] Swapping edges %d-%d and %d-%d with %d-%d and %d-%d\n", *A, *A1, *B, *B1, *A1, *B1, *B, *A);
+                verbose_print(inst, 95, "[2optLoop] Swapping edges %d-%d and %d-%d with %d-%d and %d-%d\n", *A, *A1, *B, *B1, *A1, *B1, *B, *A);
 
                 // Reverse the sub-array from A to B
                 reverseSubvector(A1, B);

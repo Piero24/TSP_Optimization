@@ -13,13 +13,14 @@
 // ***
 // *** Windows
 // *** cmake . -B build --fresh && cmake --build build --clean-first
-// *** Debug\TSP_Optimization.exe -g 100 -model 3 -v 60
+// *** Debug\TSP_Optimization.exe -g 100 -model 3 -v 60 -c 124
 // *** Debug\TSP_Optimization.exe -f Resource/a280.tsp -model 3 -v 60
-// *** 1:mipstart, 2:callback base, 3:callback relax, 4:posting base, 5:posting relax
 // ***
 // *** Linux
 // *** rm -r build && mkdir build && cmake -S . -DCPLEXDIR="C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/" -B build
 // *** make -C build && clear && ./TSP_Optimization
+// ***
+// *** CPLEX OPTIONS: 1:mipstart, 2:callback base, 3:callback relax, 4:posting base, 5:posting relax
 // ***
 // ********************************************************************************************************************* 
 // *********************************************************************************************************************
