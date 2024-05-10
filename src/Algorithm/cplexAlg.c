@@ -828,9 +828,79 @@ static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance*
 	double objval = CPX_INFBOUND; 
 	
 	int error = 0;
-	error = error = CPXcallbackgetrelaxationpoint(context, xstar, 0, ncols-1, &objval);
+	error = CPXcallbackgetrelaxationpoint(context, xstar, 0, ncols-1, &objval);
 	assert(error == 0);
+
+	bool plot = false;
+
+	if(inst->posting_relax){
+
+		for(int i=0;i<inst->ncols; i++){
+			xstar[i] = 1 - (0.25 + (xstar[i] * 0.5));
+		}
+
+		if(plot){
+			int* succ = (int *) calloc(inst->nnodes, sizeof(int));
+			int* comp = (int *) calloc(inst->nnodes, sizeof(int));
+			int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
+			int ncomp;
+			build_sol(xstar, inst, succ, comp, dim, &ncomp);
+			int** result1 = convertSolution(succ, comp, ncomp, inst);
+			
+			show_solution_comps(inst, true, result1, ncomp);
+			printf("pre\n");
+			sleep_ms(1000);
+			
+			for(int i=1; i<ncomp+1; i++) free(result1[i]);
+			free(result1);
+			free(dim);
+			free(comp);
+			free(succ);
+		}
+
+		// Nearest Neighbor using xstar as weights
+		int* result = (int*) calloc(inst->nnodes, sizeof(int));
+		WeightedNNFromEachNode(inst, xstar, result, &objval, false);
+
+		if(plot){
+			show_solution_mono(inst, true, result);
+			printf("post\n");
+			sleep_ms(1000);
+		}
+
+		// apply 2-opt
+		inst->plotCosts = NULL;
+		int nCosts = 0, xIndex = 0;
+		twoOptLoop(inst, result, &objval, NULL, &nCosts, &xIndex, false, false, true);
+
+		if(plot){
+			show_solution_mono(inst, true, result);
+			sleep_ms(1000);
+		}
+
+		// convert trip to cplex format
+		int *ind = (int *) malloc(inst->ncols * sizeof(int));
+		for ( int j = 0; j < inst->ncols; j++ ) ind[j] = j;
+
+		double* xheu = (double*) calloc(ncols, sizeof(double));
+
+		for (int i = 0; i < inst->nnodes-1; i++) {
+			int pos_index = xpos(result[i], result[i + 1], inst);
+			xheu[pos_index] = 1;
+		}
+
+		xheu[xpos(result[inst->nnodes-1], result[0], inst)] = 1;
+
+		// post solution
+		error = CPXcallbackpostheursoln(context, inst->ncols, ind, xheu, objval, CPXCALLBACKSOLUTION_NOCHECK);
+		assert(error == 0);
+		
+		free(xheu);
+		free(ind);
+		free(result);
+	}
 	
+	/*
 	int* elist = (int*) malloc(2*ncols*sizeof(int));  
 	int ncomp = -1;
 
@@ -849,7 +919,8 @@ static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance*
 	if(inst->posting_relax){
 		// TODO
 	}
-
+	//*/
+	free(xstar);
 	return 0; 
 }
 

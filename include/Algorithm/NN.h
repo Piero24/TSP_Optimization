@@ -16,6 +16,8 @@
  */
 int NNFromEachNode(instance* inst);
 
+int WeightedNNFromEachNode(instance* inst, double* weights, int* result, double* cost, bool updateInst);
+
 /**
  * @brief Applies the nearest neighbor algorithm to find the solution for the given instance.
  * 
@@ -26,6 +28,8 @@ int NNFromEachNode(instance* inst);
  * 
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
+int weightedNearestNeighbor(instance* inst, int firstNode, int* result, double* cost, double* weights);
+
 int nearestNeighbor(instance* inst, int firstNode, int* result, double* cost);
 
 #endif /* NN_H */

@@ -15,23 +15,11 @@
 -g 350
 -g 400
 -g 450
--g 500
--f Resource/rat575.tsp
--g 600
--g 650
--g 700
--g 750
--g 800
--g 850
--g 900
--g 950
--f Resource/pr1002.tsp
 
 
 // algos
--model 3 -c 2
--model 3 -c 24 
+// -c 1:mipstart, 2:callback base, 3:callback relax, 4:posting base, 5:posting relax
+-model 3 -c 1235
 
 // parameters:
-// -c 1:mipstart, 2:callback base, 3:callback relax, 4:posting base, 5:posting relax
--v 60
+-v 60 -r 8654561
