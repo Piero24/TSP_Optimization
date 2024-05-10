@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../algoSelector.h"
-#include "../tsp.h"
+#include "../../algoSelector.h"
+#include "../../tsp.h"
 
 /**
  * @brief Applies the nearest neighbor algorithm for every possible starting node.

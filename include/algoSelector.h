@@ -5,9 +5,11 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "Algorithm/NN.h"
-#include "Algorithm/cplexAlg.h"
-#include "Algorithm/optimizations.h"
+#include "Algorithm/Heuristics/NN.h"
+#include "Algorithm/Exacts/cplexAlg.h"
+#include "Algorithm/Optimizators/twoOpt.h"
+#include "Algorithm/Optimizators/tabuSearch.h"
+#include "Algorithm/Optimizators/vns.h"
 #include "parser.h"
 #include "tsp.h"
 

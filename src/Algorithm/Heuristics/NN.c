@@ -1,4 +1,4 @@
-#include "Algorithm/NN.h"
+#include "Algorithm/Heuristics/NN.h"
 
 int NNFromEachNode(instance* inst){
     int ncols = inst->nnodes * (inst->nnodes) / 2; //n*(n-1)/2

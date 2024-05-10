@@ -31,12 +31,15 @@ endif()
 # Add source files
 add_executable(TSP_Optimization
     src/main.c
+    src/Algorithm/Heuristics/NN.c
+    src/Algorithm/Optimizators/optUtils.c
+    src/Algorithm/Optimizators/tabuSearch.c
+    src/Algorithm/Optimizators/twoOpt.c
+    src/Algorithm/Optimizators/vns.c
     src/algoSelector.c
-    src/Algorithm/NN.c
-    src/Algorithm/cplexAlg.c
+    src/Algorithm/Exacts/cplexAlg.c
     src/tsp.c
     src/parser.c
-    src/Algorithm/optimizations.c
     src/menu.c
     src/launcher.c
     src/mincut.c

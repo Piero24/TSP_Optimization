@@ -5,21 +5,14 @@
 // -g 50 -model 1 -opt 3 -v 10 -t 5
 
 // files:
--g 50
--g 100
--g 150
--g 200
--g 250
--f Resource/a280.tsp
--g 300
--g 350
--g 400
--g 450
-
+-g 20
 
 // algos
 // -c 1:mipstart, 2:callback base, 3:callback relax, 4:posting base, 5:posting relax
--model 3 -c 1235
+-model 2
+-model 2 -opt 1
+-model 2 -opt 2
+-model 2 -opt 3
 
 // parameters:
--v 60 -r 8654561
+-v 10 -r 8654561 -tl 3

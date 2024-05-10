@@ -30,7 +30,7 @@
 #include <time.h>
 
 #include "tsp.h"
-#include "Algorithm/NN.h"
+#include "Algorithm/Heuristics/NN.h"
 #include "parser.h"
 #include "algoSelector.h"
 #include "menu.h"

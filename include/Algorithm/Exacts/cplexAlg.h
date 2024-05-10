@@ -4,7 +4,7 @@
 #include "tsp.h"
 #include "parser.h"
 #include "algoSelector.h"
-#include "Algorithm/NN.h"
+#include "Algorithm/Heuristics/NN.h"
 
 #include <cplex.h>
 #include <assert.h>
