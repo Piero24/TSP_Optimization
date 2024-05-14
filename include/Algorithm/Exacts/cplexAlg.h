@@ -66,6 +66,17 @@ int xpos(int i, int j, instance *inst);
 void build_model(instance *inst, CPXENVptr env, CPXLPptr lp);
 
 /**
+ * @brief Sets index and value arrays for a constraint over a component k.
+ * 
+ * @param inst Pointer to the instance containing problem data.
+ * @param index The index array to be setted.
+ * @param value The value aeeay to be setted.
+ * @param comp The array of components of the nodes.
+ * @param k The component on which the constraint must be setted.
+ */
+void setConstraint(instance* inst, int* index, double* value, int* comp, int k, double* rhs, int* nnz);
+
+/**
  * @brief Builds successor and component arrays based on the solution vector.
  * This function constructs the successor and component arrays based on the provided
  * solution vector `xstar`, which represents the selected edges in the graph. It traverses
@@ -167,6 +178,21 @@ int mipstart2Opt(instance* inst, int* result, double* cost);
  * @return Returns 0 if the callback functions were called correctly, non-zero otherwise.
  */
 static int CPXPUBLIC callbackHandler(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle);
+
+/**
+ * @brief Manages the heuristic solution posting for the candidate callback. Applies gluing on the cplex
+ *  solution, then applies 2opt and then posts it on cplex context.
+ * 
+ * @param context CPLEX context data structure.
+ * @param inst Pointer to the instance structure.
+ * @param comp Array containing the component assignments for each node.
+ * @param succ Array containing the successor of each node.
+ * @param ncomp The total number of components.
+ * @param objval Pointer to the cost of the cplex solution.
+ * 
+ * @return Returns 0 if the callback functions were called correctly, non-zero otherwise.
+ */
+int posting_base(instance* inst, CPXCALLBACKCONTEXTptr context, int* succ, int* comp, int ncomp, double* objval);
 
 /**
  * @brief CPLEX callback for candidate proposal. This function adds SEC when the candidate solution has more

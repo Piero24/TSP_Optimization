@@ -442,26 +442,15 @@ void add_SEC(instance* inst, CPXENVptr env, CPXLPptr lp, int ncomp, int* comp){
 	double* value = (double*) calloc(ncols, sizeof(double)); // valore dei coefficienti della sommatoria
 	char **cname = (char **) calloc(1, sizeof(char *));
 	cname[0] = (char *) calloc(100, sizeof(char));
+	char sense = 'L'; // <=
 
 	for(int k=1; k<=ncomp; k++){
 		int nnz = 0; // number of non zero
-		char sense = 'L'; // <=
 		double rhs = -1.0; // right hand side of contraint
 		sprintf(cname[0], "component(%d)", k+1); 
 		
 		// aggiungo vincolo per component #k
-		for(int i=0; i<inst->nnodes; i++){
-			if(comp[i] != k) continue;
-			rhs += 1;
-			
-			for(int j=i+1; j<inst->nnodes; j++){
-				if(comp[j] != k) continue;
-					
-				index[nnz] = xpos(i,j, inst);
-				value[nnz] = 1.0;
-				nnz ++;
-			}
-		}
+		setConstraint(inst, index, value, comp, k, &rhs, &nnz);
 		
 		CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, cname);
 	}
@@ -628,6 +617,22 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *d
 	}
 }
 
+void setConstraint(instance* inst, int* index, double* value, int* comp, int k, double* rhs, int* nnz)
+{
+	for(int i=0; i<inst->nnodes; i++){
+		if(comp[i] != k) continue;
+		*rhs++;
+		
+		for(int j=i+1; j<inst->nnodes; j++){
+			if(comp[j] != k) continue;
+				
+			index[*nnz] = xpos(i,j, inst);
+			value[*nnz] = 1.0;
+			nnz ++;
+		}
+	}
+}
+
 static int CPXPUBLIC callbackHandler(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle)
 {
 	// get instance and cplex solution
@@ -646,6 +651,74 @@ static int CPXPUBLIC callbackHandler(CPXCALLBACKCONTEXTptr context, CPXLONG cont
 		return 0;
 
 	assert(error == 0);
+	return 0;
+}
+
+int posting_base(instance* inst, CPXCALLBACKCONTEXTptr context, int* succ, int* comp, int ncomp, double* objval)
+{
+	// DEBUG PLOTTING (before gluing) Warning: this is not tread safe
+	if(inst->verbose >= 99){
+		int** result1 = convertSolution(succ, comp, ncomp, inst);
+		
+		show_solution_comps(inst, true, result1, ncomp);
+		sleep_ms(1000);
+		
+		for(int i=1; i<ncomp+1; i++) free(result1[i]);
+		free(result1);
+	}
+	
+	// glue components together
+	mergeComponents(inst, &ncomp, comp, succ, objval);
+
+	// convert to one-trip array
+	int* trip = (int*) calloc(inst->nnodes, sizeof(int));
+	int pos = 0;
+	trip[0] = 0;
+
+	for(int i=1;i<inst->nnodes;i++){
+		trip[i] = succ[pos];
+		pos = succ[pos];
+	}
+
+	// apply 2-opt
+	inst->plotCosts = NULL;
+	int nCosts = 0, xIndex = 0;
+	twoOptLoop(inst, trip, objval, NULL, &nCosts, &xIndex, false, false, true);
+
+	// DEBUG PLOTTING (after gluing & 2opt) Warning: this is not tread safe
+	if(inst->verbose >= 99){
+		int** result2 = convertSolution(succ, comp, ncomp, inst);
+		
+		show_solution_mono(inst, true, trip);
+		sleep_ms(1000);
+
+		for(int i=1; i<ncomp+1; i++) free(result2[i]);
+		free(result2);
+	}
+
+	verbose_print(inst, 95, "[Posting Heuristic - Gluing] Ended merging and gluing2Opt, objval: %f ncomp %d\n", *objval, ncomp);
+
+	// convert trip to cplex format
+	int *ind = (int *) malloc(inst->ncols * sizeof(int));
+	for ( int j = 0; j < inst->ncols; j++ ) ind[j] = j;
+
+	double* xheu = (double*) calloc(inst->ncols, sizeof(double));
+
+	for (int i = 0; i < inst->nnodes-1; i++) {
+		int pos_index = xpos(trip[i], trip[i + 1], inst);
+		xheu[pos_index] = 1;
+	}
+
+	xheu[xpos(trip[inst->nnodes-1], trip[0], inst)] = 1;
+
+	// post solution
+	int error = CPXcallbackpostheursoln(context, inst->ncols, ind, xheu, *objval, CPXCALLBACKSOLUTION_NOCHECK);
+	assert(error == 0);
+	
+	free(xheu);
+	free(ind);
+	free(trip);
+
 	return 0;
 }
 
@@ -678,21 +751,11 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 
 		for(int k=1; k<=ncomp; k++){
 			int nnz = 0; // number of non zero
-			double rhs = dim[k] - 1.0; // right hand side of contraint
+			double rhs = -1.0; // right hand side of contraint
 			
 			// add constraint for component #k
-			for(int i=0; i<inst->nnodes; i++){
-				if(comp[i] != k) continue;
-				
-				for(int j=i+1; j<inst->nnodes; j++){
-					if(comp[j] != k) continue;
-						
-					index[nnz] = xpos(i,j, inst);
-					value[nnz] = 1.0;
-					nnz ++;
-				}
-			}
-			
+			setConstraint(inst, index, value, comp, k, &rhs, &nnz);
+
 			error = CPXcallbackrejectcandidate(context, 1, nnz, &rhs, &sense, &izero, index, value); // reject the solution and adds one cut 
 			assert(error == 0); // CPXcallbackrejectcandidate error
 		}
@@ -702,69 +765,7 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 
 		// post heuristic with gluing
 		if(inst->posting_base)
-		{
-			// DEBUG PLOTTING (before gluing) Warning: this is not tread safe
-			if(inst->verbose >= 99){
-				int** result1 = convertSolution(succ, comp, ncomp, inst);
-				
-				show_solution_comps(inst, true, result1, ncomp);
-				sleep_ms(1000);
-				
-				for(int i=1; i<ncomp+1; i++) free(result1[i]);
-				free(result1);
-			}
-
-			// glue components together
-			mergeComponents(inst, &ncomp, comp, succ, &objval);
-
-			// convert to one-trip array
-			int* trip = (int*) calloc(inst->nnodes, sizeof(int));
-			int pos = 0;
-			trip[0] = 0;
-
-			for(int i=1;i<inst->nnodes;i++){
-				trip[i] = succ[pos];
-				pos = succ[pos];
-			}
-
-			// apply 2-opt
-			inst->plotCosts = NULL;
-			int nCosts = 0, xIndex = 0;
-			twoOptLoop(inst, trip, &objval, NULL, &nCosts, &xIndex, false, false, true);
-
-			// DEBUG PLOTTING (after gluing & 2opt) Warning: this is not tread safe
-			if(inst->verbose >= 99){
-				int** result2 = convertSolution(succ, comp, ncomp, inst);
-				
-				show_solution_mono(inst, true, trip);
-				sleep_ms(1000);
-
-				for(int i=1; i<ncomp+1; i++) free(result2[i]);
-				free(result2);
-			}
-
-			verbose_print(inst, 95, "[Posting Heuristic - Gluing] Ended merging and gluing2Opt, objval: %f ncomp %d\n", objval, ncomp);
-
-			// convert trip to cplex format
-			int *ind = (int *) malloc(inst->ncols * sizeof(int));
-			for ( int j = 0; j < inst->ncols; j++ ) ind[j] = j;
-
-			double* xheu = (double*) calloc(ncols, sizeof(double));
-
-			for (int i = 0; i < inst->nnodes-1; i++) {
-				int pos_index = xpos(trip[i], trip[i + 1], inst);
-				xheu[pos_index] = 1;
-			}
-
-			xheu[xpos(trip[inst->nnodes-1], trip[0], inst)] = 1;
-
-			// post solution
-			error = CPXcallbackpostheursoln(context, inst->ncols, ind, xheu, objval, CPXCALLBACKSOLUTION_NOCHECK);
-			assert(error == 0);
-			
-			free(xheu);
-			free(ind);
-		}
+			posting_base(inst, context, succ, comp, ncomp, &objval);
 
 	} else {
 		// if cplex solution has 1 component, do nothing
