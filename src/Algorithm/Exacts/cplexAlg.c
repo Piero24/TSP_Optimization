@@ -18,6 +18,7 @@ int TSPopt(instance *inst)
 	// build TSP problem
 	build_model(inst, env, lp);
 	CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit);
+	// CPXsetintparam(env, CPXPARAM_ScreenOutput, CPX_ON);
 	CPXsetintparam(env, CPX_PARAM_THREADS, 1);
 	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
 	inst->ncols = ncols;
@@ -619,16 +620,15 @@ void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *d
 
 void setConstraint(instance* inst, int* index, double* value, int* comp, int k, double* rhs, int* nnz)
 {
-	for(int i=0; i<inst->nnodes; i++){
+	for(int i=0; i<inst->nnodes-1; i++){
 		if(comp[i] != k) continue;
-		*rhs++;
-		
+		*rhs =  *rhs+1;
 		for(int j=i+1; j<inst->nnodes; j++){
 			if(comp[j] != k) continue;
-				
+			
 			index[*nnz] = xpos(i,j, inst);
 			value[*nnz] = 1.0;
-			nnz ++;
+			*nnz = *nnz+1;
 		}
 	}
 }
