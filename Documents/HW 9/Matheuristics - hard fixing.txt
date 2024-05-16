@@ -1,6 +1,0 @@
-Alg 9: Matheuristics - hard fixing
-
-Use xstar values as a probability (it has value 0-1).
-Do a greedy using that instead of using costs c(i,j) use costs c(i,j) * (1 - x(i,j))
-
-Can be useful to do this in the relaxation callback to post more heuristics.

@@ -1,0 +1,44 @@
+Alg 9: Matheuristics
+
+// CPXPARAM_MIP_Tolerances_MIPGap -> parametro per cambiare la tolleranza dell'ottimo
+
+per 1000-2000 nodi cplex è troppo lento, usiamo Matheuristics
+
+usiamo il modello matematico per calcolare una soluzione euristica
+
+tratto cplex come una scatola chiusa e agisco sul modello in input per aiutare cplex a trovare 
+una soluzione non ottima ma molto più velocemente
+
+DIVING - HARD FIXING
+
+    Data una soluzione euristica (ad es quella del mip start), scelgo alcuni archi che voglio tenere fissi (hard fixed)
+    e altri che permetto a cplex di ottimizzare.
+    Questa operazione può essere ripetuta più volte, ogni volta scegliendo (potenzialmente) un set di archi fissi diverso.
+    Il numero di volte per cui l'operazione viene ripetuta è un iperparametro. Il time limit dovrebbe essere diviso equamente
+    per il numero di cicli che si vuole fare (eventualmente aggiustando il tiro se un ciclo ci mette meno del previsto).
+
+    calcola Xh (soluzione euristica)
+    for i in range N:
+        scegli E' sottoinsieme di E (con E insieme di archi di Xh)
+        fissa x(e') = 1 per ogni e' in E'
+        setta time limit a TL/N
+        setta Xh come mip start
+        chiama cplex (con callback, frac, posting, mip)
+        se la soluzione di cplex è migliore di Xh, setta Xh a quella soluzione
+        rimuovi i x(e') = 1
+
+    see https://www.ibm.com/docs/es/cofz/12.9.0?topic=cpxxchgbds-cpxchgbds (settare upper bound e lower bound, posso mettere 1-1 e 0-1)
+
+    Quanti archi fisso?
+        Bisogna scegliere una percentuale di archi LIBERI (ad es 50%).
+        Si può rendere dinamico, parto con 10%, se non cambia molto lo alzo.
+        Si può scegliere un numero di archi che cplex risolve velocemente (300) e fissare gli altri (n-300)
+
+    Quali archi fisso?
+        Posso ordinare i lati per lunghezza e fissare i più piccoli (scelta deterministica: può creare loop).
+        Posso rendere più probabile la scelta di lati più corti, ma lasciarla comunque random.
+        Posso sceglierli completamente random.
+        
+
+
+Other matheuristic: LOCAL BRANCHING - SOFT FIXING
