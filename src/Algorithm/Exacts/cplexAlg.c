@@ -779,7 +779,7 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 
 			for(int i=1; i<ncomp+1; i++) free(result[i]);
 			free(result);
-			getchar();
+			//getchar();
 		}
 	}	
 
@@ -862,7 +862,7 @@ int posting_relax(CPXCALLBACKCONTEXTptr context, instance* inst, double* xstar, 
 
 static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance* inst)
 { 
-	//if(randomInt(1, 10) != 1) return 0;
+	if(randomInt(1, 10) != 1) return 0;
 
 	// get instance and cplex fractional solution
 	int ncols = inst->ncols;
@@ -874,45 +874,24 @@ static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance*
 	assert(error == 0);
 
 	// count number of components
+	int* elist = (int *) calloc(2*ncols, sizeof(int));
 	int ncomp = -1;
-	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
-	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
-	int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
-	build_sol(xstar, inst, succ, comp, dim, &ncomp);
+	int* compscount = (int*) NULL;
+	int* comps = (int*) NULL;
 
-	// try using this instead of build_sol (?):
-	/*
-	int* elist = (int*) malloc(2*ncols*sizeof(int));  
-	int ncomp = -1;
-
-	int k=0;
-	for(int i = 0;i<inst->nnodes;i++){
+    int k=0;
+	for(int i = 0; i<inst->nnodes; i++){
 		for(int j=i+1;j<inst->nnodes;j++){
 			elist[k]=i;
 			elist[++k]=j;
 			k++;
 		}
 	}
-	
-	cut_par user_handle= {context,inst};
-	cut_par user_handle = {context,inst};
-	error = CCcut_violated_cuts(inst->nnodes, ncols, elist, xstar, 1.9, add_cut, (void*) &user_handle);
-	*/
 
-	// DEBUG PLOT
-	int** result = convertSolution(succ, comp, ncomp, inst);
-	show_solution_comps(inst, true, result, ncomp);
-
-	for(int i=1; i<ncomp+1; i++) free(result[i]);
-	free(result);
-
-	//sleep_ms(2000);
-	//getchar();
-
-	// END DEBUG PLOT
+	CCcut_connect_components(inst->nnodes, ncols, elist, xstar, &ncomp, &compscount, &comps);
 
 	if(ncomp > 1){ // if there is more than 1 component add SEC
-		/*
+
 		int izero = 0;
 		char sense = 'L'; // <=
 		int* index = (int*) calloc(ncols, sizeof(int)); // index of vars with coeff non-zero 
@@ -925,7 +904,7 @@ static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance*
 			double rhs = -1.0; // right hand side of contraint
 			
 			// add constraint for component #k
-			setConstraint(inst, index, value, comp, k, &rhs, &nnz);
+			setConstraint(inst, index, value, comps, k, &rhs, &nnz);
 
 			error = CPXcallbackaddusercuts(context, 1, nnz, &rhs, &sense, &izero, index, value, &purgeable, &local); // adds one cut
 			assert(error == 0); // CPXcallbackrejectcandidate error
@@ -933,10 +912,8 @@ static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance*
 
 		free(value);
 		free(index);
-		//*/
-	} 
-	//*
-	else {
+
+	} else {
 		int* elist = (int*) malloc(2*ncols*sizeof(int));  
 		int ncomp = -1;
 
@@ -954,15 +931,14 @@ static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance*
 		
 		free(elist);
 	}
-	//*/
 
 	if(inst->posting_relax){
 		posting_relax(context, inst, xstar, &objval);
 	}
 
-	free(dim);
-	free(comp);
-	free(succ);
+	free(elist);
+	free(compscount);
+	free(comps);
 	free(xstar);
 	return 0; 
 }

@@ -1,13 +1,7 @@
 ## Algorithms
-- check cplex status after it finish
+- check cplex status after it finish (also get partial solution if it exit by time limit)
 - manage time limit with mipstart
-- relaxation callback
-    - elist should not have edges that are at zero in xstar (but then xstar's positions should not be there in that case)
-    - relaxationCallback should check connected components (CCcut_connect_components) before violated_cuts
-        - If comp==1 violated_cuts
-        - else for each component addUserCut
-    - do relaxation only 10% of the time
-- Matheuristics
+- Matheuristic: Diving (Hard Fixing)
 
 
 ## Features
