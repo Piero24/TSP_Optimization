@@ -13,7 +13,7 @@
 // ***
 // *** Windows
 // *** cmake . -B build --fresh && cmake --build build --clean-first
-// *** Debug\TSP_Optimization -g 100 -model 3 -v 90 -c 124
+// *** Debug\TSP_Optimization -g 100 -model 3 -v 90 -c 23
 // *** Debug\TSP_Optimization -f Resource/a280.tsp -model 3 -v 60
 // *** Debug\TSP_Optimization -launcher Resource/Launcher/launcher.txt
 // ***

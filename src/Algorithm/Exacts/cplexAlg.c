@@ -779,6 +779,7 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 
 			for(int i=1; i<ncomp+1; i++) free(result[i]);
 			free(result);
+			getchar();
 		}
 	}	
 
@@ -811,7 +812,8 @@ int add_cut(double cut_value, int cut_nnodes, int* cut_index_nodes, void* userha
 			value[nnz]=1.0;
 			nnz++;
 		}
-	}	
+	}
+	
 	
 	int error = CPXcallbackaddusercuts(cut_pars.context, 1, nnz, &rhs, &sense, &izero, index, value, &purgeable, &local);
 	assert(error == 0);// CPXcallbackaddusercuts error
@@ -821,9 +823,48 @@ int add_cut(double cut_value, int cut_nnodes, int* cut_index_nodes, void* userha
 	return 0; 
 }
 
+int posting_relax(CPXCALLBACKCONTEXTptr context, instance* inst, double* xstar, double* objval){
+	for(int i=0;i<inst->ncols; i++){
+		xstar[i] = 1 - (0.25 + (xstar[i] * 0.5));
+	}
+
+	// Nearest Neighbor using xstar as weights
+	int* result = (int*) calloc(inst->nnodes, sizeof(int));
+	WeightedNNFromEachNode(inst, xstar, result, objval, false);
+
+	// apply 2-opt
+	inst->plotCosts = NULL;
+	int nCosts = 0, xIndex = 0;
+	twoOptLoop(inst, result, objval, NULL, &nCosts, &xIndex, false, false, true);
+
+	// convert trip to cplex format
+	int *ind = (int *) malloc(inst->ncols * sizeof(int));
+	for ( int j = 0; j < inst->ncols; j++ ) ind[j] = j;
+
+	double* xheu = (double*) calloc(inst->ncols, sizeof(double));
+
+	for (int i = 0; i < inst->nnodes-1; i++) {
+		int pos_index = xpos(result[i], result[i + 1], inst);
+		xheu[pos_index] = 1;
+	}
+
+	xheu[xpos(result[inst->nnodes-1], result[0], inst)] = 1;
+
+	// post solution
+	int error = CPXcallbackpostheursoln(context, inst->ncols, ind, xheu, *objval, CPXCALLBACKSOLUTION_NOCHECK);
+	assert(error == 0);
+	
+	free(xheu);
+	free(ind);
+	free(result);
+	return 0;
+}
+
 static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance* inst)
 { 
-	// get instance and cplex solution
+	//if(randomInt(1, 10) != 1) return 0;
+
+	// get instance and cplex fractional solution
 	int ncols = inst->ncols;
 	double* xstar = (double*) malloc(ncols * sizeof(double));  
 	double objval = CPX_INFBOUND; 
@@ -832,75 +873,14 @@ static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance*
 	error = CPXcallbackgetrelaxationpoint(context, xstar, 0, ncols-1, &objval);
 	assert(error == 0);
 
-	bool plot = false;
+	// count number of components
+	int ncomp = -1;
+	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
+	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
+	int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
+	build_sol(xstar, inst, succ, comp, dim, &ncomp);
 
-	if(inst->posting_relax){
-
-		for(int i=0;i<inst->ncols; i++){
-			xstar[i] = 1 - (0.25 + (xstar[i] * 0.5));
-		}
-
-		if(plot){
-			int* succ = (int *) calloc(inst->nnodes, sizeof(int));
-			int* comp = (int *) calloc(inst->nnodes, sizeof(int));
-			int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
-			int ncomp;
-			build_sol(xstar, inst, succ, comp, dim, &ncomp);
-			int** result1 = convertSolution(succ, comp, ncomp, inst);
-			
-			show_solution_comps(inst, true, result1, ncomp);
-			printf("pre\n");
-			sleep_ms(1000);
-			
-			for(int i=1; i<ncomp+1; i++) free(result1[i]);
-			free(result1);
-			free(dim);
-			free(comp);
-			free(succ);
-		}
-
-		// Nearest Neighbor using xstar as weights
-		int* result = (int*) calloc(inst->nnodes, sizeof(int));
-		WeightedNNFromEachNode(inst, xstar, result, &objval, false);
-
-		if(plot){
-			show_solution_mono(inst, true, result);
-			printf("post\n");
-			sleep_ms(1000);
-		}
-
-		// apply 2-opt
-		inst->plotCosts = NULL;
-		int nCosts = 0, xIndex = 0;
-		twoOptLoop(inst, result, &objval, NULL, &nCosts, &xIndex, false, false, true);
-
-		if(plot){
-			show_solution_mono(inst, true, result);
-			sleep_ms(1000);
-		}
-
-		// convert trip to cplex format
-		int *ind = (int *) malloc(inst->ncols * sizeof(int));
-		for ( int j = 0; j < inst->ncols; j++ ) ind[j] = j;
-
-		double* xheu = (double*) calloc(ncols, sizeof(double));
-
-		for (int i = 0; i < inst->nnodes-1; i++) {
-			int pos_index = xpos(result[i], result[i + 1], inst);
-			xheu[pos_index] = 1;
-		}
-
-		xheu[xpos(result[inst->nnodes-1], result[0], inst)] = 1;
-
-		// post solution
-		error = CPXcallbackpostheursoln(context, inst->ncols, ind, xheu, objval, CPXCALLBACKSOLUTION_NOCHECK);
-		assert(error == 0);
-		
-		free(xheu);
-		free(ind);
-		free(result);
-	}
-	
+	// try using this instead of build_sol (?):
 	/*
 	int* elist = (int*) malloc(2*ncols*sizeof(int));  
 	int ncomp = -1;
@@ -914,13 +894,75 @@ static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance*
 		}
 	}
 	
+	cut_par user_handle= {context,inst};
 	cut_par user_handle = {context,inst};
 	error = CCcut_violated_cuts(inst->nnodes, ncols, elist, xstar, 1.9, add_cut, (void*) &user_handle);
+	*/
 
-	if(inst->posting_relax){
-		// TODO
+	// DEBUG PLOT
+	int** result = convertSolution(succ, comp, ncomp, inst);
+	show_solution_comps(inst, true, result, ncomp);
+
+	for(int i=1; i<ncomp+1; i++) free(result[i]);
+	free(result);
+
+	//sleep_ms(2000);
+	//getchar();
+
+	// END DEBUG PLOT
+
+	if(ncomp > 1){ // if there is more than 1 component add SEC
+		/*
+		int izero = 0;
+		char sense = 'L'; // <=
+		int* index = (int*) calloc(ncols, sizeof(int)); // index of vars with coeff non-zero 
+		double* value = (double*) calloc(ncols, sizeof(double)); // coeff values
+		int purgeable = CPX_USECUT_FILTER;
+		int local = 0;
+
+		for(int k=1; k<=ncomp; k++){
+			int nnz = 0; // number of non zero
+			double rhs = -1.0; // right hand side of contraint
+			
+			// add constraint for component #k
+			setConstraint(inst, index, value, comp, k, &rhs, &nnz);
+
+			error = CPXcallbackaddusercuts(context, 1, nnz, &rhs, &sense, &izero, index, value, &purgeable, &local); // adds one cut
+			assert(error == 0); // CPXcallbackrejectcandidate error
+		}
+
+		free(value);
+		free(index);
+		//*/
+	} 
+	//*
+	else {
+		int* elist = (int*) malloc(2*ncols*sizeof(int));  
+		int ncomp = -1;
+
+		int k=0;
+		for(int i = 0;i<inst->nnodes;i++){
+			for(int j=i+1;j<inst->nnodes;j++){
+				elist[k]=i;
+				elist[++k]=j;
+				k++;
+			}
+		}
+		
+		cut_par user_handle = {context,inst};
+		error = CCcut_violated_cuts(inst->nnodes, ncols, elist, xstar, 1.9, add_cut, (void*) &user_handle);
+		
+		free(elist);
 	}
 	//*/
+
+	if(inst->posting_relax){
+		posting_relax(context, inst, xstar, &objval);
+	}
+
+	free(dim);
+	free(comp);
+	free(succ);
 	free(xstar);
 	return 0; 
 }

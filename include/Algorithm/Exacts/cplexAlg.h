@@ -216,5 +216,6 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
  */
 static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance* inst);
 int add_cut(double cut_value, int cut_nnodes, int* cut_index_nodes, void* userhandle);
+int posting_relax(CPXCALLBACKCONTEXTptr context, instance* inst, double* xstar, double* objval);
 
 #endif /* CPLEXALG_H */
