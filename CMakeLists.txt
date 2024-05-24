@@ -44,7 +44,7 @@ add_executable(TSP_Optimization
     src/menu.c
     src/launcher.c
     src/mincut.c
-    src/Algorithm/Matheuristics/localBranching.c
+    src/Algorithm/Matheuristics/softFixing.c
     src/Algorithm/Matheuristics/hardFixing.c
 )
 

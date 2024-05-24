@@ -1,5 +1,0 @@
-#ifndef LOCALBRANCHING_H
-#define LOCALBRANCHING_H
-
-
-#endif /* LOCALBRANCHING_H */
