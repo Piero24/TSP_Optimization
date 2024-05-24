@@ -1,0 +1,29 @@
+Alg 10: Matheuristics
+
+LOCAL BRANCHING - SOFT FIXING
+
+Voglio poter dire solo quanti lati fissare e non quali. Aggiungo a cplex un vincolo (see vincolo.png):
+    la sommatoria, per ogni e tale che xh(e) = 1, di x(e), deve essere maggiore di n-k
+
+    xh(e) è il lato 'e' della soluzione euristica in input
+    x(e) è il lato 'e' del problema
+    n numero di lati, k parametro
+
+Di fatto è come cercare nell'intorno di k-opt di Xheu, ma si può fare anche con k molto grandi (circa 10, 20, 30, 40, 50)
+
+Per trovare il k giusto parto da un valore (es 20) e, se finisce entro un certo time limit, provo a lanciare anche con 
+un k maggiore (che ci metterà di più ma potrebbe trovare soluzioni migliori).
+
+Funziona meglio partendo da una buona soluzione (es NN + 2opt).
+
+Se trovo una soluzione migliore e voglio partire da quella, posso aggiungere un vincolo che dica di cercare nell'intorno della
+nuova soluzione ma evitando l'intorno di quella vecchia (all'interno del quale ho già cercato) (basterebbe cambiare il vecchio 
+vincolo, mettendo sense a 'G' al posto di 'L' e mettere un -1 nel rhs). Questo potrebbe non aiutare molto perchè aggiunge un 
+ulteriore vincolo che rende il modello più complicato.
+
+paper "learning to search": scegliere k con una rete neurale
+
+un metodo più avanzato ma senza ML potrebbe essere prendere il valore medio tra 0 (che significa che Xheu è la soluzione ottimale) e 
+il valore di k* della soluzione ottimale del problema rilassato (converti le variabili da binare in continue cambiando ctype da 'B' a 
+'C' (setctype()), cambia tipo di problema a CPX_RELAX_LP con changeProblem, chiama CPXlpopt()), ossia k*/2.
+

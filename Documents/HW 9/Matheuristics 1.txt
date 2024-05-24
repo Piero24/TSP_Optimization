@@ -38,7 +38,3 @@ DIVING - HARD FIXING
         Posso ordinare i lati per lunghezza e fissare i più piccoli (scelta deterministica: può creare loop).
         Posso rendere più probabile la scelta di lati più corti, ma lasciarla comunque random.
         Posso sceglierli completamente random.
-        
-
-
-Other matheuristic: LOCAL BRANCHING - SOFT FIXING
