@@ -18,6 +18,21 @@ typedef struct {
 } cut_par;
 
 /**
+ * @brief
+ * 
+ * @param env
+ * @param lp
+ * @param inst 
+ * @param time_limit 
+ * @param xstar 
+ * @param objval 
+ * 
+ * @return Returns 0 upon successful completion, or an appropriate nonzero 
+ *  error code if an error occurs.
+ */
+int branchBound(CPXENVptr env, CPXLPptr lp, instance* inst, double time_limit, double* xstar, double* objval);
+
+/**
  * @brief Solves the Traveling Salesman Problem (TSP) using CPLEX optimization.
  * 
  * @param inst Pointer to the instance containing problem data.

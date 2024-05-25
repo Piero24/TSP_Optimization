@@ -1,5 +1,9 @@
 #include "Algorithm/Matheuristics/softFixing.h"
 
+
+// branchBound(env, lp, inst, inst->time_limit - time, xheu, objval);
+
+
 int localBranching(instance* inst)
 {
     verbose_print(inst, 60, "[Local Branching] Initializing algorithm...\n");
@@ -16,14 +20,8 @@ int localBranching(instance* inst)
 
 	build_model(inst, env, lp);
 
-	CPXsetintparam(env, CPX_PARAM_THREADS, 1);
 	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
 	inst->ncols = ncols;
-	
-	// setting callbacks
-	CPXLONG contextid = CPX_CALLBACKCONTEXT_CANDIDATE | CPX_CALLBACKCONTEXT_RELAXATION;
-	error = CPXcallbacksetfunc(env, lp, contextid, callbackHandler, inst);
-	assert(error == 0);
 
 	// add mipstart
 	double *xheu = addMipstart(inst, env, lp);
@@ -33,6 +31,11 @@ int localBranching(instance* inst)
 		for(int b = a+1; b<inst->nnodes; b++)
 			if(xheu[xpos(a, b, inst)] > 0.5)
 				objval += dist(inst, a, b);
+	
+	int* result = (int*)calloc(inst->nnodes, sizeof(int));
+	cpxToResult(inst, xheu, result);
+
+	bestSolution(result, objval, inst);
 
 	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
 	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
@@ -53,11 +56,8 @@ int localBranching(instance* inst)
 	//first check of time
 	clock_t end = clock();
     double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
-
+	
 	do {
-
-		//set time limit
-		CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit - time);
 
 		double rhs = inst->nnodes - k; // n-k
 		// 'E' for equality constraint 
@@ -66,37 +66,36 @@ int localBranching(instance* inst)
 		int izero = 0;
 		sprintf(cname[0], "localBrancing"); 
 		int nnz = 0;
-
+		
 		// add the degree constraints
 		for ( int h = 0; h < inst->nnodes; h++ )
 		{
-			for ( int i = 0; i < inst->nnodes; i++ )
+			for ( int i = h+1; i < inst->nnodes; i++ )
 			{
 				if ( xheu[xpos(h,i,inst)] < 0.5 ) continue;
 				index[nnz] = xpos(i,h, inst);
 				value[nnz] = 1.0;
 				nnz++;
 			}
-		} 
+		}
 
-		int error = CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, &cname[0]);
+		error = CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, &cname[0]);
 		assert(error == 0); // wrong CPXaddrows [degree]
 
-		// compute CPLEX solution
-		verbose_print(inst, 60, "[Local Branching] Getting best solution\n");
-		error = CPXmipopt(env,lp);
-		assert(error == 0);
-
-		// get CPLEX solution
+		// call B&B blackbox
 		double new_objval;
-		CPXgetbestobjval(env, lp, &new_objval);
-		CPXgetx(env, lp, xstar, 0, ncols - 1);
+		error = branchBound(env, lp, inst, inst->time_limit - time, xstar, &new_objval);
+		if(error != 0) break;
 
 		if (new_objval < objval)
 		{
 			objval = new_objval;
 			for (int i = 0; i < ncols; i++)
 				xheu[i] = xstar[i];
+			
+			cpxToResult(inst, xheu, result);
+
+			bestSolution(result, objval, inst);
 		}
 
 		//check time
@@ -114,15 +113,16 @@ int localBranching(instance* inst)
 
 	} while(time < inst->time_limit);
 
+	assert(error == 0 || error == 2);
+
 	// compute connected components
 	build_sol(xstar, inst, succ, comp, dim, &ncomp);
 
-	int** result = convertSolution(succ, comp, ncomp, inst);
-	bestSolution(result[1], objval, inst);
-	show_solution_comps(inst, true, result, ncomp);
+	int** result1 = convertSolution(succ, comp, ncomp, inst);
+	show_solution_comps(inst, true, result1, ncomp);
 
-	for(int i=1; i<ncomp+1; i++) free(result[i]);
-	free(result);
+	for(int i=1; i<ncomp+1; i++) free(result1[i]);
+	free(result1);
 	
 	// free and close cplex model   
 	free(cname[0]);
@@ -131,6 +131,7 @@ int localBranching(instance* inst)
 	free(value);
 
     free(xstar);
+	free(result);
 	free(succ);
 	free(comp);
     free(dim);

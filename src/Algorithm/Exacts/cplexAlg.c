@@ -3,8 +3,9 @@
 
 #define EPS 1e-5
 
-int branchBound(CPXENVptr env, CPXLPptr lp, instance* inst, double time_limit, double* xstar, double* objval){
-	verbose_print(inst, 60, "[CPLEX] Initializing algorithm...\n");
+int branchBound(CPXENVptr env, CPXLPptr lp, instance* inst, double time_limit, double* xstar, double* objval)
+{
+	verbose_print(inst, 90, "[CPLEX] Initializing algorithm...\n");
 
 	// CPXsetintparam(env, CPXPARAM_ScreenOutput, CPX_ON);
 	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
@@ -16,25 +17,40 @@ int branchBound(CPXENVptr env, CPXLPptr lp, instance* inst, double time_limit, d
 	assert(error == 0);
 
 	// add time limit
-	clock_t end = clock();
-    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
-	CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit - time);
+	CPXsetdblparam(env, CPXPARAM_TimeLimit, time_limit);
 	
 	// compute CPLEX solution
-	verbose_print(inst, 60, "[CPLEX] Getting best solution\n");
-	error = CPXmipopt(env,lp);
+	verbose_print(inst, 90, "[CPLEX] Getting best solution\n");
+	error = CPXmipopt(env, lp);
 	assert(error == 0);
 
 	// get CPLEX solution
-	double objval = 0;
-    CPXgetbestobjval(env, lp, &objval);
+    CPXgetbestobjval(env, lp, objval);
 	CPXgetx(env, lp, xstar, 0, ncols - 1);
-	
-	// free and close cplex model
-    free(xstar);
-	CPXfreeprob(env, &lp);
-	CPXcloseCPLEX(&env); 
 
+	// check cplex status
+	int solstat = CPXgetstat(env, lp);
+
+	switch (solstat) {
+		case CPXMIP_OPTIMAL:
+			return 0;
+		case CPXMIP_OPTIMAL_TOL:
+			return 0;
+		case CPXMIP_INFEASIBLE:
+			return 1;
+		case CPXMIP_INForUNBD:
+			return 1;
+		case CPXMIP_UNBOUNDED:
+			return 1;
+		case CPXMIP_TIME_LIM_FEAS:
+			return 2;
+		case CPXMIP_TIME_LIM_INFEAS:
+			return 2;
+		
+		default:
+			return -1;
+	}
+	
 	return 0;
 }
 
@@ -52,9 +68,6 @@ int TSPopt(instance *inst)
 
 	// build TSP problem
 	build_model(inst, env, lp);
-	CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit);
-	// CPXsetintparam(env, CPXPARAM_ScreenOutput, CPX_ON);
-	CPXsetintparam(env, CPX_PARAM_THREADS, 1);
 	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
 	inst->ncols = ncols;
 	
@@ -67,6 +80,12 @@ int TSPopt(instance *inst)
 	double *xstar;
 	if(inst->mipstart)
 		xstar = addMipstart(inst, env, lp);
+
+	
+	clock_t end = clock();
+    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+	
+	CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit - time);
 	
 	// compute CPLEX solution
 	verbose_print(inst, 60, "[CPLEX] Getting best solution\n");
