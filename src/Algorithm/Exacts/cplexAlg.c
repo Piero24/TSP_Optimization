@@ -29,8 +29,9 @@ int TSPopt(instance *inst)
 	assert(error == 0);
 
 	// add mipstart
+	double *xstar;
 	if(inst->mipstart)
-		addMipstart(inst, env, lp);
+		xstar = addMipstart(inst, env, lp);
 	
 	// compute CPLEX solution
 	verbose_print(inst, 60, "[CPLEX] Getting best solution\n");
@@ -38,7 +39,6 @@ int TSPopt(instance *inst)
 	assert(error == 0);
 
 	// get CPLEX solution
-	double *xstar = (double *) calloc(ncols, sizeof(double));
 	double objval = 0;
     CPXgetbestobjval(env, lp, &objval);
 	CPXgetx(env, lp, xstar, 0, ncols - 1);
@@ -92,7 +92,7 @@ int TSPopt(instance *inst)
 	return 0;
 }
 
-int addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp)
+double* addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp)
 {
 	// heuristic mipstart
 	double objval = 0;
@@ -103,7 +103,7 @@ int addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp)
 	mipstart2Opt(inst, result, &objval);
 
 	// convert heuristic to CPLEX format
-	double *xstar = (double *) calloc(inst->ncols, sizeof(double));
+	double* xstar = (double *) calloc(inst->ncols, sizeof(double));
 	
 	for(int i=0; i<inst->ncols; i++)
 		xstar[i] = 0.0;
@@ -123,9 +123,8 @@ int addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp)
 	assert(error == 0);
 
 	free(ind);
-	free(xstar);
 	free(result);
-	return 0;
+	return xstar;
 }
 
 int bendersLoop(instance *inst, bool gluing)

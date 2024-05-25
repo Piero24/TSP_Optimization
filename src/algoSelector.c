@@ -82,6 +82,14 @@ int algorithmSelector(instance* inst)
     {
         bendersLoop(inst, true);
 
+    } else if (strcmp(inst->algorithm_name, "Diving") == 0)
+    {
+        diving(inst);
+
+    } else if (strcmp(inst->algorithm_name, "Local Branching") == 0)
+    {
+        localBranching(inst);
+
     } else 
     {
         printf("Model type not implemented\n");

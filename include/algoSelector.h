@@ -10,6 +10,8 @@
 #include "Algorithm/Optimizators/twoOpt.h"
 #include "Algorithm/Optimizators/tabuSearch.h"
 #include "Algorithm/Optimizators/vns.h"
+#include "Algorithm/Matheuristics/hardFixing.h"
+#include "Algorithm/Matheuristics/softFixing.h"
 #include "parser.h"
 #include "tsp.h"
 

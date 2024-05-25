@@ -153,9 +153,9 @@ int gluing2Opt(instance* inst, int* result, double cost);
  * @param env Pointer to the CPLEX environment.
  * @param lp Pointer to the CPLEX problem.
  * 
- * @return Returns 0 if the operation completes successfully, or an appropriate nonzero error code.
+ * @return Returns the created solution.
  */
-int addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp);
+double* addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp);
 
 /**
  * @brief Performs the 2-opt optimization on the given solution.

@@ -284,6 +284,14 @@ int intToModelName(instance* inst, int type)
 			strcpy(inst->algorithm_name, "Glued Benders' Loop");
 			break;
 
+		case 6:
+			strcpy(inst->algorithm_name, "Diving");
+			break;
+
+		case 7:
+			strcpy(inst->algorithm_name, "Local Branching");
+			break;
+
 		default:
 			strcpy(inst->algorithm_name, "Undefined");
 			break;
