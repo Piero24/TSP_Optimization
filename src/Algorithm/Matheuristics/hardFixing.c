@@ -8,7 +8,7 @@ void cpxToResult(instance* inst, double* x, int* result){
 	build_sol(x, inst, succ, comp, dim, &ncomp);
 	
 	result = (int *) calloc(inst->nnodes, sizeof(int));
-
+ 
 	int pos = 0;
 	int next = 0;
 	do{
