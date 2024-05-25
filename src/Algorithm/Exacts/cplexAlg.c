@@ -3,6 +3,41 @@
 
 #define EPS 1e-5
 
+int branchBound(CPXENVptr env, CPXLPptr lp, instance* inst, double time_limit, double* xstar, double* objval){
+	verbose_print(inst, 60, "[CPLEX] Initializing algorithm...\n");
+
+	// CPXsetintparam(env, CPXPARAM_ScreenOutput, CPX_ON);
+	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
+	inst->ncols = ncols;
+	
+	// setting callbacks
+	CPXLONG contextid = CPX_CALLBACKCONTEXT_CANDIDATE | CPX_CALLBACKCONTEXT_RELAXATION;
+	int error = CPXcallbacksetfunc(env, lp, contextid, callbackHandler, inst);
+	assert(error == 0);
+
+	// add time limit
+	clock_t end = clock();
+    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+	CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit - time);
+	
+	// compute CPLEX solution
+	verbose_print(inst, 60, "[CPLEX] Getting best solution\n");
+	error = CPXmipopt(env,lp);
+	assert(error == 0);
+
+	// get CPLEX solution
+	double objval = 0;
+    CPXgetbestobjval(env, lp, &objval);
+	CPXgetx(env, lp, xstar, 0, ncols - 1);
+	
+	// free and close cplex model
+    free(xstar);
+	CPXfreeprob(env, &lp);
+	CPXcloseCPLEX(&env); 
+
+	return 0;
+}
+
 int TSPopt(instance *inst)
 {  
 	verbose_print(inst, 60, "[CPLEX] Initializing algorithm...\n");
