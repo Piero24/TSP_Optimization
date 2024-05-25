@@ -6,8 +6,6 @@ void cpxToResult(instance* inst, double* x, int* result){
 	int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
 	int ncomp;
 	build_sol(x, inst, succ, comp, dim, &ncomp);
-	
-	result = (int *) calloc(inst->nnodes, sizeof(int));
  
 	int pos = 0;
 	int next = 0;
@@ -23,7 +21,7 @@ void cpxToResult(instance* inst, double* x, int* result){
 
 int diving(instance* inst)
 {
-    verbose_print(inst, 60, "[Local Branching] Initializing algorithm...\n");
+    verbose_print(inst, 80, "[Diving] Initializing algorithm...\n");
 
     int error;
 	CPXENVptr env = CPXopenCPLEX(&error);
@@ -34,41 +32,33 @@ int diving(instance* inst)
 
 	// build TSP problem
 	build_model(inst, env, lp);
-	CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit);
-	// CPXsetintparam(env, CPXPARAM_ScreenOutput, CPX_ON);
-	CPXsetintparam(env, CPX_PARAM_THREADS, 1);
 	int ncols = CPXgetnumcols(env, lp); //n*(n-1)/2
 	inst->ncols = ncols;
 	inst->callback_base = true;
 	inst->callback_relax = true;
 	inst->posting_base = false;
 	inst->posting_relax = false;
-	
-	// setting callbacks
-	CPXLONG contextid = CPX_CALLBACKCONTEXT_CANDIDATE | CPX_CALLBACKCONTEXT_RELAXATION;
-	error = CPXcallbacksetfunc(env, lp, contextid, callbackHandler, inst);
-	assert(error == 0);
     
 	double *xheu = addMipstart(inst, env, lp);
-	double objval;
+	double objval = 0.0;
 
 	for(int a = 0; a < inst->nnodes; a++)
 		for(int b = a+1; b<inst->nnodes; b++)
 			if(xheu[xpos(a, b, inst)] > 0.5)
 				objval += dist(inst, a, b);
 	
-	int* result;
+	int* result = (int *) calloc(inst->nnodes, sizeof(int));
 	cpxToResult(inst, xheu, result);
 	bestSolution(result, objval, inst);
 
 	double *xstar = (double *) calloc(ncols, sizeof(double));
-	double *value = (double *) calloc(inst->ncols, sizeof(double));
-	int *index = (int *) calloc(inst->ncols, sizeof(int));
+	double *value = (double *) calloc(ncols, sizeof(double));
+	int *index = (int *) calloc(ncols, sizeof(int));
 	char **cname = (char **) malloc(sizeof(char *));
 	cname[0] = (char *) malloc(100 * sizeof(char));
 	double cpx_objval = 0;
 	double rhs = 1.0;
-	char sense = 'G';
+	char sense = 'E';
 	int izero = 0;
 	for(int i=0;i<inst->ncols;i++) value[i] = 1.0;
 	
@@ -76,37 +66,41 @@ int diving(instance* inst)
 	clock_t end = clock();
     double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 	
+	verbose_print(inst, 80, "[Diving] Initializing done\n");
+
 	do {
-		//set time limit
-		CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit - time);
 		double freeEdgesProb = 0.1;
 
 		// fix edges
-		int nnz = 0;
 		for(int a = 0; a < inst->nnodes; a++)
 		{
 			for(int b = a+1; b<inst->nnodes; b++)
 			{
 				if(xheu[xpos(a, b, inst)] < 0.5) continue;
-			
-				if(randomDouble(0, 1) < freeEdgesProb){
-					sprintf(cname[0], "diving(%d, %d)", a, b); 
-					index[nnz] = xpos(a, b, inst);
-					nnz++;
 
-					int error = CPXaddrows(env, lp, 0, 1, nnz, &rhs, &sense, &izero, index, value, NULL, &cname[0]);
+				double rand = randomDouble(0, 1);
+			
+				if(rand < freeEdgesProb){
+					sprintf(cname[0], "diving(%d, %d)", a, b); 
+					index[0] = xpos(a, b, inst);
+
+					int error = CPXaddrows(env, lp, 0, 1, 1, &rhs, &sense, &izero, index, value, NULL, &cname[0]);
 					assert(error == 0); // wrong CPXaddrows
 				}
 			}
-		} 
+		}
 
-		// compute CPLEX solution
-		error = CPXmipopt(env,lp);
-		assert(error == 0);
+		verbose_print(inst, 95, "[Diving] Constraints added\n");
 
-		// get CPLEX solution
-		CPXgetbestobjval(env, lp, &cpx_objval);
-		CPXgetx(env, lp, xstar, 0, ncols - 1);
+		// check time
+		end = clock();
+        time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+
+		// call branch and bound blackbox 
+		error = branchBound(env, lp, inst, inst->time_limit - time, xstar, &cpx_objval);
+		if(error != 0) break;
+
+		verbose_print(inst, 95, "[Diving] branchBound called\n");
 
 		// update free edges probability
 		double eps = 0.1 * objval;
@@ -118,11 +112,12 @@ int diving(instance* inst)
 		if(cpx_objval < objval){
 			objval = cpx_objval;
 
-			free(result);
 			cpxToResult(inst, xheu, result);
 
 			bestSolution(result, objval, inst);
 		}
+
+		verbose_print(inst, 95, "[Diving] data updated\n");
 
 		// remove fixed edges
 		for(int a = 0; a < inst->ncols; a++)
@@ -140,11 +135,33 @@ int diving(instance* inst)
 			}
 		} 
 
+		verbose_print(inst, 95, "[Diving] constrains removed\n");
+
 		//check time
 		end = clock();
         time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
 	} while(time < inst->time_limit);
+	
+	assert(error == 0 || error == 2);
+
+	verbose_print(inst, 80, "[Diving] time ended\n");
+
+	// plot
+	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
+	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
+	int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
+	int ncomp;
+	build_sol(xstar, inst, succ, comp, dim, &ncomp);
+
+	int** result1 = convertSolution(succ, comp, ncomp, inst);
+	show_solution_comps(inst, true, result1, ncomp);
+
+	for(int i=1; i<ncomp+1; i++) free(result1[i]);
+	free(result1);
+	free(succ);
+	free(comp);
+	free(dim);
 
 	free(result);
     free(cname[0]);
