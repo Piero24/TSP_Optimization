@@ -84,11 +84,11 @@ int algorithmSelector(instance* inst)
 
     } else if (strcmp(inst->algorithm_name, "Diving") == 0)
     {
-        diving(inst);
+        //diving(inst);
 
     } else if (strcmp(inst->algorithm_name, "Local Branching") == 0)
     {
-        localBranching(inst);
+        //localBranching(inst);
 
     } else 
     {

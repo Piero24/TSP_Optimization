@@ -16,4 +16,7 @@
 int diving(instance* inst);
 void cpxToResult(instance* inst, double* x, int* result);
 
+extern int CPXPUBLIC callbackHandler(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle);
+
+
 #endif /* HARDFIXING_H */
