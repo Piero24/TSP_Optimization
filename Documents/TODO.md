@@ -1,5 +1,6 @@
 ## Algorithms
-
+- hard and soft fixing should take cplex partial solution if it ends by time limit
+- addMipstart solution (made with NN + 2opt) is 10 times better than solution of NN + 2opt for 300 nodes, there must be an error somewhere
 
 ## Features
 - add checks

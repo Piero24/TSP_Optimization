@@ -66,7 +66,7 @@ int diving(instance* inst)
 	clock_t end = clock();
     double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 	
-	verbose_print(inst, 80, "[Diving] Initializing done\n");
+	verbose_print(inst, 80, "[Diving] Initializing done, mipstart cost: %f\n", objval);
 
 	do {
 		double freeEdgesProb = 0.1;

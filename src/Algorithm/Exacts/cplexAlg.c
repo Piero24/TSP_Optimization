@@ -166,6 +166,14 @@ double* addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp)
 		xstar[xpos(result[i], result[i+1], inst)] = 1.0;
 	xstar[xpos(result[inst->nnodes-1], result[0], inst)] = 1.0;
 
+	int error = addCPLEXMipStart(inst, env, lp, xstar);
+	assert(error == 0);
+	
+	free(result);
+	return xstar;
+}
+
+int addCPLEXMipStart(instance* inst, CPXENVptr env, CPXLPptr lp, double* x){
 	int *ind = (int *) malloc(inst->ncols * sizeof(int));
 	for ( int j = 0; j < inst->ncols; j++ ) ind[j] = j;
 	
@@ -173,12 +181,11 @@ double* addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp)
 	int beg = 0;
 
 	// add solution to cplex as mipstart
-	int error = CPXaddmipstarts(env, lp, 1, inst->ncols, &beg, ind, xstar, &effortlevel, NULL);
-	assert(error == 0);
+	int error = CPXaddmipstarts(env, lp, 1, inst->ncols, &beg, ind, x, &effortlevel, NULL);
 
 	free(ind);
-	free(result);
-	return xstar;
+
+	return error;
 }
 
 int bendersLoop(instance *inst, bool gluing)
