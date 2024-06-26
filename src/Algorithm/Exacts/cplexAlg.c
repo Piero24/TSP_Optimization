@@ -1,8 +1,6 @@
 #include "Algorithm/Exacts/cplexAlg.h"
 #include "mincut.h"
 
-#define EPS 1e-5
-
 int branchBound(CPXENVptr env, CPXLPptr lp, instance* inst, double time_limit, double* xstar, double* objval)
 {
 	verbose_print(inst, 90, "[CPLEX] Initializing algorithm...\n");
@@ -155,6 +153,18 @@ double* addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp)
 	int* result = (int*) calloc(inst->nnodes, sizeof(int));
 	nearestNeighbor(inst, firstNode, result, &objval);
 	mipstart2Opt(inst, result, &objval);
+
+	if(inst->debug){	
+		// check value
+		double costTester = 0.0;
+		for(int i=0; i<inst->nnodes-1; i++)
+			costTester += dist(inst, result[i], result[i+1]);
+		costTester += dist(inst, result[0], result[inst->nnodes-1]);
+
+		if(fabs(objval - costTester) > EPS)
+			printf("objval: %f\ncostTester: %f\n", objval, costTester);
+		assert(fabs(objval - costTester) < EPS);
+	}
 
 	// convert heuristic to CPLEX format
 	double* xstar = (double *) calloc(inst->ncols, sizeof(double));

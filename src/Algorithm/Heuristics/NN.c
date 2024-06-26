@@ -1,5 +1,10 @@
 #include "Algorithm/Heuristics/NN.h"
 
+double wDist(instance* inst, double* weights, int a, int b){
+    assert(weights[xpos(a, b, inst)] == 1);
+    return dist(inst, a, b) * weights[xpos(a, b, inst)];
+}
+
 int NNFromEachNode(instance* inst){
     int ncols = inst->nnodes * (inst->nnodes) / 2; //n*(n-1)/2
     double* weights = (double*) malloc(ncols*sizeof(double));
@@ -29,7 +34,7 @@ int WeightedNNFromEachNode(instance* inst, double* weights, int* result, double*
         weightedNearestNeighbor(inst, firstNode, result, cost, weights);
 
         if(bestCost == -1 || bestCost > *cost){
-            verbose_print(inst, 80, "[NNFromEachNode] New best solution founded starting from %d with cost %f\n", firstNode, cost);
+            verbose_print(inst, 80, "[NNFromEachNode] New best solution founded starting from %d with cost %f\n", firstNode, *cost);
 
             bestCost = *cost;
             bestFirst = firstNode;
@@ -60,6 +65,11 @@ int WeightedNNFromEachNode(instance* inst, double* weights, int* result, double*
             free(costs);
             costs = tmp;
         }
+
+        // time check
+        double time = ((double) (clock() - inst->tstart)) / CLOCKS_PER_SEC;
+        if(time >= inst->time_limit)
+            break;
     }
 
     verbose_print(inst, 70, "[NNFromEachNode] Best solution founded starting from %d with cost %f\n\n", bestFirst, bestCost);
@@ -90,7 +100,7 @@ int weightedNearestNeighbor(instance* inst, int firstNode, int* result, double* 
         return 1;
     }
 
-    verbose_print(inst, 80, "[Nearest Neighbor] Starting initialization\n");
+    verbose_print(inst, 85, "[Nearest Neighbor] Starting initialization\n");
 
     *cost = 0;
     for(int i=0; i<inst->nnodes; i++)
@@ -101,20 +111,20 @@ int weightedNearestNeighbor(instance* inst, int firstNode, int* result, double* 
     result[0] = firstNode;
     result[firstNode] = 0;
 
-    verbose_print(inst, 80, "[Nearest Neighbor] Initialization completed, starting the algorithm\n");
+    verbose_print(inst, 85, "[Nearest Neighbor] Initialization completed, starting the algorithm\n");
 
     for(int current=0; current<inst->nnodes-1; current++)
     {
         verbose_print(inst, 95, "[Nearest Neighbor] Current node: %d\n", result[current]);
 
-        double minDist = dist(inst, result[current], result[current+1]) * weights[xpos(result[current], result[current+1], inst)];
+        double minDist = wDist(inst, weights, result[current], result[current+1]);
         int nearest = current+1;
 
         for(int next=current+2; next<inst->nnodes; next++)
         {
-            if(dist(inst, result[current], result[next]) * weights[xpos(result[current], result[next], inst)] < minDist)
+            if(wDist(inst, weights, result[current], result[next]) < minDist)
             {
-                minDist = dist(inst, result[current], result[next]) * weights[xpos(result[current], result[next], inst)];
+                minDist = wDist(inst, weights, result[current], result[next]);
                 nearest = next;
             }
         }
@@ -123,14 +133,38 @@ int weightedNearestNeighbor(instance* inst, int firstNode, int* result, double* 
         result[current+1] = result[nearest];
         result[nearest] = tmp;
 
-        *cost += dist(inst, result[current], result[nearest]);
+        *cost += minDist;
+
+        if(inst->debug){
+            double costChecker = 0.0;
+            for(int i=0;i<current+1; i++){
+                costChecker += wDist(inst, weights, result[i], result[i+1]);
+            }
+
+            assert(*cost == costChecker);
+        }
+
         verbose_print(inst, 95, "[Nearest Neighbor] Current cost: %f\n", *cost);
     }
 
     *cost += dist(inst, result[0], result[inst->nnodes-1]);
     verbose_print(inst, 95, "[Nearest Neighbor] Current cost: %f\n", *cost);
 
-    verbose_print(inst, 80, "[Nearest Neighbor] Algorithm finished\n\n");
+    if(inst->debug){
+        double costChecker = 0.0;
+        for(int i=0;i<inst->nnodes-1; i++){
+            costChecker += wDist(inst, weights, result[i], result[i+1]);
+        }
+        costChecker += wDist(inst, weights, result[0], result[inst->nnodes-1]);
+
+        assert(*cost == costChecker);
+
+        if(fabs(*cost - costChecker) > EPS)
+			printf("cost: %f\ncostChecker: %f\n", *cost, costChecker);
+		assert(fabs(*cost - costChecker) < EPS);
+    }
+
+    verbose_print(inst, 85, "[Nearest Neighbor] Algorithm finished\n\n");
     
     return 0;
 }

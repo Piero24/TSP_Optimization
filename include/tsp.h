@@ -13,6 +13,8 @@
     #include <Windows.h>
 #endif
 
+#define EPS 1e-5
+
 typedef struct {
 	double x, y;
 } point;
@@ -40,6 +42,7 @@ typedef struct {
 	double cutoff; 							// cutoff (upper bound) for master
 	int integer_costs;
 	int verbose;							// range 0-100
+	bool debug;
 	int ncols;								// cplex number of columns
 
 	//global data

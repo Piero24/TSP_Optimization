@@ -40,7 +40,7 @@ int localBranching(instance* inst)
 
 	inst->callback_base = true;
 	inst->callback_relax = true;
-	inst->posting_base = false;
+	inst->posting_base = true;
 	inst->posting_relax = false;
 
 	char **cname = (char **) calloc(1, sizeof(char *));
@@ -82,7 +82,6 @@ int localBranching(instance* inst)
 		// call B&B blackbox
 		double new_objval;
 		error = branchBound(env, lp, inst, inst->time_limit - time, xstar, &new_objval);
-		if(error != 0) break;
 
 		if (new_objval < objval)
 		{
@@ -95,9 +94,12 @@ int localBranching(instance* inst)
 			bestSolution(result, objval, inst);
 
 			// add new best solution to cplex as mipstart
-			int error = addCPLEXMipStart(inst, env, lp, xheu);
-			assert(error == 0);
+			int error2 = addCPLEXMipStart(inst, env, lp, xheu);
+			assert(error2 == 0);
 		}
+
+		// if cplex exited with an error or by time limit, end the algorithm
+		if(error != 0) break;
 
 		// increase number of free edges
 		k = k + 10;

@@ -32,7 +32,8 @@ int apply_algorithm(instance* inst)
 
     if(inst->verbose > 0)
     {
-        double time =((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC;
+        double solutionTime = ((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC;
+        double totalTime = ((double) (clock() - inst->tstart)) / CLOCKS_PER_SEC;
         printf("\n\n");
 
         char info[] = " BEST SOLUTION ";
@@ -44,7 +45,8 @@ int apply_algorithm(instance* inst)
         if (strcmp(inst->algorithm_name, "Nearest Neighbor") == 0)
             printf("Starting Node: %d\t\t\t", inst->start);
         
-        printf("Time: %f sec.\t\t\t", time);
+        printf("Solution found after: %f sec.\t\t\t", solutionTime);
+        printf("Program ended after: %f sec.\t\t\t", totalTime);
         
         if (strcmp(inst->algorithm_name, "CPLEX") != 0 || inst->callback_base || inst->callback_relax)
             printf("Cost: %f\t\t", inst->zbest);

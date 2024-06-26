@@ -27,12 +27,12 @@ int tabuSearch(instance* inst)
     bool plotFlag = false;
 
     // time checkers
-    clock_t end;
-    double time;
+    clock_t end = clock();
+    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
     
     verbose_print(inst, 80, "[Tabu' Search] Initialization completed, starting optimization.\n");
 
-    do
+    while(time < inst->time_limit)
     {
         // INITIALIZATION:
         /*
@@ -158,7 +158,7 @@ int tabuSearch(instance* inst)
 
         //system("pause");
 
-    }while(time < inst->time_limit);
+    }
 
     verbose_print(inst, 80, "[Tabu' Search] Optimization completed.\n\n");
 

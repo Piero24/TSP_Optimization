@@ -3,7 +3,9 @@
 - addMipstart solution (made with NN + 2opt) is 10 times better than solution of NN + 2opt for 300 nodes, there must be an error somewhere
 
 ## Features
-- add checks
+- add checks (only if inst->debug == true)
+    - done on NN
+    - done on addMipstart
 - add input flag for cost-itaration function plot + add cplex plot
 - Add the fact that if the code use an opt method it must save the image and print the solution with and without the optimization method so it's possible to check both the results || Add multiple solutions on the instance for the final print and images.
 - clean code
@@ -30,3 +32,5 @@
 - izero in cplex functions tells where the sections of the index and value arrays start for each constraint/cut
 - CCcut_violated_cuts(inst->nnodes, ncols, elist, xstar, 1.9, add_cut, (void*) &user_handle);
     - 1.9 means that the cut added was violated by 0.1 (2 would means not violated)
+- Orario tipico esame: 16-16.30
+- ricordare di mettere foto nella tesina

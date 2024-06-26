@@ -36,16 +36,19 @@ int diving(instance* inst)
 	inst->ncols = ncols;
 	inst->callback_base = true;
 	inst->callback_relax = true;
-	inst->posting_base = false;
+	inst->posting_base = true;
 	inst->posting_relax = false;
     
 	double *xheu = addMipstart(inst, env, lp);
 	double objval = 0.0;
 
+	int counter = 0;
 	for(int a = 0; a < inst->nnodes; a++)
 		for(int b = a+1; b<inst->nnodes; b++)
-			if(xheu[xpos(a, b, inst)] > 0.5)
+			if(xheu[xpos(a, b, inst)] > 0.5){
 				objval += dist(inst, a, b);
+				counter ++;
+			}
 	
 	int* result = (int *) calloc(inst->nnodes, sizeof(int));
 	cpxToResult(inst, xheu, result);
@@ -66,7 +69,7 @@ int diving(instance* inst)
 	clock_t end = clock();
     double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 	
-	verbose_print(inst, 80, "[Diving] Initializing done, mipstart cost: %f\n", objval);
+	verbose_print(inst, 80, "[Diving] Initializing done, mipstart cost: %f, counter: %d\n", objval, counter);
 
 	do {
 		double freeEdgesProb = 0.1;
@@ -98,8 +101,7 @@ int diving(instance* inst)
 
 		// call branch and bound blackbox 
 		error = branchBound(env, lp, inst, inst->time_limit - time, xstar, &cpx_objval);
-		if(error != 0) break;
-
+		
 		verbose_print(inst, 95, "[Diving] branchBound called\n");
 
 		// update free edges probability
@@ -115,9 +117,16 @@ int diving(instance* inst)
 			cpxToResult(inst, xheu, result);
 
 			bestSolution(result, objval, inst);
+
+			// add new best solution to cplex as mipstart
+			int error2 = addCPLEXMipStart(inst, env, lp, xheu);
+			assert(error2 == 0);
 		}
 
 		verbose_print(inst, 95, "[Diving] data updated\n");
+
+		// if cplex exited with an error or by time limit, end the algorithm
+		if(error != 0) break;
 
 		// remove fixed edges
 		for(int a = 0; a < inst->ncols; a++)
