@@ -57,6 +57,7 @@ dkms.conf
 build/
 TSP_Optimization
 /Archive/
+Archive/
 creationdate.lua
 main.log
 pdfa.xmpi
