@@ -23,8 +23,8 @@ int branchBound(CPXENVptr env, CPXLPptr lp, instance* inst, double time_limit, d
 	assert(error == 0);
 
 	// get CPLEX solution
-    CPXgetbestobjval(env, lp, objval);
 	CPXgetx(env, lp, xstar, 0, ncols - 1);
+    CPXgetobjval(env, lp, objval);
 
 	// check cplex status
 	int solstat = CPXgetstat(env, lp);
@@ -92,7 +92,7 @@ int TSPopt(instance *inst)
 
 	// get CPLEX solution
 	double objval = 0;
-    CPXgetbestobjval(env, lp, &objval);
+    CPXgetobjval(env, lp, &objval);
 	CPXgetx(env, lp, xstar, 0, ncols - 1);
     
     // print solution
@@ -149,6 +149,8 @@ double* addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp)
 	// heuristic mipstart
 	double objval = 0;
 	int firstNode = randomInt(0, inst->nnodes-1);
+
+	printf("First node: %d\n", firstNode);
 
 	int* result = (int*) calloc(inst->nnodes, sizeof(int));
 	nearestNeighbor(inst, firstNode, result, &objval);
@@ -234,7 +236,7 @@ int bendersLoop(instance *inst, bool gluing)
 		assert(error == 0);
 
 		//get solution
-		CPXgetbestobjval(env, lp, &objval);
+		CPXgetobjval(env, lp, &objval);
 		CPXgetx(env, lp, xstar, 0, ncols - 1);
 
 		//save lower bound
@@ -408,7 +410,7 @@ int** convertSolution(int *succ, int *comp, int ncomp, instance* inst)
 
 void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *cost)
 {
-	verbose_print(inst, 90, "[mergeComponents] Starting the merge of %d components\n", *ncomp);
+	verbose_print(inst, 91, "[mergeComponents] Starting the merge of %d components\n", *ncomp);
 	int count = 0;
 	while(*ncomp > 1){
 		verbose_print(inst, 95, "[mergeComponents] Current #components: %d\n", *ncomp);

@@ -145,6 +145,14 @@ int weightedNearestNeighbor(instance* inst, int firstNode, int* result, double* 
         }
 
         verbose_print(inst, 95, "[Nearest Neighbor] Current cost: %f\n", *cost);
+
+        // check time limit
+        clock_t end = clock();
+        double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+        if (time >= inst->time_limit) {
+            verbose_print(inst, 90, "[Nearest Neighbor] Exiting by time limit\n");
+            break;
+        }
     }
 
     *cost += dist(inst, result[0], result[inst->nnodes-1]);

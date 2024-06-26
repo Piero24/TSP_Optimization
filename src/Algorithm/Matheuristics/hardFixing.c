@@ -39,22 +39,21 @@ int diving(instance* inst)
 	inst->posting_base = true;
 	inst->posting_relax = false;
     
-	double *xheu = addMipstart(inst, env, lp);
+	double *xstar = addMipstart(inst, env, lp);
 	double objval = 0.0;
 
 	int counter = 0;
 	for(int a = 0; a < inst->nnodes; a++)
 		for(int b = a+1; b<inst->nnodes; b++)
-			if(xheu[xpos(a, b, inst)] > 0.5){
+			if(xstar[xpos(a, b, inst)] > 0.5){
 				objval += dist(inst, a, b);
 				counter ++;
 			}
 	
 	int* result = (int *) calloc(inst->nnodes, sizeof(int));
-	cpxToResult(inst, xheu, result);
+	cpxToResult(inst, xstar, result);
 	bestSolution(result, objval, inst);
 
-	double *xstar = (double *) calloc(ncols, sizeof(double));
 	double *value = (double *) calloc(ncols, sizeof(double));
 	int *index = (int *) calloc(ncols, sizeof(int));
 	char **cname = (char **) malloc(sizeof(char *));
@@ -65,13 +64,13 @@ int diving(instance* inst)
 	int izero = 0;
 	for(int i=0;i<inst->ncols;i++) value[i] = 1.0;
 	
+	verbose_print(inst, 80, "[Diving] Initializing done, mipstart cost: %f, counter: %d\n", objval, counter);
+
 	//first check of time
 	clock_t end = clock();
     double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 	
-	verbose_print(inst, 80, "[Diving] Initializing done, mipstart cost: %f, counter: %d\n", objval, counter);
-
-	do {
+	while(time < inst->time_limit) {
 		double freeEdgesProb = 0.1;
 
 		// fix edges
@@ -79,7 +78,7 @@ int diving(instance* inst)
 		{
 			for(int b = a+1; b<inst->nnodes; b++)
 			{
-				if(xheu[xpos(a, b, inst)] < 0.5) continue;
+				if(xstar[xpos(a, b, inst)] < 0.5) continue;
 
 				double rand = randomDouble(0, 1);
 			
@@ -93,16 +92,21 @@ int diving(instance* inst)
 			}
 		}
 
-		verbose_print(inst, 95, "[Diving] Constraints added\n");
+		verbose_print(inst, 90, "[Diving] Constraints added\n");
 
 		// check time
 		end = clock();
         time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
 		// call branch and bound blackbox 
-		error = branchBound(env, lp, inst, inst->time_limit - time, xstar, &cpx_objval);
+		if(time < inst->time_limit)
+			error = branchBound(env, lp, inst, inst->time_limit - time, xstar, &cpx_objval);
+		else {
+			error = 2;
+			break;
+		}
 		
-		verbose_print(inst, 95, "[Diving] branchBound called\n");
+		verbose_print(inst, 90, "[Diving] branchBound called\n");
 
 		// update free edges probability
 		double eps = 0.1 * objval;
@@ -114,16 +118,15 @@ int diving(instance* inst)
 		if(cpx_objval < objval){
 			objval = cpx_objval;
 
-			cpxToResult(inst, xheu, result);
-
+			cpxToResult(inst, xstar, result);
 			bestSolution(result, objval, inst);
 
 			// add new best solution to cplex as mipstart
-			int error2 = addCPLEXMipStart(inst, env, lp, xheu);
+			int error2 = addCPLEXMipStart(inst, env, lp, xstar);
 			assert(error2 == 0);
 		}
 
-		verbose_print(inst, 95, "[Diving] data updated\n");
+		verbose_print(inst, 90, "[Diving] data updated\n");
 
 		// if cplex exited with an error or by time limit, end the algorithm
 		if(error != 0) break;
@@ -144,13 +147,13 @@ int diving(instance* inst)
 			}
 		} 
 
-		verbose_print(inst, 95, "[Diving] constrains removed\n");
+		verbose_print(inst, 90, "[Diving] constrains removed\n");
 
 		//check time
 		end = clock();
         time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
-	} while(time < inst->time_limit);
+	}
 	
 	assert(error == 0 || error == 2);
 

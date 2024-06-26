@@ -20,24 +20,23 @@ int localBranching(instance* inst)
 	inst->ncols = ncols;
 
 	// add mipstart
-	double *xheu = addMipstart(inst, env, lp);
+	double *xstar = addMipstart(inst, env, lp);
 	double objval = 0;
 
 	for(int a = 0; a < inst->nnodes; a++)
 		for(int b = a+1; b<inst->nnodes; b++)
-			if(xheu[xpos(a, b, inst)] > 0.5)
+			if(xstar[xpos(a, b, inst)] > 0.5)
 				objval += dist(inst, a, b);
 	
 	int* result = (int*)calloc(inst->nnodes, sizeof(int));
-	cpxToResult(inst, xheu, result);
+	cpxToResult(inst, xstar, result);
 
 	bestSolution(result, objval, inst);
 
 	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
 	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
 	int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
-	double *xstar = (double *) calloc(ncols, sizeof(double));
-
+	
 	inst->callback_base = true;
 	inst->callback_relax = true;
 	inst->posting_base = true;
@@ -60,7 +59,7 @@ int localBranching(instance* inst)
 	clock_t end = clock();
     double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 	
-	do {
+	while(time < inst->time_limit) {
 		// add contraint: fix n-k edges
 		int nnz = 0;
 		
@@ -68,7 +67,7 @@ int localBranching(instance* inst)
 		{
 			for ( int i = h+1; i < inst->nnodes; i++ )
 			{
-				if ( xheu[xpos(h,i,inst)] < 0.5 ) continue;
+				if ( xstar[xpos(h,i,inst)] < 0.5 ) continue;
 
 				index[nnz] = xpos(i,h, inst);
 				value[nnz] = 1.0;
@@ -81,20 +80,25 @@ int localBranching(instance* inst)
 
 		// call B&B blackbox
 		double new_objval;
-		error = branchBound(env, lp, inst, inst->time_limit - time, xstar, &new_objval);
+		if(time < inst->time_limit) {
+			error = branchBound(env, lp, inst, inst->time_limit - time, xstar, &new_objval);
+		}else {
+			error = 2;
+			break;
+		}
 
 		if (new_objval < objval)
 		{
 			objval = new_objval;
 			for (int i = 0; i < ncols; i++)
-				xheu[i] = xstar[i];
+				xstar[i] = xstar[i];
 			
-			cpxToResult(inst, xheu, result);
+			cpxToResult(inst, xstar, result);
 
 			bestSolution(result, objval, inst);
 
 			// add new best solution to cplex as mipstart
-			int error2 = addCPLEXMipStart(inst, env, lp, xheu);
+			int error2 = addCPLEXMipStart(inst, env, lp, xstar);
 			assert(error2 == 0);
 		}
 
@@ -116,7 +120,9 @@ int localBranching(instance* inst)
 		end = clock();
         time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
-	} while(time < inst->time_limit);
+	}
+
+	printf("[localBranching] CPLEX status: %d\n", error);
 
 	assert(error == 0 || error == 2);
 
