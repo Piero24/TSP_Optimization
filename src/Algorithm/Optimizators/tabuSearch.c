@@ -51,7 +51,8 @@ int tabuSearch(instance* inst)
         /*
         * The neighborhood of the current solution consists of all the solutions that have 2 
         * swapped nodes wrt the current solution.
-        * We try to swap each couple of nodes and we 
+        * We try to swap each couple of nodes and we check if the cost improves. If so we keep
+        * the new solution with the swapped nodes.
         */
 
         // swap two nodes A and B
@@ -75,7 +76,7 @@ int tabuSearch(instance* inst)
                 double new = dist(inst, result[prevA], result[B]) + dist(inst, result[succB], result[A]);
                 
                 // if is the first non-tabù solution, save it as current candidate
-                if(bestCost == -1 || new < old)
+                if(bestCost == -1 || cost - old + new < bestCost)
                 {
                     if (bestCost == -1)
                         verbose_print(inst, 80, "[Tabu' Search] First feasible solution found, saving it\n");

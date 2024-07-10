@@ -165,8 +165,6 @@ int weightedNearestNeighbor(instance* inst, int firstNode, int* result, double* 
         }
         costChecker += wDist(inst, weights, result[0], result[inst->nnodes-1]);
 
-        assert(*cost == costChecker);
-
         if(fabs(*cost - costChecker) > EPS)
 			printf("cost: %f\ncostChecker: %f\n", *cost, costChecker);
 		assert(fabs(*cost - costChecker) < EPS);

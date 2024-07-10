@@ -78,8 +78,8 @@ int TSPopt(instance *inst)
 	double *xstar;
 	if(inst->mipstart)
 		xstar = addMipstart(inst, env, lp);
-
 	
+	// set CPLEX time limit
 	clock_t end = clock();
     double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 	
@@ -1014,21 +1014,3 @@ static int CPXPUBLIC relaxationCallback(CPXCALLBACKCONTEXTptr context, instance*
 	free(xstar);
 	return 0; 
 }
-
-/*
-*** SOME CPLEX'S PARAMETERS ***
-
-	// increased precision for big-M models
-	CPXsetdblparam(env, CPX_PARAM_EPINT, 0.0);		// very important if big-M is present
-	CPXsetdblparam(env, CPX_PARAM_EPRHS, 1e-9);   						
-
-	CPXsetintparam(env, CPX_PARAM_MIPDISPLAY, 4);
-	if ( VERBOSE >= 60 ) CPXsetintparam(env, CPX_PARAM_SCRIND, CPX_ON); // Cplex output on screen
-	CPXsetintparam(env, CPX_PARAM_RANDOMSEED, 123456);
-	
-	CPXsetdblparam(env, CPX_PARAM_TILIM, CPX_INFBOUND+0.0); 
-	
-	CPXsetintparam(env, CPX_PARAM_NODELIM, 0); 		// abort Cplex after the root node
-	CPXsetintparam(env, CPX_PARAM_INTSOLLIM, 1);	// abort Cplex after the first incumbent update
-	CPXsetdblparam(env, CPX_PARAM_EPGAP, 1e-4);  	// abort Cplex when gap below 10%	 
-*/
