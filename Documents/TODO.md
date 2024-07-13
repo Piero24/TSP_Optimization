@@ -5,7 +5,8 @@
     - done on NN
     - done on addMipstart
     - done in twoOptLoop
-    - TODO: tabu?, vns?, cplex, matheu
+    - done in benders
+    - TODO: tabu?, vns?, matheu
 - add input flag for cost-itaration function plot + add cplex plot
 - Add the fact that if the code use an opt method it must save the image and print the solution with and without the optimization method so it's possible to check both the results || Add multiple solutions on the instance for the final print and images.
 - clean code (smaller functions)

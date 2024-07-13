@@ -251,7 +251,7 @@ int bendersLoop(instance *inst, bool gluing)
 		// if there is only 1 connected compotent the solution is found
 		if(ncomp == 1) break;
 
-		// otherwise add sub-tour elimination contraint
+		// otherwise add sub-tour elimination contraints
 		add_SEC(inst, env, lp, ncomp, comp);
 
 		// merge components
@@ -294,6 +294,13 @@ int bendersLoop(instance *inst, bool gluing)
 			
 			for(int i=1; i<ncomp+1; i++) free(result[i]);
 			free(result);
+
+			if(inst->debug){
+				// compute connected components
+				build_sol(xstar, inst, succ, comp, dim, &ncomp);
+
+				assert(ncomp == 1);
+			}
 
 		} else if(inst->show_gnuplot > -1)
 		{
@@ -437,7 +444,6 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
 			}
 		}
 
-
 		// do best swap
 		int A1 = succ[bestA], B1 = succ[bestB];
 		
@@ -465,8 +471,6 @@ void mergeComponents(instance* inst, int* ncomp, int* comp, int *succ, double *c
 				comp[i]--;
 		}
 		
-		//if(bestDiffC < 0 && count == 0) {printf("[mergeComponents] Error: diffC < 0 diffC: %f\n", bestDiffC);exit(0);}
-
 		*cost += bestDiffC;
 		
 		*ncomp = *ncomp - 1;
@@ -851,7 +855,6 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 
 			for(int i=1; i<ncomp+1; i++) free(result[i]);
 			free(result);
-			//getchar();
 		}
 	}	
 
