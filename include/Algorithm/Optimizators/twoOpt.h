@@ -1,9 +1,28 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <float.h>
+#ifndef TWOOPT_H
+#define TWOOPT_H
 
-#include "../include/Algorithm/NN.h"
+#include "optUtils.h"
+#include "../../tsp.h"
+
+/**
+ * @brief The actual loop of a twoOpt optimization.
+ * 
+ * @param inst Pointer to the instance structure.
+ * @param result Pointer to the array with the inizial solution that will be optimized. 
+ *  Will contain the optimized solution after the function ends.
+ * @param cost Pointer to the variable to store the cost of the solution.
+ * 
+ * @param costs Pointer to array of costs function (needed for plotting).
+ * @param nCosts Number of elements of costs.
+ * @param xIndex Iterations counter (needed for plotting).
+ * 
+ * @param VNS True if the caller function is VNS, false otherwise.
+ * @param plotFlag True if the costs function should be plotted, false otherwise.
+ * @param mipstart True if the caller function is mipstart, false otherwise.
+ * 
+ * @return 0 if the algorithm runs successfully, 1 if an error occurs.
+ */
+int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCosts, int* xIndex, bool VNS, bool plotFlag, bool mipstart);
 
 /**
  * @brief Optimizes a solution by removing intersections
@@ -29,18 +48,9 @@
  *  Will contain the optimized solution after the function ends.
  * @param cost Pointer to the variable to store the cost of the solution.
  * @param inst Pointer to the instance structure.
- * @return 0 if the algorithm runs successfully, 1 if an error occurs.
- */
-int optimization(int* result, double* cost, instance* inst);
-
-/**
- * @brief Optimizes a solution by searching in the neighborhood of solutions (in terms of
- *  different edges). Uses tabu search to overcome local minimums
  * 
- * @param result Pointer to the array with the inizial solution that will be optimized. 
- *  Will contain the optimized solution after the function ends.
- * @param cost Pointer to the variable to store the cost of the solution.
- * @param inst Pointer to the instance structure.
  * @return 0 if the algorithm runs successfully, 1 if an error occurs.
  */
-int tabuSearch(int* result, double* cost, instance* inst);
+int twoOpt(instance* inst);
+
+#endif /* TWOOPT_H */

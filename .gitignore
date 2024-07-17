@@ -56,4 +56,13 @@ dkms.conf
 .vscode/
 build/
 TSP_Optimization
-
+/Archive/
+Archive/
+creationdate.lua
+main.log
+pdfa.xmpi
+Debug/
+Csv/
+tmp/
+env/
+pr*

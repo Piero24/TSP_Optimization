@@ -1,115 +1,160 @@
-#include <stdio.h>
-#include <time.h>
+#include "algoSelector.h"
 
-#include "../include/tsp.h"
-#include "../include/Algorithm/NN.h"
-#include "../include/parser.h"
-#include "../include/algoSelector.h"
-
-int apply_algorithm(instance* inst, bool onlyBestSolution, char *AlgorithmName)
+void Random(instance* inst)
 {
-    int bestFirst = 0;
-    double bestCost = -1;
-
-    for(int firstNode=0; firstNode<inst->nnodes; firstNode++)
+    for (int i = 0; i < inst->nnodes; i++)
     {
-        int* result;
-        double cost;
-        result = (int *) calloc(inst->nnodes, sizeof(int));
-
-        clock_t start, end;
-        double time;
-        start = clock();
-        
-        algorithmSelector(result, &cost, inst, firstNode, AlgorithmName);
-
-        end = clock();
-        time = ((double) (end - start)) / CLOCKS_PER_SEC;
-
-        if (!onlyBestSolution)
-        {
-            printf("\nSelected Algorithm: %s\tStarting Node: %d\tTime: %f sec.\tCost: %f\n", AlgorithmName, firstNode, time, cost);
-            printf("Output Path -> [");
-            for(int i=0; i<inst->nnodes; i++)
-            {
-                if (i<inst->nnodes-1) 
-                {
-                    printf("%d, ", result[i]);
-                } else
-                {
-                    printf("%d", result[i]);
-                }
-            }
-            printf("]\n\n");
-        }
-
-        if(bestCost == -1 || bestCost > cost)
-        {
-            bestCost = cost;
-            bestFirst = firstNode;
-
-            free(inst->best_sol);
-            inst->best_sol = result;
-            inst->tbest = time;
-        } else
-        {
-            free(result);
-        }
+        inst->best_sol[i] = i;
     }
 
-    printf("\n\n\n********************************************* BEST SOLUTION *********************************************\n");
-    printf("\nSelected Algorithm: %s\tStarting Node: %d\tTime: %f sec.\tCost: %f\n", AlgorithmName, bestFirst, inst->tbest, bestCost);
-    printf("\n*********************************************************************************************************\n\n\n");
+    for (int i = 0; i < inst->nnodes/4; i++)
+    {
+        int a = rand() % (inst->nnodes + 1);
+        int b = rand() % (inst->nnodes + 1);
 
-    inst->zbest = bestCost;
+        int temp = inst->best_sol[a];
+        inst->best_sol[a] = inst->best_sol[b];
+        inst->best_sol[b] = temp;
+    }
+
+    inst->zbest = 0;
+    for (int i = 1; i < inst->nnodes; i++)
+    {
+        inst->zbest += dist(inst, inst->best_sol[i], inst->best_sol[i-1]);
+    }
+    inst->zbest += dist(inst, inst->best_sol[0], inst->best_sol[inst->nnodes-1]);
+    inst->tbest = clock();
+}
+
+int apply_algorithm(instance* inst)
+{
+    algorithmSelector(inst);
+
+    if(inst->verbose > 0)
+    {
+        double solutionTime = ((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC;
+        double totalTime = ((double) (clock() - inst->tstart)) / CLOCKS_PER_SEC;
+        printf("\n\n");
+
+        char info[] = " BEST SOLUTION ";
+        printCentered(info, '*');
+	    printf("\n");
+
+        printf("\nSelected Algorithm: %s\t\t\t", inst->algorithm_name);
+        
+        if (strcmp(inst->algorithm_name, "Nearest Neighbor") == 0)
+            printf("Starting Node: %d\t\t\t", inst->start);
+        
+        printf("Solution found after: %f sec.\t\t\t", solutionTime);
+        printf("Program ended after: %f sec.\t\t\t", totalTime);
+        
+        if (strcmp(inst->algorithm_name, "CPLEX") != 0 || inst->callback_base || inst->callback_relax)
+            printf("Cost: %f\t\t", inst->zbest);
+        else
+            printf("Lower bound: %f\t\t", inst->best_lb);
+        
+        printf("\n\n");
+
+        printHorizontalLine('*');
+    }
+
     return 0;
 }
 
-int algorithmSelector(int* result, double* cost, instance* inst, int firstNode, char *AlgorithmName)
+int algorithmSelector(instance* inst)
 {
-
-    if (inst->model_type == 1)
+    // If statement for selecting the algorithm 
+    if (strcmp(inst->algorithm_name, "Random") == 0)
     {
-        strcpy(AlgorithmName, "Nearest Neighbor");
-        nearestNeighbor(result, cost, inst, firstNode);
+        Random(inst);
 
-    } else if (inst->model_type == 2)
+    } else if (strcmp(inst->algorithm_name, "Nearest Neighbor") == 0)
     {
-        printf("Model type not implemented\n");
-        exit(0);
+        NNFromEachNode(inst);
 
-    } else if (inst->model_type == 3)
+    } else if (strcmp(inst->algorithm_name, "CPLEX") == 0)
     {
-        printf("Model type not implemented\n");
-        exit(0);
+        TSPopt(inst);
 
-    } else if (inst->model_type == 4)
+    } else if (strcmp(inst->algorithm_name, "Benders' Loop") == 0)
     {
-        printf("Model type not implemented\n");
-        exit(0);
+        bendersLoop(inst, false);
 
-    } else if (inst->model_type == 5)
+    } else if (strcmp(inst->algorithm_name, "Glued Benders' Loop") == 0)
     {
-        printf("Model type not implemented\n");
-        exit(0);
+        bendersLoop(inst, true);
+
+    } else if (strcmp(inst->algorithm_name, "Diving") == 0)
+    {
+        diving(inst);
+
+    } else if (strcmp(inst->algorithm_name, "Local Branching") == 0)
+    {
+        localBranching(inst);
 
     } else 
     {
         printf("Model type not implemented\n");
         exit(0);
-
     } 
+
+    // If statement for selecting the optimization method
+    if (strcmp(inst->opt_name, "2-Opt") == 0){
+        twoOpt(inst);
+    
+    }else if (strcmp(inst->opt_name, "Tabu Search") == 0)
+    {
+        twoOpt(inst);
+        tabuSearch(inst);
+        
+    }else if (strcmp(inst->opt_name, "Variable Neighborhood Search") == 0)
+    {
+        variableNeighborhoodSearch(inst);
+
+    }else if (strcmp(inst->opt_name, "Opt 3") == 0)
+    {
+        printf("Optimization method not implemented\n");
+        exit(0);
+
+    }
     return 0;
 }
 
-void bestSolution(int* result, double cost, instance* inst)
+void sleep_ms(int milliseconds)
 {
-    for (int i = 0; i < inst->nnodes; i++)
+    #ifdef WIN32
+        Sleep(milliseconds);
+    #elif _POSIX_C_SOURCE >= 199309L
+        struct timespec ts;
+        ts.tv_sec = milliseconds / 1000;
+        ts.tv_nsec = (milliseconds % 1000) * 1000000;
+        nanosleep(&ts, NULL);
+    #else
+        usleep(milliseconds * 1000);
+    #endif
+}
+
+int bestSolution(int* result, double cost, instance* inst)
+{
+    for (int i = 0; i < inst->nnodes && result[i] != -1; i++)
     {
         inst->best_sol[i] = result[i];
     }
+    
     inst->zbest = cost;
-    inst->tbest = clock() - inst->tstart;
-    double time = ((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC;
-    //print(time);
+    inst->tbest = clock();
+    
+    int time = (int)(((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC);
+    
+    verbose_print(inst, 50, "Best solution updated. Its cost is %f, it was founded after %d seconds\n", cost, time);
+    
+    if(inst->show_gnuplot > -1){
+        if(inst->show_gnuplot > 0)
+            sleep_ms(inst->show_gnuplot*1000);
+        show_solution(inst, true);
+    }
+
+    if (time >= inst->time_limit)
+        return 1;
+    return 0;
 }

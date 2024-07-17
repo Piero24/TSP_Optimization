@@ -1,40 +1,37 @@
+## Algorithms
+
+## Features
+- add checks (only if inst->debug == true)
+    - done on NN
+    - done on addMipstart
+    - done in twoOptLoop
+    - done in benders
+    - TODO: tabu?, vns?, matheu
+- add input flag for cost-itaration function plot + add cplex plot
+- Add the fact that if the code use an opt method it must save the image and print the solution with and without the optimization method so it's possible to check both the results || Add multiple solutions on the instance for the final print and images.
+- clean code (smaller functions)
 
 
-## Profiler
-Used to check the time that the algorithm takes to complete a certain task.
+## Documentation
+- Make the txt file with the explanation of the homework asked in class && Start preparing the Latex file with the solution proposed
+- Comment the code
+
+---------------------------------------------------
+
+## Tools (to be used)
+- Profiler: Used to check the time that the algorithm takes to complete a certain task.
 
 
-## Timing
-When a new solution is saved (bestSolution() is called) we save the time it took to generate it.
-
-TODO:
- - Save current time when starting the program (in the parser) in inst->tstart
- - Compute current time inside bestSolution() and save the difference with inst->tstart in inst->tbest
-
-
-## Add bestSolution and optimization to the code
-
-## Use the pointer inside inst as a final bestSolution instead of the one called result (inst->best_sol)
-
-## Add the time limit as input parameter and create the function that stop when the time limit is reached
-
-## Create the parser for the optimization parameter
-
-TODO:
- - Only (2opt) optimization 
- - (2opt) optimization + Tabu search
-
- Implement this on the algoSelector ???
-
- ## Update verbose
+## Official input - solutions
+- Best solution of file "kroA100.tsp" has cost 21282 (100 nodes)
+- Best solution of file "a280.tsp" has cost 2579 (280 nodes)
+- Best solution of file "rat575.tsp" has cost 6773 (575 nodes)
+- Best solution of file "pr1002.tsp" has cost 259045 (1002 nodes)
 
 
- ## Make the txt file with the explanation of the homework asked in class
-
-
- ## Comment the code
-
- ## Start preparing the Latex file with the solution proposed
-
- ## Add the fact that if the code use an opt method it must save the image and print the solution with and without the optimization method so it's possible to check both the results.
-
+## Notes
+- izero in cplex functions tells where the sections of the index and value arrays start for each constraint/cut
+- CCcut_violated_cuts(inst->nnodes, ncols, elist, xstar, 1.9, add_cut, (void*) &user_handle);
+    - 1.9 means that the cut added was violated by 0.1 (2 would means not violated)
+- Orario tipico esame: 16-16.30
+- ricordare di mettere foto nella tesina

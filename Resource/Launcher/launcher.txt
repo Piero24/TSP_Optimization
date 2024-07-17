@@ -1,0 +1,34 @@
+// -file Resource/pr10v1.tsp -model 1 -opt 1 -v 50 
+// -file Resource/pr10v1.tsp -model 1 -opt 1 -v 40 
+// -g 50 -model 0 -opt 1 -v 60 -s 1
+// -g 50 -model 1 -opt 2 -v 10 -t 5
+// -g 50 -model 1 -opt 3 -v 10 -t 5
+
+// files:
+-g 100
+-g 200
+-g 300
+-g 400
+-g 500
+-g 600
+-g 700
+-g 800
+-g 900
+-g 1000
+-g 1100
+-g 1200
+-g 1300
+-g 1400
+-g 1500
+
+// algos
+// -c 1:mipstart, 2:callback base, 3:callback relax, 4:posting base, 5:posting relax
+// -model 2
+// -model 2 -opt 1
+// -model 2 -opt 2
+// -model 2 -opt 3
+-model 6
+-model 7
+
+// parameters:
+-v 10 -tl 30

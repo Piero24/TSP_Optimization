@@ -1,0 +1,86 @@
+Alg 3: VNS (Variable Neighborhood Search)
+
+It's a follow up of tabu search. Tabu search waste half of the time by not getting better solution bu by trying to get around local minimum.
+
+RANDOM MULTI-START 2OPT
+An other option is, once a local minimum is reached, going to a random solution. We can use 2 opt on the random solution to make it better.
+A random solution will probably need a lot of optimization to reach an other local minimum.
+
+A better solution could be to use the local minimum found and, instead of searching in a "small" neighborhood given by swapping 2 nodes,
+we search in a bigger neighborhood given by swapping 3, 4, 5, ... n nodes.
+
+N.B. Swapping more than 2 nodes can generate more tha 1 solution with the same nodes swapped in different ways.
+
+In the original version, if I can't find a new solution in the 3-opt neighborhood, I search in the 4-opt (and so on).
+We will do a simpler version where, when we are in a local minimum, we do a random 3-nodes swap (kick).
+
+ex.
+	Choose 3 random sections of the array (not overlapping)
+	
+	| a | b | c | d | e | f | g | h | i | j | k | l | m | n | o |
+	                |^^^^^^^^^^^^^^^|   |^^^^^^^^^^^^^^^|
+		            |               |   |               |            
+                    |               |   |               |           
+	| a | b | c | d | e | f | g | h | i | j | k | l | m | n | o |
+	             ^^^                 ^^^                 ^^^ 
+	              i         <         j         <         k
+				  
+	now choose a fixed way of swapping them and implement it
+
+If after n kicks we still didn't find any better solution, we can do more kicks. Or, even better, every time we can do a random number of
+kicks (ex between 2 and 10), or loop the number of kicks between 2 and 10 (and then starting again from 2).
+
+
+
+
+COMPARING ALGORITHMS
+
+The choose of a better algorithm depends on the class of inputs that we use for testing them. 
+Let's fix some parameters:
+ - Uniform random 2D set of points with coords from 0 to 10k (an other option would be not random, clustered like houses on a map with cities and fields).
+ - Use up to 5k points.
+ - Use a time limit of some minutes, let's say 120 seconds.
+ - Use 10 instances
+ 
+ Everything can be generated in the same way by using the same seed. The input seed will generate 10 other seed for each instance.
+ The same seed (and thus the same settings, same input) will be used to test n algorithms, and then the results can be compared.
+ 
+ For each algorithm and for each instance, the program will take the result and generate (for example) a CSV file with a table of results (and the mean)
+ 
+Alg\Inst	#1		#2		#3		#4		#5		#6		#7		#8		#9		#10		mean		mean w/o biggest and smallest		geometric mean
+
+#1			...		...		...		...		...		...		...		...		...		...		...			...									...
+
+#2			...		...		...		...		...		...		...		...		...		...		...			...									...
+
+#3			...		...		...		...		...		...		...		...		...		...		...			...									...
+
+#4			...		...		...		...		...		...		...		...		...		...		...			...									...
+
+#5			...		...		...		...		...		...		...		...		...		...		...			...									...
+
+
+mean w/o biggest and smallest and geometric mean are used to go around outliers.
+
+An other way to see which is better we can use F1-score (a voting rule) (not required for this exam).
+
+In our report we should use "PERFORMANCE PROFILE" that takes in input a CSV table like this:
+
+instances	alg1	alg2	alg3
+#inst1 		...		...		...
+#inst2 		...		...		...
+#inst3 		...		...		...
+#inst4 		...		...		...
+
+
+and then a python script (perfprof.py) takes that in input and gives in output a pdf with a plot where we can see, for each alg, 
+how many times (y%) it was at a distance x from the best alg. (an alg with a point on the y axis was the best 
+(distance x=0 from the best) in y% of the times).
+Files: https://www.dei.unipd.it/~fisch/ricop/OR2/PerfProf/
+
+
+
+notes:
+ - good to have a mathematical description of the problem in the paper
+ - also good to have pseudocode of the algorithms
+ - must have performance profile in it

@@ -1,0 +1,56 @@
+Other matheuristics:
+simulated annealing
+    l'annealing è una procedura fisica usata ad esempio in mettallurgica in cui si riscalda e raffredda un metallo lenatmente
+    in modo da trovare automaticamente uno stato energetico minimo. Succede per una questione statistica, il movimento vibratorio
+    degli atomi tende ad allinearli e quindi a diminuire il livello energetico. Un movimento di una vibrazione potrebbe inizialmente
+    far aumentare l'energia, per poi diminuirla di nuovo.
+
+    la corrispondenza simulata (s) per il tsp è provare a fare una mossa 2-opt random. Se miglioro bene, la faccio, se
+    peggioro dipende e il peggioramento è piccolo implemento lo stesso con una certa probabilità, se il peggioramento
+    è grande no (oppure si ma con probabilità a scalare).
+    Implementare anche mosse peggiorative porta diversificazione.
+
+    Inoltre le mosse peggiorative vanno bene più che altro all'inizio, ma non alla fine del procedimento, quando devo
+    ritornare la soluzione. Posso quindi far diminuire la probabilità anche in base al tempo.
+
+    possibile funzione per la probabilità: (dt = delta costo, T = temperatura, cm = costo medio)
+        
+        1 se dt < 0
+
+        exp((-dt/cm)/T) se dt >= 0
+
+    la temperatura diminuisce a ogni iterazione (es T *= 0.99)
+    la temperatura inizia ad un valore T0 (iperparametro)
+
+    Periodicamente si può aumentare la temperatura a T0 in modo da avere un comportamento simile a tabù
+
+Algoritmi Genetici
+    vedasi paper sul sito del prof
+
+    - si lavora con una popolazione di individui
+    - dati due individui il loro figlio avrà caratteristiche prese randomicamente da entrambi
+    - il figlio ha inoltre delle mutazioni aggiuntive casuali
+    - sopravvivono solo gli individui che hanno caratteristiche che si adattano meglio all'ambiente (fittness maggiore)
+    - in un'iterazione l'individuo con il fitness maggiore è detto champion
+
+    Nel nostro caso un individuo è una soluzione del tsp con un certo costo.
+    Un modo di far sopravviviere i migliori è farli accoppiare con probabilità maggiore, ma non è detto che porti a un vantaggio.
+    
+    Quando a furia di accoppiarsi la popolazione cresce troppo (es da 100 a 150) bisogna eliminare alcuni individui, si possono 
+    eliminare con probabilità maggiore quelli con fitness minore (costo maggiore).
+
+    Nel nostro caso in cui il champion è il più importante, gli si può garantire l'immunità.
+
+    La popolazione zero (iniziale) può essere composta da soluzioni randomiche.
+
+    Per risolvere il problema del grado dei vertitici e delle componenti multiple, si può modificare la fitness in modo da essere più
+    bassa se ci sono situazioni di questo tipo (es. M1 * #vertici con grado > 2 + M2 * #componenti).
+    Altrimenti si forzano i figli ad essere soluzioni corrette.
+        Un'opzione è: date due soluzioni si sceglie una posizione "crossover" randomicamente e si prende la prima parte 
+        da un genitore e la seconda dall'altro. Questo potrebbe generare soluzioni errate (ad es vertici visitati 2
+        volte). 
+        Potrei mantenere le soluzioni errate ma penalizzarle, oppure ripararle (ma non sarebbe più genetico).
+        Il repair si può fare saltando i vertici ripetuti nella soluzione errata, e poi aggiungendo i vertici
+        saltati alla fine con logica minimum extra mileage (magari aggiungendo anche un 2-opt alla fine).
+    
+    

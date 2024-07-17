@@ -1,32 +1,47 @@
 #ifndef ALGOSELECTOR_H
 #define ALGOSELECTOR_H
 
-#include "../include/tsp.h"
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+#include "Algorithm/Heuristics/NN.h"
+#include "Algorithm/Exacts/cplexAlg.h"
+#include "Algorithm/Optimizators/twoOpt.h"
+#include "Algorithm/Optimizators/tabuSearch.h"
+#include "Algorithm/Optimizators/vns.h"
+#include "Algorithm/Matheuristics/hardFixing.h"
+#include "Algorithm/Matheuristics/softFixing.h"
+#include "parser.h"
+#include "tsp.h"
 
 /**
  * @brief Measure the time it takes to run the selected algorithm and print 
  * the results to the standard output.
  * 
  * @param inst Pointer to the instance structure.
- * @param onlyBestSolution Boolean true if you want to print only the best 
- * solution false all the possible solutions.
- * @param AlgorithmName The name of the algorithm to be used.
+ * 
  * @return 0 if the algorithm runs successfully.
  */
-int apply_algorithm(instance* inst, bool onlyBestSolution, char *AlgorithmName);
+int apply_algorithm(instance* inst);
 
 /**
  * @brief Selects and applies the appropriate algorithm based on the model type 
  * specified in the instance.
  * 
- * @param result Pointer to the array to store the resulting solution.
- * @param cost Pointer to the variable to store the cost of the solution.
  * @param inst Pointer to the instance structure.
  * @param firstNode The starting node for the algorithm.
- * @param AlgorithmName The name of the algorithm to be used.
+ * 
  * @return 0 if the algorithm runs successfully.
  */
-int algorithmSelector(int* result, double* cost, instance* inst, int firstNode, char *AlgorithmName);
+int algorithmSelector(instance* inst);
+
+/**
+ * @brief Randomly generates a solution for the TSP instance.
+ * 
+ * @param inst Pointer to the instance structure.
+ */
+void sleep_ms(int milliseconds);
 
 /**
  * @brief Substitute the path of the old best solution with the path of 
@@ -36,7 +51,9 @@ int algorithmSelector(int* result, double* cost, instance* inst, int firstNode, 
  * @param cost Cost of the best solution.
  * @param inst Pointer to the instance structure that contain the information
  * of the new best solution.
+ * 
+ * @return 0 if the time limit isn't violated yet, 1 otherwise
  */
-void bestSolution(int* result, double cost, instance* inst);
+int bestSolution(int* result, double cost, instance* inst);
 
 #endif /* ALGOSELECTOR_H */

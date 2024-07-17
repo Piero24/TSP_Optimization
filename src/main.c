@@ -1,41 +1,61 @@
-// MacOS
-// rm -r build && mkdir build && cmake -S . -B build
-// make -C build && clear && ./TSP_Optimization -file Resource/pr10v1.tsp -model 1
 
-// Windows
-// rmdir /S /Q build && mkdir build && cmake . -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -B build
-// make -C build && cls && TSP_Optimization -file Resource/pr10v1.tsp -model 1
+// ********************************************************************************************************************* 
+// ********************************************************************************************************************* 
+// ***
+// ***                                                     COMMANDS
+// ***
+// *** MacOS
+// *** rm -r build && mkdir build && cmake -S . -DCPLEXDIR="/Applications/CPLEX_Studio2211/cplex" -B build
+// *** rm -r build && mkdir build && cmake -S . -B build
+// *** make -C build && clear && ./TSP_Optimization -file Resource/pr10v1.tsp -model 1 -opt 1 -v 50
+// *** make -C build && clear && ./TSP_Optimization -launcher Resource/Launcher/launcher.txt
+// *** Resource/Launcher/launcher.txt
+// ***
+// *** Windows
+// *** cmake . -B build --fresh && cmake --build build --clean-first
+// *** Debug\TSP_Optimization -g 300 -model 7 -v 80 -tl 60
+// *** Debug\TSP_Optimization -f Resource/a280.tsp -model 3 -v 60
+// *** Debug\TSP_Optimization -launcher Resource/Launcher/launcher.txt
+// ***
+// *** Linux
+// *** rm -r build && mkdir build && cmake -S . -DCPLEXDIR="C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/" -B build
+// *** make -C build && clear && ./TSP_Optimization
+// ***
+// *** CPLEX OPTIONS: 1:mipstart, 2:callback base, 3:callback relax, 4:posting base, 5:posting relax
+// ***
+// ********************************************************************************************************************* 
+// *********************************************************************************************************************
 
 #include <stdio.h>
 #include <time.h>
 
-#include "../include/tsp.h"
-#include "../include/Algorithm/NN.h"
-#include "../include/parser.h"
-#include "../include/algoSelector.h"
-
+#include "tsp.h"
+#include "Algorithm/Heuristics/NN.h"
+#include "parser.h"
+#include "algoSelector.h"
+#include "menu.h"
+#include "launcher.h"
 
 int main(int argc, char** argv)
 {
+    instance inst;
+    inst.debug = true;
+    
     if(argc<2)
     {
-        printf("Usage: %s -help for help\n", argv[0]);
-        return 1;
+        manageMenu(&inst);
+
+    } else if (argc == 3 && strcmp(argv[1], "-launcher") == 0)
+    {
+        manageLauncher(&inst, argv[2]);
+        return 0;
+
+    } else
+    {
+        parse_args(argc, argv, &inst);
     }
 
-    instance inst;
-    char AlgorithmName[100];
-    char *AlgorithmNamePtr = AlgorithmName;
-
-    parse_args(argc, argv, &inst);
-    read_input(&inst);
-
-    apply_algorithm(&inst, false, AlgorithmName);
-
-    show_solution(&inst, true);
-    save_solution(&inst, AlgorithmName);
-
+    executeWorkflow(&inst);
     free_instance(&inst);
     return 0;
 }
-
