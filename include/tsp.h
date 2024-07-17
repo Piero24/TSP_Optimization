@@ -66,6 +66,7 @@ typedef struct {
 	char algorithm_name[50];
     char opt_name[50];
     int show_gnuplot;
+    bool plotFlag;
 	FILE *plotSolution;
 	FILE *plotCosts;
 

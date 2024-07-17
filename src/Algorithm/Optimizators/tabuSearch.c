@@ -24,7 +24,6 @@ int tabuSearch(instance* inst)
     inst->plotCosts = NULL;
     point* costs = (point*)calloc(1, sizeof(point));
     int nCosts = 0, xIndex = 0;
-    bool plotFlag = false;
 
     // time checkers
     clock_t end = clock();
@@ -130,7 +129,7 @@ int tabuSearch(instance* inst)
 
         free(bestSol);
 
-        if(plotFlag){
+        if(inst->plotFlag){
             costs[nCosts].x = xIndex;
             costs[nCosts].y = bestCost;
 

@@ -129,8 +129,13 @@ int TSPopt(instance *inst)
 	
 	build_sol(xstar, inst, succ, comp, dim, &ncomp);
 	resultPlot = convertSolution(succ, comp, ncomp, inst);
-	show_solution_comps(inst, true, resultPlot, ncomp);
-	
+
+	if(inst->show_gnuplot > -1){
+        if(inst->show_gnuplot > 0)
+            sleep_ms(inst->show_gnuplot*1000);
+        show_solution_comps(inst, true, resultPlot, ncomp);
+    }
+
 	// free and close cplex model   
     for(int i=1; i<ncomp+1; i++) free(resultPlot[i]);
 	free(resultPlot);
@@ -264,7 +269,7 @@ int bendersLoop(instance *inst, bool gluing)
 				
 				result = convertSolution(succ, comp, ncomp, inst);
 				show_solution_comps(inst, true, result, ncomp);
-				
+
 				for(int i=1; i<ncomp+1; i++) free(result[i]);
 				free(result);
 			}
@@ -277,15 +282,16 @@ int bendersLoop(instance *inst, bool gluing)
 					sleep_ms(inst->show_gnuplot*1000);
 
 				show_solution_comps(inst, true, result, ncomp);
-
-				if(inst->show_gnuplot > 0)
-					sleep_ms(inst->show_gnuplot*1000);
 			}
 			
 			gluing2Opt(inst, result[1], objval);
 
-			if(inst->show_gnuplot > -1)
+			if(inst->show_gnuplot > -1){
+				if(inst->show_gnuplot > 0)
+					sleep_ms(inst->show_gnuplot*1000);
+
 				show_solution_comps(inst, true, result, ncomp);
+			}
 
 			verbose_print(inst, 80, "[Benders - Gluing] Merged solution has cost %f\n", objval);
 
@@ -304,11 +310,11 @@ int bendersLoop(instance *inst, bool gluing)
 
 		} else if(inst->show_gnuplot > -1)
 		{
-			int** result = convertSolution(succ, comp, ncomp, inst);
-			show_solution_comps(inst, true, result, ncomp);
-
 			if(inst->show_gnuplot > 0)
 				sleep_ms(inst->show_gnuplot*1000);
+
+			int** result = convertSolution(succ, comp, ncomp, inst);
+			show_solution_comps(inst, true, result, ncomp);
 		}
 
 		//check time
@@ -341,7 +347,6 @@ int bendersLoop(instance *inst, bool gluing)
 		int** result = convertSolution(succ, comp, ncomp, inst);
 
 		bestSolution(result[1], objval, inst);
-		show_solution_comps(inst, true, result, ncomp);
 
 		for(int i=1; i<ncomp+1; i++) free(result[i]);
 		free(result);
@@ -733,7 +738,10 @@ static int CPXPUBLIC callbackHandler(CPXCALLBACKCONTEXTptr context, CPXLONG cont
 int posting_base(instance* inst, CPXCALLBACKCONTEXTptr context, int* succ, int* comp, int ncomp, double* objval)
 {
 	// DEBUG PLOTTING (before gluing) Warning: this is not tread safe
-	if(inst->verbose >= 99){
+	if(inst->show_gnuplot > -1){
+		if(inst->show_gnuplot > 0)
+			sleep_ms(inst->show_gnuplot*1000);
+					
 		int** result1 = convertSolution(succ, comp, ncomp, inst);
 		
 		show_solution_comps(inst, true, result1, ncomp);
@@ -762,7 +770,10 @@ int posting_base(instance* inst, CPXCALLBACKCONTEXTptr context, int* succ, int* 
 	twoOptLoop(inst, trip, objval, NULL, &nCosts, &xIndex, false, false, true);
 
 	// DEBUG PLOTTING (after gluing & 2opt) Warning: this is not tread safe
-	if(inst->verbose >= 99){
+	if(inst->show_gnuplot > -1){
+		if(inst->show_gnuplot > 0)
+			sleep_ms(inst->show_gnuplot*1000);
+
 		int** result2 = convertSolution(succ, comp, ncomp, inst);
 		
 		show_solution_mono(inst, true, trip);
@@ -849,7 +860,10 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 		verbose_print(inst, 80, "[CPLEX callback] Found feasible solution with cost %f after %f seconds\n", objval, time);
 
 		// plot
-		if(inst->verbose >= 90){
+		if(inst->show_gnuplot > -1){
+			if(inst->show_gnuplot > 0)
+				sleep_ms(inst->show_gnuplot*1000);
+
 			int** result = convertSolution(succ, comp, ncomp, inst);
 			show_solution_comps(inst, true, result, ncomp);
 

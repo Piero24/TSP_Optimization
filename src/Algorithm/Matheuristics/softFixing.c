@@ -126,14 +126,18 @@ int localBranching(instance* inst)
 
 	assert(error == 0 || error == 2);
 
-	// compute connected components
-	build_sol(xstar, inst, succ, comp, dim, &ncomp);
+	// compute connected components and plot
+	if(inst->show_gnuplot > -1){
+		if(inst->show_gnuplot > 0)
+			sleep_ms(inst->show_gnuplot*1000);
+		
+		build_sol(xstar, inst, succ, comp, dim, &ncomp);
+		int** result1 = convertSolution(succ, comp, ncomp, inst);
+		show_solution_comps(inst, true, result1, ncomp);
 
-	int** result1 = convertSolution(succ, comp, ncomp, inst);
-	show_solution_comps(inst, true, result1, ncomp);
-
-	for(int i=1; i<ncomp+1; i++) free(result1[i]);
-	free(result1);
+		for(int i=1; i<ncomp+1; i++) free(result1[i]);
+		free(result1);
+	}
 	
 	// free and close cplex model   
 	free(cname[0]);

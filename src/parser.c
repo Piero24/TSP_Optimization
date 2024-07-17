@@ -72,14 +72,10 @@ int parse_args(int argc, char** argv, instance* inst)
 		else if ( strcmp(argv[i],"-plot") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// plot with gnuplot
 		else if ( strcmp(argv[i],"-gnuplot") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));			// plot with gnuplot
 		else if ( strcmp(argv[i],"-s") == 0 ) inst->show_gnuplot = abs(atoi(argv[++i]));				// plot with gnuplot
-
-		// else if ( strcmp(argv[i],"-old_benders") == 0 ) inst->old_benders = atoi(argv[++i]); 		// old benders
-		// else if ( strcmp(argv[i],"-threads") == 0 ) inst->num_threads = atoi(argv[++i]); 			// n. threads
-		// else if ( strcmp(argv[i],"-memory") == 0 ) inst->available_memory = atoi(argv[++i]);			// available memory (in MB)
-		// else if ( strcmp(argv[i],"-node_file") == 0 ) strcpy(inst->node_file,argv[++i]);				// cplex's node file
-		// else if ( strcmp(argv[i],"-max_nodes") == 0 ) inst->max_nodes = atoi(argv[++i]); 			// max n. of nodes
-		// else if ( strcmp(argv[i],"-cutoff") == 0 ) inst->cutoff = atof(argv[++i]);					// master cutoff
-		// else if ( strcmp(argv[i],"-int") == 0 ) inst->integer_costs = 1; 							// inteher costs
+		
+		else if ( strcmp(argv[i],"-showCost") == 0 ) inst->plotFlag = abs(atoi(argv[++i]));				// plot with gnuplot
+		else if ( strcmp(argv[i],"-plotCost") == 0 ) inst->plotFlag = abs(atoi(argv[++i]));			// plot with gnuplot
+		else if ( strcmp(argv[i],"-sC") == 0 ) inst->plotFlag = abs(atoi(argv[++i]));				// plot with gnuplot
 		
 		else if ( strcmp(argv[i],"-help") == 0 ) help = 1; 												// help
 		else if ( strcmp(argv[i],"--help") == 0 ) help = 1;  											// help

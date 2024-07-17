@@ -160,21 +160,26 @@ int diving(instance* inst)
 	verbose_print(inst, 80, "[Diving] time ended\n");
 
 	// plot
-	int* succ = (int *) calloc(inst->nnodes, sizeof(int));
-	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
-	int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
-	int ncomp;
-	build_sol(xstar, inst, succ, comp, dim, &ncomp);
+	if(inst->show_gnuplot > -1){
+		if(inst->show_gnuplot > 0)
+			sleep_ms(inst->show_gnuplot*1000);
+		
+		int* succ = (int *) calloc(inst->nnodes, sizeof(int));
+		int* comp = (int *) calloc(inst->nnodes, sizeof(int));
+		int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
+		int ncomp;
+		build_sol(xstar, inst, succ, comp, dim, &ncomp);
 
-	int** result1 = convertSolution(succ, comp, ncomp, inst);
-	show_solution_comps(inst, true, result1, ncomp);
+		int** result1 = convertSolution(succ, comp, ncomp, inst);
+		show_solution_comps(inst, true, result1, ncomp);
 
-	for(int i=1; i<ncomp+1; i++) free(result1[i]);
-	free(result1);
-	free(succ);
-	free(comp);
-	free(dim);
-
+		for(int i=1; i<ncomp+1; i++) free(result1[i]);
+		free(result1);
+		free(dim);
+		free(comp);
+		free(succ);
+	}
+	
 	free(result);
     free(cname[0]);
 	free(cname);

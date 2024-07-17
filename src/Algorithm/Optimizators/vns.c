@@ -17,7 +17,6 @@ int variableNeighborhoodSearch(instance* inst)
     inst->plotCosts = NULL;
     point* costs = (point*)calloc(1, sizeof(point));
     int nCosts = 0, xIndex = 0;
-    bool plotFlag = false;
 
     verbose_print(inst, 80, "[VNS] Initialization completed, starting optimization.\n");
 
@@ -38,7 +37,7 @@ int variableNeighborhoodSearch(instance* inst)
         }
 
         xIndex++;
-        if(plotFlag){
+        if(inst->plotFlag){
             costs[nCosts].x = xIndex;
             costs[nCosts].y = cost;
 

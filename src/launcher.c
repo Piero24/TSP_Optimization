@@ -253,10 +253,7 @@ int executeWorkflow(instance *inst)
     read_input(inst);
     apply_algorithm(inst);
 
-    //show_solution(inst, true);
     save_solution(inst);
-    
-    //free_instance(inst);
     return 0;
 }
 

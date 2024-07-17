@@ -1,20 +1,14 @@
 ## Algorithms
 
-## Features
-- add checks (only if inst->debug == true)
-    - done on NN
-    - done on addMipstart
-    - done in twoOptLoop
-    - done in benders
-    - TODO: tabu?, vns?, matheu
+# primary
 - add input flag for cost-itaration function plot + add cplex plot
+
+# secondary
+- add checks (only if inst->debug == true) on matheu
 - Add the fact that if the code use an opt method it must save the image and print the solution with and without the optimization method so it's possible to check both the results || Add multiple solutions on the instance for the final print and images.
-- clean code (smaller functions)
-
-
-## Documentation
-- Make the txt file with the explanation of the homework asked in class && Start preparing the Latex file with the solution proposed
 - Comment the code
+- clean code (smaller functions)
+- try catch in the arguments parsing
 
 ---------------------------------------------------
 
