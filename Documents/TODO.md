@@ -1,7 +1,6 @@
 ## Algorithms
 
 # primary
-- add input flag for cost-itaration function plot + add cplex plot
 
 # secondary
 - add checks (only if inst->debug == true) on matheu
@@ -9,6 +8,10 @@
 - Comment the code
 - clean code (smaller functions)
 - try catch in the arguments parsing
+
+# questions
+- come chiamiamo hard fixing/diving e soft fixing/local branching?
+- bibliografia
 
 ---------------------------------------------------
 

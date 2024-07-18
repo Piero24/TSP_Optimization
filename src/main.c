@@ -13,7 +13,7 @@
 // ***
 // *** Windows
 // *** cmake . -B build --fresh && cmake --build build --clean-first
-// *** Debug\TSP_Optimization -g 300 -model 7 -v 80 -tl 60
+// *** Debug\TSP_Optimization -g 300 -model 5 -v 60 -tl 60 -s 0
 // *** Debug\TSP_Optimization -f Resource/a280.tsp -model 3 -v 60
 // *** Debug\TSP_Optimization -launcher Resource/Launcher/launcher.txt
 // ***
@@ -39,7 +39,7 @@
 int main(int argc, char** argv)
 {
     instance inst;
-    //inst.debug = true;
+    inst.debug = true;
     
     if(argc<2)
     {

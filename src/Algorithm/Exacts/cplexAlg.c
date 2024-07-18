@@ -155,8 +155,6 @@ double* addMipstart(instance* inst, CPXENVptr env, CPXLPptr lp)
 	double objval = 0;
 	int firstNode = randomInt(0, inst->nnodes-1);
 
-	printf("First node: %d\n", firstNode);
-
 	int* result = (int*) calloc(inst->nnodes, sizeof(int));
 	nearestNeighbor(inst, firstNode, result, &objval);
 	mipstart2Opt(inst, result, &objval);
@@ -294,19 +292,18 @@ int bendersLoop(instance *inst, bool gluing)
 			}
 
 			verbose_print(inst, 80, "[Benders - Gluing] Merged solution has cost %f\n", objval);
-
+			
 			if(objval < inst->zbest)
 				bestSolution(result[1], objval, inst);
 			
+			if(inst->debug){
+				for(int i=1; i<inst->nnodes; i++)
+					for(int j=i+1; j<inst->nnodes; j++)
+						assert(result[1][i] != result[1][j]);
+			}
+
 			for(int i=1; i<ncomp+1; i++) free(result[i]);
 			free(result);
-
-			if(inst->debug){
-				// compute connected components
-				build_sol(xstar, inst, succ, comp, dim, &ncomp);
-
-				assert(ncomp == 1);
-			}
 
 		} else if(inst->show_gnuplot > -1)
 		{
@@ -326,8 +323,6 @@ int bendersLoop(instance *inst, bool gluing)
     // print solution
     if(inst->verbose >= 100)
 	{
-        printf("costs:%f\n", objval);
-
         for ( int i = 0; i < inst->nnodes; i++ )
         {
             for ( int j = i+1; j < inst->nnodes; j++ )
@@ -341,7 +336,7 @@ int bendersLoop(instance *inst, bool gluing)
             }
         }
     }
-
+	
 	if(ncomp == 1)
 	{
 		int** result = convertSolution(succ, comp, ncomp, inst);
@@ -353,7 +348,7 @@ int bendersLoop(instance *inst, bool gluing)
 
 	}else 
 		verbose_print(inst, 60, "[Benders] solution not found");
-	
+
 	// free and close cplex model   
     free(xstar);
 	free(succ);
@@ -631,34 +626,32 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
 
 void build_sol(const double *xstar, instance *inst, int *succ, int *comp, int *dim, int *ncomp) // build succ() and comp() wrt xstar()...
 {   
-	/* DEBUG (add a '/' to activate this section)
-
-	int *degree = (int *) calloc(inst->nnodes, sizeof(int));
-	for ( int i = 0; i < inst->nnodes-1; i++ )
-	{
-		for ( int j = i+1; j < inst->nnodes; j++ )
+	if(inst->debug){
+		int *degree = (int *) calloc(inst->nnodes, sizeof(int));
+		for ( int i = 0; i < inst->nnodes-1; i++ )
 		{
-			int k = xpos(i,j,inst);
-			if (fabs(xstar[k]) > EPS && fabs(xstar[k]-1.0) > EPS){
-				printf("i %d j %d xpos %d\n", i, j, k);
-				printf("fabs(xstar[k]) %f, fabs(xstar[k]-1.0) %f\n", fabs(xstar[k]), fabs(xstar[k]-1.0));
-				printf("\n\tWrong xstar in build_sol()\n\n");
-				exit(0);
-			}
-			if (xstar[k] > 0.5) 
+			for ( int j = i+1; j < inst->nnodes; j++ )
 			{
-				++degree[i];
-				++degree[j];
+				int k = xpos(i,j,inst);
+				if (fabs(xstar[k]) > EPS && fabs(xstar[k]-1.0) > EPS){
+					printf("i %d j %d xpos %d\n", i, j, k);
+					printf("fabs(xstar[k]) %f, fabs(xstar[k]-1.0) %f\n", fabs(xstar[k]), fabs(xstar[k]-1.0));
+					printf("\n\tWrong xstar in build_sol()\n\n");
+					exit(0);
+				}
+				if (xstar[k] > 0.5) 
+				{
+					++degree[i];
+					++degree[j];
+				}
 			}
 		}
+		for ( int i = 0; i < inst->nnodes; i++ )
+		{
+			assert(degree[i] == 2); // wrong degree in build_sol()
+		}	
+		free(degree);
 	}
-	for ( int i = 0; i < inst->nnodes; i++ )
-	{
-		assert(degree[i] == 2); // wrong degree in build_sol()
-	}	
-	free(degree);
-
-	// END DEBUG */
 
 	*ncomp = 0;
 	for ( int i = 0; i < inst->nnodes; i++ )
