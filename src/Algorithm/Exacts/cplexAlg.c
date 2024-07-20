@@ -78,6 +78,8 @@ int TSPopt(instance *inst)
 	double *xstar;
 	if(inst->mipstart)
 		xstar = addMipstart(inst, env, lp);
+	else
+		xstar = (double *) calloc(inst->ncols, sizeof(double)); 
 	
 	// set CPLEX time limit
 	void* current_time = currentTime();
