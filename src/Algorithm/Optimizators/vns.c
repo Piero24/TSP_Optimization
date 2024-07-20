@@ -4,7 +4,7 @@ int variableNeighborhoodSearch(instance* inst)
 {
     // time checkers
     clock_t end = clock();
-    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+    double time;// = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
     //result vector initialization
     verbose_print(inst, 80, "[VNS] Starting initialization.\n");
@@ -57,7 +57,7 @@ int variableNeighborhoodSearch(instance* inst)
 
         // TIME CHECK
         end = clock();
-        time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+        //time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
         verbose_print(inst, 90, "[VNS] time: %f, limit:%f\n", time, inst->time_limit);
 

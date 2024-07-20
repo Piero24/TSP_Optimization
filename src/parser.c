@@ -577,7 +577,7 @@ int read_input(instance* inst)
 		exit(0);
 	}  
 
-	inst->tstart = clock();
+	inst->tstart_w = clock();
 
 	fclose(fin); 
     return 0;

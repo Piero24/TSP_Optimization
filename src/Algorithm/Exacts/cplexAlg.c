@@ -81,7 +81,7 @@ int TSPopt(instance *inst)
 	
 	// set CPLEX time limit
 	clock_t end = clock();
-    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+    double time;// = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 	
 	CPXsetdblparam(env, CPXPARAM_TimeLimit, inst->time_limit - time);
 	
@@ -120,7 +120,7 @@ int TSPopt(instance *inst)
 	int* comp = (int *) calloc(inst->nnodes, sizeof(int));
 	int* dim = (int *) calloc(inst->nnodes + 1, sizeof(int));
 
-	inst->tbest = clock();
+	inst->tbest_w = clock();
 	inst->best_lb = objval;
 
 	if(inst->callback_base || inst->callback_relax){
@@ -228,7 +228,7 @@ int bendersLoop(instance *inst, bool gluing)
 	
 	//first check of time
 	clock_t end = clock();
-    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+    double time;// = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 	
 	do {
 		//set time limit
@@ -333,7 +333,7 @@ int bendersLoop(instance *inst, bool gluing)
 
 		//check time
 		end = clock();
-        time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+        //time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
 	} while(time < inst->time_limit);
 	
@@ -866,7 +866,7 @@ static int CPXPUBLIC candidateCallback(CPXCALLBACKCONTEXTptr context, instance* 
 
 	} else {
 		// if cplex solution has 1 component, do nothing
-		double time =((double) (clock() - inst->tstart)) / CLOCKS_PER_SEC;
+		double time;// =((double) (clock() - inst->tstart)) / CLOCKS_PER_SEC;
 		verbose_print(inst, 80, "[CPLEX callback] Found feasible solution with cost %f after %f seconds\n", objval, time);
 
 		// plot

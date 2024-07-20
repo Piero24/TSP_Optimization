@@ -57,7 +57,7 @@ int localBranching(instance* inst)
 
 	//first check of time
 	clock_t end = clock();
-    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+    double time;// = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 	
 	while(time < inst->time_limit) {
 		// add contraint: fix n-k edges
@@ -118,7 +118,7 @@ int localBranching(instance* inst)
 
 		//check time
 		end = clock();
-        time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+        //time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
 	}
 

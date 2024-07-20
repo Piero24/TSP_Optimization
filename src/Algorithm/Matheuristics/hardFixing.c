@@ -68,7 +68,7 @@ int diving(instance* inst)
 
 	//first check of time
 	clock_t end = clock();
-    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+    double time;// = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 	
 	while(time < inst->time_limit) {
 		double freeEdgesProb = 0.1;
@@ -96,7 +96,7 @@ int diving(instance* inst)
 
 		// check time
 		end = clock();
-        time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+        //time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
 		// call branch and bound blackbox 
 		if(time < inst->time_limit)
@@ -151,7 +151,7 @@ int diving(instance* inst)
 
 		//check time
 		end = clock();
-        time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+        //time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
 	}
 	

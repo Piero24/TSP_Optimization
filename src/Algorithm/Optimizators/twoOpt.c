@@ -8,7 +8,7 @@ int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCo
     {
         // check time limit
         clock_t end = clock();
-        double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+        double time;// = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
         if (time >= inst->time_limit) {
             verbose_print(inst, 90, "[2optLoop] Exiting by time limit\n");
             break;

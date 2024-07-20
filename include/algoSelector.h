@@ -56,4 +56,10 @@ void sleep_ms(int milliseconds);
  */
 int bestSolution(int* result, double cost, instance* inst);
 
+
+
+double timeElapsed(void* start, void* end);
+
+void* currentTime();
+
 #endif /* ALGOSELECTOR_H */

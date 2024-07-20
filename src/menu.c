@@ -42,7 +42,7 @@ void clearScreen() {
     #ifdef _WIN32
         //system("cls"); // For Windows
     #else
-        system("clear"); // For Unix/Linux
+        //system("clear"); // For Unix/Linux
     #endif
 }
 

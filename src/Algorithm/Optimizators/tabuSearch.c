@@ -27,7 +27,7 @@ int tabuSearch(instance* inst)
 
     // time checkers
     clock_t end = clock();
-    double time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+    double time;// = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
     
     verbose_print(inst, 80, "[Tabu' Search] Initialization completed, starting optimization.\n");
 
@@ -152,7 +152,7 @@ int tabuSearch(instance* inst)
          */
 
         end = clock();
-        time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+        //time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
 
         verbose_print(inst, 80, "[Tabu' Search] time: %f, limit:%f\n", time, inst->time_limit);
 
