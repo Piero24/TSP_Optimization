@@ -11,7 +11,8 @@
 
 # questions
 - come chiamiamo hard fixing/diving e soft fixing/local branching?
-- bibliografia
+- cosa mettere nella bibliografia
+- mettiamo la linea optimal nei perf prof con le heu?
 
 ---------------------------------------------------
 

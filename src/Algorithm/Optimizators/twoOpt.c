@@ -92,23 +92,18 @@ int twoOptLoop(instance* inst, int* result, double* cost, point* costs, int* nCo
     } while (counter < inst->nnodes);
 
     if(inst->debug){
-        for(int i=0;i<inst->nnodes;i++)
+        for(int j=0; j<inst->nnodes; j++) 
         {
             int* A = &result[0];
-            for (int* B = &result[2]; B < &result[inst->nnodes-2]; B++)
-            {
-                // Check that d(A1,B1) + d(A,B) >= d(A,A1) + d(B,B1)
-                double dist1 = dist(inst, *(A+1), *(B+1)) + dist(inst, *A, *B);
-                double dist2 = dist(inst, *A, *(A+1)) + dist(inst, *B, *(B+1));
-                assert(dist1 >= dist2);
-            }
 
-            // rotate array
+            //check that there aren't doable swaps
+            for (int* B = &result[2]; B < &result[inst->nnodes-2]; B++)
+                assert(dist(inst, *A, *B) + dist(inst, *(A+1), *(B+1)) >= dist(inst, *A, *(A+1)) + dist(inst, *B, *(B+1)));
+            
+            // move A to the end of the array
             int Acopy = *A;
             for(int i=0; i<inst->nnodes-1; i++)
-            {
                 result[i] = result[i+1];
-            }
             result[inst->nnodes-1] = Acopy;
         }
     }
