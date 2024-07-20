@@ -145,6 +145,9 @@ int bestSolution(int* result, double cost, instance* inst)
     inst->tbest = clock();
     
     int time = (int)(((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC);
+    // model Gluing ------------ 55816111.000000 ------- 14370.000000
+    // model NN ------------ 55816111.000000 ------- 14370.000000
+    printf("%f ------- %f\n\n", inst->tbest, inst->tstart);
     
     verbose_print(inst, 50, "Best solution updated. Its cost is %f, it was founded after %d seconds\n", cost, time);
     

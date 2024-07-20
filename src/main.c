@@ -38,6 +38,16 @@
 
 int main(int argc, char** argv)
 {
+
+    // calculate the time to do this code
+    clock_t start = clock();
+    sleep_ms(1000);
+    clock_t end = clock();
+    double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time spent: %f\n", time_spent);
+    return 0;
+
+
     instance inst;
     //inst.debug = true;
     

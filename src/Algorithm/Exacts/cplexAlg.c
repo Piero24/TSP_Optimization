@@ -345,7 +345,7 @@ int bendersLoop(instance *inst, bool gluing)
 	if(ncomp == 1)
 	{
 		int** result = convertSolution(succ, comp, ncomp, inst);
-
+		
 		bestSolution(result[1], objval, inst);
 
 		for(int i=1; i<ncomp+1; i++) free(result[i]);
