@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 {
 
     instance inst;
-    inst.debug = true;
+    inst.debug = false;
     
     if(argc<2)
     {
@@ -58,5 +58,8 @@ int main(int argc, char** argv)
 
     executeWorkflow(&inst);
     free_instance(&inst);
+
+    //while(true){}
+
     return 0;
 }

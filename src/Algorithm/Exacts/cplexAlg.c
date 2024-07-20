@@ -293,8 +293,25 @@ int bendersLoop(instance *inst, bool gluing)
 
 			verbose_print(inst, 80, "[Benders - Gluing] Merged solution has cost %f\n", objval);
 			
-			if(objval < inst->zbest)
+			if(objval < inst->zbest){
 				bestSolution(result[1], objval, inst);
+
+				// convert heuristic to CPLEX format
+				double* x = (double *) calloc(inst->ncols, sizeof(double));
+				
+				for(int i=0; i<inst->ncols; i++)
+					x[i] = 0.0;
+				
+				for(int i=0; i<inst->nnodes-1; i++)
+					x[xpos(result[1][i], result[1][i+1], inst)] = 1.0;
+				x[xpos(result[1][inst->nnodes-1], result[1][0], inst)] = 1.0;
+
+				int error = addCPLEXMipStart(inst, env, lp, x);
+				assert(error == 0);
+
+				free(x);
+				//*/
+			}
 			
 			if(inst->debug){
 				for(int i=1; i<inst->nnodes; i++)
@@ -895,7 +912,6 @@ int add_cut(double cut_value, int cut_nnodes, int* cut_index_nodes, void* userha
 			nnz++;
 		}
 	}
-	
 	
 	int error = CPXcallbackaddusercuts(cut_pars.context, 1, nnz, &rhs, &sense, &izero, index, value, &purgeable, &local);
 	assert(error == 0);// CPXcallbackaddusercuts error
