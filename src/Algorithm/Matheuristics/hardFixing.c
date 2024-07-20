@@ -64,6 +64,8 @@ int diving(instance* inst)
 	int izero = 0;
 	for(int i=0;i<inst->ncols;i++) value[i] = 1.0;
 	
+	double freeEdgesProb = 0.1; // probability of fixing an edge
+	
 	verbose_print(inst, 80, "[Diving] Initializing done, mipstart cost: %f, counter: %d\n", objval, counter);
 
 	//first check of time
@@ -74,7 +76,6 @@ int diving(instance* inst)
 	double time = timeElapsed(&(inst->tstart), &(end));
 	
 	while(time < inst->time_limit) {
-		double freeEdgesProb = 0.1;
 
 		// fix edges
 		for(int a = 0; a < inst->nnodes; a++)
@@ -116,7 +117,7 @@ int diving(instance* inst)
 
 		// update free edges probability
 		double eps = 0.1 * objval;
-		if(objval - cpx_objval < eps && freeEdgesProb < 0.5){
+		if(abs(objval - cpx_objval) < eps && freeEdgesProb < 0.5){
 			freeEdgesProb += 0.1;
 		}
 
