@@ -46,8 +46,7 @@ int main(int argc, char** argv)
     double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
     printf("Time spent: %f\n", time_spent);
     return 0;
-
-
+    
     instance inst;
     inst.debug = true;
     
