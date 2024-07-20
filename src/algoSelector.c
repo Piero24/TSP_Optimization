@@ -23,7 +23,10 @@ void Random(instance* inst)
         inst->zbest += dist(inst, inst->best_sol[i], inst->best_sol[i-1]);
     }
     inst->zbest += dist(inst, inst->best_sol[0], inst->best_sol[inst->nnodes-1]);
-    //inst->tbest = clock();
+
+    void* current_time = currentTime();
+    inst->tbest = *((struct timespec*)current_time);
+    free(current_time);
 }
 
 int apply_algorithm(instance* inst)
@@ -32,8 +35,13 @@ int apply_algorithm(instance* inst)
 
     if(inst->verbose > 0)
     {
-        //double solutionTime = ((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC;
-        //double totalTime = ((double) (clock() - inst->tstart)) / CLOCKS_PER_SEC;
+
+        void* current_time = currentTime();
+        struct timespec c_time = *((struct timespec*)current_time);
+        free(current_time);
+
+        double solutionTime = timeElapsed(&(inst->tstart), &(inst->tbest));
+        double totalTime = timeElapsed(&(inst->tstart), &(c_time));
         printf("\n\n");
 
         char info[] = " BEST SOLUTION ";
@@ -45,8 +53,8 @@ int apply_algorithm(instance* inst)
         if (strcmp(inst->algorithm_name, "Nearest Neighbor") == 0)
             printf("Starting Node: %d\t\t\t", inst->start);
         
-        //printf("Solution found after: %f sec.\t\t\t", solutionTime);
-        //printf("Program ended after: %f sec.\t\t\t", totalTime);
+        printf("Solution found after: %f sec.\t\t\t", solutionTime);
+        printf("Program ended after: %f sec.\t\t\t", totalTime);
         
         if (strcmp(inst->algorithm_name, "CPLEX") != 0 || inst->callback_base || inst->callback_relax)
             printf("Cost: %f\t\t", inst->zbest);
@@ -174,16 +182,11 @@ int bestSolution(int* result, double cost, instance* inst)
     inst->zbest = cost;
 
     void* current_time = currentTime();
-    double time;
-    #ifdef WIN32
-        inst->tbest_w = *((clock_t*)current_time);
-        time = timeElapsed(&(inst->tstart_w), &(inst->tbest_w));
-    #else
-        inst->tbest_u = *((struct timespec*)current_time);
-        time = timeElapsed(&(inst->tstart_u), &(inst->tbest_u));
-    #endif
+    inst->tbest = *((struct timespec*)current_time);
+    double time = timeElapsed(&(inst->tstart), &(inst->tbest));
+    free(current_time);
     
-    verbose_print(inst, 50, "Best solution updated. Its cost is %f, it was founded after %d seconds\n", cost, time);
+    verbose_print(inst, 50, "Best solution updated. Its cost is %f, it was founded after %f seconds\n", cost, time);
     
     if(inst->show_gnuplot > -1){
         if(inst->show_gnuplot > 0)

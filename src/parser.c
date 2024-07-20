@@ -577,7 +577,9 @@ int read_input(instance* inst)
 		exit(0);
 	}  
 
-	inst->tstart_w = clock();
+	void* current_time = currentTime();
+	inst->tstart = *((struct timespec*)current_time);
+	free(current_time);
 
 	fclose(fin); 
     return 0;

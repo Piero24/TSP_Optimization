@@ -46,10 +46,8 @@ typedef struct {
 	int ncols;								// cplex number of columns
 
 	//global data
-	double tstart_w;						// starting time (for windows system)		
-	struct timespec tstart_u;				// starting time (for unix system)
-	double tbest_w;							// time for the best sol. available (for windows system)	
-	struct timespec tbest_u;				// time for the best sol. available   (for unix system)
+	struct timespec tstart;					// starting time
+	struct timespec tbest;					// time for the best sol. available
 	double zbest;							// cost best sol. available  
 	int *best_sol;							// best sol. available (WARNING: was double)
 	double best_lb;							// best lower bound available  

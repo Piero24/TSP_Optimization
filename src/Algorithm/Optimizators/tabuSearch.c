@@ -26,8 +26,11 @@ int tabuSearch(instance* inst)
     int nCosts = 0, xIndex = 0;
 
     // time checkers
-    clock_t end = clock();
-    double time;// = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+    void* current_time = currentTime();
+    struct timespec end = *((struct timespec*)current_time);
+    free(current_time);
+	
+    double time = timeElapsed(&(inst->tstart), &(end));
     
     verbose_print(inst, 80, "[Tabu' Search] Initialization completed, starting optimization.\n");
 
@@ -151,8 +154,11 @@ int tabuSearch(instance* inst)
          * Here we check if this has happened.
          */
 
-        end = clock();
-        //time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+        current_time = currentTime();
+    	end = *((struct timespec*)current_time);
+        free(current_time);
+	
+    	time = timeElapsed(&(inst->tstart), &(end));
 
         verbose_print(inst, 80, "[Tabu' Search] time: %f, limit:%f\n", time, inst->time_limit);
 

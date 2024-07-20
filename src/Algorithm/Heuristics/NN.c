@@ -67,7 +67,12 @@ int WeightedNNFromEachNode(instance* inst, double* weights, int* result, double*
         }
 
         // time check
-        double time;// = ((double) (clock() - inst->tstart)) / CLOCKS_PER_SEC;
+        void* current_time = currentTime();
+        struct timespec end = *((struct timespec*)current_time);
+        free(current_time);
+
+        double time = timeElapsed(&(inst->tstart), &(end));
+
         if(time >= inst->time_limit)
             break;
     }
@@ -147,8 +152,12 @@ int weightedNearestNeighbor(instance* inst, int firstNode, int* result, double* 
         verbose_print(inst, 95, "[Nearest Neighbor] Current cost: %f\n", *cost);
 
         // check time limit
-        clock_t end = clock();
-        double time;// = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+        void* current_time = currentTime();
+        struct timespec end = *((struct timespec*)current_time);
+        free(current_time);
+
+        double time = timeElapsed(&(inst->tstart), &(end));
+
         if (time >= inst->time_limit) {
             verbose_print(inst, 90, "[Nearest Neighbor] Exiting by time limit\n");
             break;

@@ -38,17 +38,6 @@
 
 int main(int argc, char** argv)
 {
-    void* current_time = currentTime();
-    struct timespec start = *((struct timespec*)current_time);
-
-    current_time = currentTime();
-    struct timespec end = *((struct timespec*)current_time);
-    double time = timeElapsed(&(start), &(end));
-    
-    printf("%f\n", time);
-    return 0;
-
-
     instance inst;
     inst.debug = false;
     

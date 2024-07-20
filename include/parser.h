@@ -12,6 +12,7 @@
 
 #include "tsp.h"
 #include "menu.h"
+#include "algoSelector.h"
 
 /**
  * @brief Initializes the instance structure with default values.

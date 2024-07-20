@@ -3,8 +3,11 @@
 int variableNeighborhoodSearch(instance* inst)
 {
     // time checkers
-    clock_t end = clock();
-    double time;// = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+    void* current_time = currentTime();
+    struct timespec end = *((struct timespec*)current_time);
+    free(current_time);
+	
+    double time = timeElapsed(&(inst->tstart), &(end));
 
     //result vector initialization
     verbose_print(inst, 80, "[VNS] Starting initialization.\n");
@@ -56,8 +59,10 @@ int variableNeighborhoodSearch(instance* inst)
         verbose_print(inst, 80, "[VNS - 2opt] Kicks done, cost: %f.\n\n", cost);
 
         // TIME CHECK
-        end = clock();
-        //time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+        current_time = currentTime();
+        end = *((struct timespec*)current_time);
+        free(current_time);
+        time = timeElapsed(&(inst->tstart), &(end));
 
         verbose_print(inst, 90, "[VNS] time: %f, limit:%f\n", time, inst->time_limit);
 

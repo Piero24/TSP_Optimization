@@ -56,8 +56,11 @@ int localBranching(instance* inst)
 	verbose_print(inst, 80, "[Local Branching] Initializing done, mipstart cost: %f\n", objval);
 
 	//first check of time
-	clock_t end = clock();
-    double time;// = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+	void* current_time = currentTime();
+    struct timespec end = *((struct timespec*)current_time);
+	free(current_time);
+	
+    double time = timeElapsed(&(inst->tstart), &(end));
 	
 	while(time < inst->time_limit) {
 		// add contraint: fix n-k edges
@@ -117,8 +120,11 @@ int localBranching(instance* inst)
 		assert(error == 0);
 
 		//check time
-		end = clock();
-        //time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+		current_time = currentTime();
+    	end = *((struct timespec*)current_time);
+		free(current_time);
+	
+    	time = timeElapsed(&(inst->tstart), &(end));
 
 	}
 

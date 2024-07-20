@@ -222,7 +222,8 @@ int manageLauncher(instance *inst, const char *filename)
                 snprintf(score_str, sizeof(score_str), "%f", inst->zbest);
 
             } else {
-                double time_score;// =((double) (inst->tbest - inst->tstart)) / CLOCKS_PER_SEC;
+                
+                double time_score = timeElapsed(&(inst->tstart), &(inst->tbest));
                 snprintf(score_str, sizeof(score_str), "%f", time_score);
             }
             

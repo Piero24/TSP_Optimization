@@ -67,8 +67,11 @@ int diving(instance* inst)
 	verbose_print(inst, 80, "[Diving] Initializing done, mipstart cost: %f, counter: %d\n", objval, counter);
 
 	//first check of time
-	clock_t end = clock();
-    double time;// = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+	void* current_time = currentTime();
+	struct timespec end = *((struct timespec*)current_time);
+	free(current_time);
+
+	double time = timeElapsed(&(inst->tstart), &(end));
 	
 	while(time < inst->time_limit) {
 		double freeEdgesProb = 0.1;
@@ -95,8 +98,11 @@ int diving(instance* inst)
 		verbose_print(inst, 90, "[Diving] Constraints added\n");
 
 		// check time
-		end = clock();
-        //time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+		current_time = currentTime();
+        end = *((struct timespec*)current_time);
+		free(current_time);
+
+        double time = timeElapsed(&(inst->tstart), &(end));
 
 		// call branch and bound blackbox 
 		if(time < inst->time_limit)
@@ -150,8 +156,11 @@ int diving(instance* inst)
 		verbose_print(inst, 90, "[Diving] constrains removed\n");
 
 		//check time
-		end = clock();
-        //time = ((double) (end - inst->tstart)) / CLOCKS_PER_SEC;
+		current_time = currentTime();
+        end = *((struct timespec*)current_time);
+		free(current_time);
+
+        time = timeElapsed(&(inst->tstart), &(end));
 
 	}
 	

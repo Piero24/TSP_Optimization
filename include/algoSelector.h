@@ -44,6 +44,26 @@ int algorithmSelector(instance* inst);
 void sleep_ms(int milliseconds);
 
 /**
+ * @brief Calculates the elapsed time between two time points.
+ * 
+ * @param start Pointer to the start time. On Windows, this is a pointer to `clock_t`.
+ * On Unix-like systems, this is a pointer to `struct timespec`.
+ * @param end Pointer to the end time. On Windows, this is a pointer to `clock_t`.
+ * On Unix-like systems, this is a pointer to `struct timespec`.
+ * 
+ * @return The elapsed time in seconds as a `double` value.
+ */
+double timeElapsed(void* start, void* end);
+
+/**
+ * @brief Gets the current time.
+ * 
+ * @return A pointer to the current time. On Windows, this is a pointer to `clock_t`.
+ * On Unix-like systems, this is a pointer to `struct timespec`.
+ */
+void* currentTime();
+
+/**
  * @brief Substitute the path of the old best solution with the path of 
  * new solution.
  * 
@@ -55,11 +75,5 @@ void sleep_ms(int milliseconds);
  * @return 0 if the time limit isn't violated yet, 1 otherwise
  */
 int bestSolution(int* result, double cost, instance* inst);
-
-
-
-double timeElapsed(void* start, void* end);
-
-void* currentTime();
 
 #endif /* ALGOSELECTOR_H */
