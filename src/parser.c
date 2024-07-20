@@ -33,6 +33,7 @@ int parse_args(int argc, char** argv, instance* inst)
 	int model_type = 0;
 	int opt_type = 0;
 	char cplexOpt[10] = "";
+	inst->plotFlag = false;
 
 	// default  
 	initialization(inst); 

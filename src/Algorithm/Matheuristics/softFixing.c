@@ -41,7 +41,6 @@ int localBranching(instance* inst)
 	inst->callback_relax = true;
 	inst->posting_base = true;
 	inst->posting_relax = false;
-
 	char **cname = (char **) calloc(1, sizeof(char *));
 	double rhs = inst->nnodes - k; // n-k
 	char sense = 'G';
@@ -65,6 +64,7 @@ int localBranching(instance* inst)
 	while(time < inst->time_limit) {
 		// add contraint: fix n-k edges
 		int nnz = 0;
+		double rhs = inst->nnodes - k; // n-k
 		
 		for ( int h = 0; h < inst->nnodes; h++ )
 		{
