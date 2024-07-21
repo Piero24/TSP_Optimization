@@ -5,24 +5,32 @@
 // -g 50 -model 1 -opt 3 -v 10 -t 5
 
 // files:
-// -g 200
-// -g 300
-// -g 400
-// -g 500
-// -g 600
+-g 200
+-g 300
+-g 400
+-g 500
+-g 600
 -g 700
 -g 800
 -g 900
 -g 1000
--g 1100
--g 1200
--g 1300
--g 1400
+//-g 1100
+//-g 1200
+//-g 1300
+//-g 1400
 
 // algos
 // -c 1:mipstart, 2:callback base, 3:callback relax, 4:posting base, 5:posting relax
--model 2
+//-model 2
 //-model 2 -opt 1
+//-model 3 -c 1234
+//-model 3
+//-model 3 -c 1
+-model 4
+-model 5
+-model 3 -c 2
+-model 3 -c 23
+-model 3 -c 24
 -model 3 -c 1234
 
 // parameters:
