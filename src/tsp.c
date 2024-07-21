@@ -304,7 +304,7 @@ bool randomBool()
 	return randomInt(0, 1) == 0 ? false : true;
 }
 
-char* fileGenerator(int n)
+char* fileGenerator(int n, int seed)
 {
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);
@@ -315,7 +315,7 @@ char* fileGenerator(int n)
 	// Create the file name
 	char file_name[50];
 
-	snprintf(file_name, sizeof(file_name), "Resource/pr%d-%s.tsp", n, date_str);
+	snprintf(file_name, sizeof(file_name), "Resource/pr%d-%d-%s.tsp", n, seed, date_str);
 
     // Open the file
     // printf("%s\n",file_name);

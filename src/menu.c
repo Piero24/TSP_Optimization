@@ -23,7 +23,7 @@ int manageMenu(instance *inst)
 
     if (n > 0) 
     {
-        char* name = fileGenerator(n);
+        char* name = fileGenerator(n, inst->random_seed);
         strcpy(inst->input_file, name);
         // Free the dynamically allocated memory
         free(name);

@@ -87,7 +87,7 @@ int parse_args(int argc, char** argv, instance* inst)
 
 	if (n > 0) 
 	{
-		char* name = fileGenerator(n);
+		char* name = fileGenerator(n, inst->random_seed);
 		strcpy(inst->input_file, name);
 		free(name);
 	}

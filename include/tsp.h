@@ -170,10 +170,11 @@ bool randomBool();
  * The file it will be saved in the Resource folder.
  * 
  * @param n The number of nodes to generate.
+ * @param seed The random seed of the file to generate.
  * 
  * @return The name of the file generated.
  */
-char* fileGenerator(int n);
+char* fileGenerator(int n, int seed);
 
 /**
  * @brief Return distance between node a and b.
