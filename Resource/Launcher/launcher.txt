@@ -21,21 +21,22 @@
 
 // algos
 // -c 1:mipstart, 2:callback base, 3:callback relax, 4:posting base, 5:posting relax
-//-model 2
-//-model 2 -opt 1
+-model 2
+-model 2 -opt 1
 //-model 3 -c 1234
 //-model 3
 //-model 3 -c 1
--model 4
--model 5
--model 3 -c 2
--model 3 -c 23
--model 3 -c 24
--model 3 -c 1234
+//-model 4
+//-model 5
+//-model 3 -c 2
+//-model 3 -c 23
+//-model 3 -c 24
+//-model 3 -c 1234
 
 // parameters:
--r 2378098
+-r 2378098 -v 10
 
--v 10
-//2345678
+// 2378098
+// 2345678
+
 //started at 14:14

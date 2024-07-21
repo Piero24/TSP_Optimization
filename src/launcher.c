@@ -7,11 +7,11 @@ void instExtractor(instance *inst, char *line)
     char *words[384];
     // Start with 1 to reserve the first cell for an empty string
     int argc = 1;
-    char line_copy[256];
+    char line_copy[MAX_PARAMETERS_LENGTH];
     strcpy(line_copy, line);
     token = strtok(line_copy, delim);
 
-    while (token != NULL && argc < 256)
+    while (token != NULL && argc < MAX_PARAMETERS_LENGTH)
     {
         // printf("%s\n", token);
         words[argc++] = token;
@@ -85,7 +85,7 @@ int manageLauncher(instance *inst, const char *filename)
     Tuple tuples[MAX_FILES];
     int tuple_count = 0;
 
-    char parameters[256];
+    char parameters[MAX_PARAMETERS_LENGTH];
 
     bool some_heuristic = false;
 

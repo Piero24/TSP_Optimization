@@ -19,6 +19,7 @@
 
 #define MAX_FILES 100
 #define MAX_HEADER_LENGTH 350
+#define MAX_PARAMETERS_LENGTH 256
 
 typedef struct {
 	char algorithm[50];

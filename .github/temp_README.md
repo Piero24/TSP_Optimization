@@ -13,7 +13,7 @@
 
 
 <p align="center">
-  <img src=".github/path.png" width="100" height="100">
+  <img src="https://github.com/Piero24/TSP_Optimization/blob/main/.github/path.png?raw=true" width="150" height="150">
 </p>
 <h1 align="center">
     <a href="https://github.com/Piero24/TSP_Optimization">Traveler Salesman Problem Optimization</a>
