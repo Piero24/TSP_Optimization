@@ -111,7 +111,9 @@ int manageLauncher(instance *inst, const char *filename)
 
             if (strcmp(inst->algorithm_name, "Undefined") != 0 && tuple_count < MAX_FILES*5)
             {
-                if (strcmp(inst->algorithm_name, "CPLEX") != 0)
+                if (strcmp(inst->algorithm_name, "CPLEX") != 0 
+                    || strcmp(inst->algorithm_name, "Benders' Loop") != 0
+                    || strcmp(inst->algorithm_name, "Glued Benders' Loop") != 0)
                     some_heuristic = true;
 
                 strcpy(tuples[tuple_count].algorithm, inst->algorithm_name);
