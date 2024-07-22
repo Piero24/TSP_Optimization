@@ -1,0 +1,57 @@
+// -file Resource/pr10v1.tsp -model 1 -opt 1 -v 50 
+// -file Resource/pr10v1.tsp -model 1 -opt 1 -v 40 
+// -g 50 -model 0 -opt 1 -v 60 -s 1
+// -g 50 -model 1 -opt 2 -v 10 -t 5
+// -g 50 -model 1 -opt 3 -v 10 -t 5
+
+// files:
+// -g 200 -r 987
+// -g 300 -r 987
+// -g 400 -r 987
+// -g 200 -r 2345678
+// -g 300 -r 2345678
+// -g 400 -r 2345678
+// -g 500 -r 2378098
+// -g 500 -r 2345678
+// -g 500 -r 987
+// -g 600 -r 2378098
+// -g 600 -r 2345678
+// -g 600 -r 987
+
+-g 700 -r 2118098
+-g 700 -r 2225678
+-g 700 -r 2335688
+-g 700 -r 6882335
+-g 700 -r 3872578
+
+-g 800 -r 2118098
+-g 800 -r 2225678
+-g 800 -r 2335688
+-g 800 -r 6882335
+-g 800 -r 3872578
+
+
+// -g 1000 -r 2378098
+// -g 1000 -r 2345678
+// -g 1000 -r 987
+// -g 900 -r 987
+// -g 900 -r 2345678
+// -g 900 -r 2378098
+
+// algos
+// -c 1:mipstart, 2:callback base, 3:callback relax, 4:posting base, 5:posting relax
+-model 4
+-model 5
+-model 3 -c 2
+-model 3 -c 23
+-model 3 -c 24
+-model 3 -c 1234
+// -model 2
+// -model 2 -opt 2
+// -model 2 -opt 3
+
+// parameters:
+-v 10
+
+//2345678
+//2378098
