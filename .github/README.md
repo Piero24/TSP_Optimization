@@ -335,8 +335,7 @@ Di seguto è possibile vedere un esempio dell'output ottenuto a termminale. Dove
         <th><a href="#"></a></th> 
     </tr>
     <tr align="center">
-        <th>🗄</th>
-        <th align="center" colspan="2"><a href="https://github.com/Piero24/TSP_Optimization">Traveler Salesman Problem Optimization</a></th>
+        <th style="text-align:center" align="center" colspan="3">🗄 <a href="https://github.com/Piero24/TSP_Optimization">Traveler Salesman Problem Optimization</a></th>
     </tr>
     </table>
 
