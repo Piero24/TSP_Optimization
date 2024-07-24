@@ -45,7 +45,7 @@
 <p align="center">
     A list of Heuristics, Metaheuristics and Matheuristic algorithms for solve the TSP.
     <br/>
-    <a href="#index"><strong>Explore the docs »</strong></a>
+    <a href="#index"><strong>Read the paper »</strong></a>
     <br/>
     <br/>
     <a href="https://github.com/Piero24/TSP_Optimization">View Demo</a>
@@ -61,63 +61,93 @@
 
 <br/><br/>
 <h2 id="itroduction">📔  Itroduction</h2>
-<p>
-    This section contains a series of information on 
-    how to use the code such as the prerequisites, the dev tools to use etc.
-</p>
+<p> This project encompasses a comprehensive suite of algorithms designed to tackle the classic TSP, providing solutions via various heuristics, matheuristics, and exact optimization models. Leveraging the power of IBM’s CPLEX solver, our exact models deliver high-quality solutions with mathematical rigor and efficiency. </p>
+<h4>Overview</h4>
+<p>The TSP Solver offers a versatile and powerful framework to approach the Traveling Salesman Problem, which seeks the shortest possible route that visits each city once and returns to the origin city. Our solver is equipped with:</p>
+    <ul>
+        <li><strong>Heuristics:</strong> Fast, efficient algorithms that provide good solutions within a reasonable time frame. These include methods such as Nearest Neighbor and 2-Opt.</li>
+        <li><strong>Matheuristics:</strong> Advanced hybrid techniques that combine heuristics with mathematical programming to enhance solution quality.</li>
+        <li><strong>Exact Models:</strong> Robust formulations that guarantee optimal solutions using the CPLEX solver from IBM, ensuring precision and thoroughness in solving TSP instances.</li>
+    </ul>
 <br/>
-<img src="https://github.githubassets.com/images/modules/site/social-cards/github-social.png">
+<table>
+  <tr  align="center">
+    <th><strong>Neirest Neighbor + 2-Opt</strong></th>
+    <th><strong>Neirest Neighbor + VNS</strong></th>
+  </tr>
+  <tr  align="center">
+    <th><img src="Localhost.png" alt="Web Page"></th>
+    <th><img src="example_img.jpeg" alt="Example Image"></th> 
+  </tr>
+  <tr  align="center">
+    <th><strong>Benders' Loop</strong></th>
+    <th><strong>Local Branching</strong></th> 
+  </tr>
+  <tr  align="center">
+    <th><img src="Localhost.png" alt="Web Page"></th>
+    <th><img src="example_img.jpeg" alt="Example Image"></th> 
+  </tr>
+</table>
 <br/>
 <br/>
+
+> [!IMPORTANT]  
+> 1. To run this program you need to have a valid CPLEX license. You can download the CPLEX solver from the IBM website.
+> 2. 
 
 
 <h2 id="made-in"><br/>🛠  Built in</h2>
 <p>
-    This section should list all the major frameworks/libraries used to start your project. Leave any add-ons / plug-ins for the thanks section.
+    The entire program is developed using the following major frameworks and libraries. Leave any add-ons / plug-ins for the thanks section.
 </p>
 <br/>
-<a href="https://github.com/Piero24/Template-README">Programming Language 1</a> • <a href="https://github.com/Piero24/Template-README/issues">Programming Language 2</a> • <a href="https://github.com/Piero24/Template-README/issues">Programming Language 3</a>
+<a href="https://www.cprogramming.com/">C Programming Language</a> • <a href="https://cmake.org/">CMake</a> • <a href="https://www.ibm.com/products/ilog-cplex-optimization-studio">IBM CPLEX Optimization Studio</a>
 
 <p align="right"><a href="#top">⇧</a></p>
-
-
-<h2 id="index"><br/>📋  Index</h2>
-<ul>
-    <li><h4><a href="#documentation">Documentation</a></h4></li>
-    <li><h4><a href="#prerequisites">Prerequisites</a></h4></li>
-    <li><h4><a href="#how-to-start">How to Start</a></h4></li>
-    <li><h4><a href="#structure-of-the-project">Structure of the Project</a></h4></li>
-    <li><h4><a href="#roadmap">Roadmap</a></h4></li>
-    <li><h4><a href="#responsible-disclosure">Responsible Disclosure</a></h4></li>
-    <li><h4><a href="#report-a-bug">Report a Bug</a></h4></li>
-    <li><h4><a href="#maintenance">Maintenance</a></h4></li>
-    <li><h4><a href="#license">License</a></h4></li>
-    <li><h4><a href="#third-party-licenses">Third Party Licenses</a></h4></li>
-</ul>
-
-<p align="right"><a href="#top">⇧</a></p>
-
 
 <h2 id="documentation"><br/><br/>📚  Documentation</h2>
+<ul>
+  <li><strong>Random</strong>: 
+  </li>
+  <li><strong>Heuristics</strong>
+    <ul>
+      <li><strong>Nearest Neighbor (NN)</strong>: This algorithm starts from an initial node and selects the nearest node to move to next. The process is repeated until all nodes have been visited. It is a simple and effective method to quickly obtain an acceptable solution for problems like the Traveling Salesman Problem (TSP).</li>
+      <li><strong>2-Opt</strong>: The 2-Opt algorithm is used to iteratively improve a solution by exchanging pairs of edges. The idea is to reduce the overall path length by finding and removing "crosses" between the edges, replacing them with non-intersecting edges.</li>
+    </ul>
+  </li>
+  <li><strong>Metaheuristics</strong>
+    <ul>
+      <li><strong>Variable Neighborhood Search (VNS)</strong>: This metaheuristic explores different neighborhood structures to avoid getting stuck in local minima. By changing the neighborhood structure, the algorithm can explore a larger part of the solution space, increasing the chances of finding the optimal solution.</li>
+      <li><strong>Tabu Search (TS)</strong>: Tabu Search employs a tabu list to keep track of already visited solutions, preventing the algorithm from revisiting them. This mechanism helps avoid cycles and overcome local minima, promoting a more thorough search of the solution space.</li>
+    </ul>
+  </li>
+  <li><strong>Exact Methods</strong>
+    <ul>
+      <li><strong>Benders' Loop</strong>: This algorithm solves complex problems by dividing them into a main problem and various subproblems. The iterative process alternates between solving the main problem and the subproblems, progressively refining the overall solution.</li>
+      <li><strong>Glued Benders' Loop</strong>: Similar to Benders' Loop, this method addresses the main problem and subproblems iteratively but with the integration of techniques that improve convergence and process efficiency.</li>
+    </ul>
+  </li>
+  <li><strong>Matheuristics</strong>
+    <ul>
+      <li><strong>Local Branching</strong>: This approach introduces local constraints to rapidly explore portions of the solution space, improving the effectiveness in searching for optimal solutions.</li>
+      <li><strong>Hard Fixing (Diving)</strong>: This technique temporarily fixes some variables to reduce the problem size, allowing a deeper search in the remaining variables. It is particularly useful for tackling large-scale problems, improving the speed of convergence towards an optimal solution.</li>
+    </ul>
+  </li>
+</ul>
 <p>
-    Including pieces of documentation will allow you to better understand what the program does. At this point it is best to write only short portions.
+    For a more complete explanation of how the algorithms work, please refer to the <a href="https://shields.io/">Paper »</a>
 </p>
 <p>
-    For a broader view it is better to refer the user to the documentation via links: <a href="https://shields.io/">Documentation »</a>
+    There are different parameters and different ways to start the program. More details are available at the following link: <a href="https://shields.io/">Documentation »</a>
 </p>
-
 
 <p align="right"><a href="#top">⇧</a></p>
 
 
 <h2 id="prerequisites"><br/>🧰  Prerequisites</h2>
 <p>
-    This is an example of how to list the things needed to use the software and how to install them.
+    To use the actual algorithms, a CPLEX license is required. If you have a license, you can download the software from IBM's official website. An installation guide for MacOS is available at the following link: <a href="https://shields.io/">Installazione CPLEX su MacOS »</a>. Currently, there is no installation guide available for Windows or Linux.
 </p>
-
-```
-Pre-requisites section
-```
 
 <p align="right"><a href="#top">⇧</a></p>
 
@@ -152,27 +182,6 @@ const API_KEY = 'ENTER YOUR API';
 
 
 ---
-  
-
-<h2 id="roadmap"><br/><br/>🛫  Roadmap</h2>
-
-- [x] Upload code
-- [x] README file
-- [x] Multi-language README
-    - [x] Inglese
-    - [x] Italaino
-- [x] Point 1
-- [ ] Point 2
-- [ ] Point 3
-
-<p>
-    See the 
-    <a href="https://github.com/Piero24/TSP_Optimization/issues">open issues</a>
-    for a full list of proposed features (and known issues).
-</p>
-
-<p align="right"><a href="#top">⇧</a></p>
-
 
 <h3 id="responsible-disclosure"><br/>📮  Responsible Disclosure</h3>
 <p>
@@ -213,29 +222,6 @@ const API_KEY = 'ENTER YOUR API';
 <br/>
 
 <p align="right"><a href="#top">⇧</a></p>
-
-
-<h3 id="maintenance"><br/>🔧  Maintenance</h3>
-<p>
-    There are currently no parts of the code under maintenance. You can quickly check the <a href="#top">status of the project</a> at the top of the page.
-</p>
-<br/>
-<p>
-    This section details which parts of the code are under maintenance and for what reason.
-</p>
-
-<br/>
-
-<h4 id="changelog"><br/>📟  Changelog</h4>
-<p>
-    Here you can find all the information regarding the fixes and implementations that took place in the various program reviews.
-</p>
-
-<br/>
-<a href="https://github.com/Piero24/Template-README/blob/main/CHANGELOG.md"><strong>Explore the changelog docs</strong></a>
-<br/>
-
-<p align="right"><a href="#top">⇧</a></p>
   
  --- 
 
@@ -260,43 +246,34 @@ const API_KEY = 'ENTER YOUR API';
 <h3 id="authors-and-copyright"><br/>✏️  Authors and Copyright</h3>
 <br/>
 <p>
-    👨🏽‍💻: <strong>Pietrobon Andrea</strong>
-    <br/>
-    🌐: <a href="https://www.pietrobonandrea.com">pietrobonandrea.com</a>
-    <br/>
-    <img src="https://assets.stickpng.com/thumbs/580b57fcd9996e24bc43c53e.png" width="30" height="30" align="center">:
-    <a href="https://twitter.com/pietrobonandrea">@PietrobonAndrea</a>
-    <br/>
-    🗄: <a href="https://github.com/Piero24/TSP_Optimization">Traveler Salesman Problem Optimization</a>
-</p>
-<br/>
-<p>
-    My name is <strong>Pietrobon Andrea</strong>, a computer engineering student at the 
-    <img src="https://upload.wikimedia.org/wikipedia/it/thumb/5/53/Logo_Università_Padova.svg/800px-Logo_Università_Padova.svg.png"  width="26" height="26" align="center"> 
-    University of Padua (🇮🇹).
-</p>
-<p>
-    My passion turns towards <strong>AI</strong> and <strong>ML</strong>.
-    I have learned and worked in different sectors that have allowed me to gain skills in different fields, such as IT and industrial design.
-    To find out more, visit my <a href="https://www.pietrobonandrea.com">
-    <strong>website »</strong></a>
-</p>
-<p>
-    <strong>The Copyright (C) of this project is held exclusively by my person.</strong>
-</p>
+    <table>
+    <tr  align="center">
+        <th><strong>👨🏽‍💻</strong></th>
+        <th><strong>Andrea Pietrobon</strong></th>
+        <th><strong>Andrea Felline</strong></th>
+    </tr>
+    <tr  align="center">
+        <th>🌐</th>
+        <th><a href="https://www.pietrobonandrea.com">pietrobonandrea.com</a></th>
+        <th><a href="https://www.pietrobonandrea.com">pietrobonandrea.com</a></th> 
+    </tr>
+    <tr  align="center">
+        <th><img src="https://assets.stickpng.com/thumbs/580b57fcd9996e24bc43c53e.png" width="30" height="30" align="center"></th>
+        <th><a href="https://twitter.com/pietrobonandrea">@PietrobonAndrea</a></th> 
+        <th><a href="https://twitter.com/pietrobonandrea">@PietrobonAndrea</a></th> 
+    </tr>
+    <tr  align="center">
+        <th>🗄</th>
+        <th align="center"><a href="https://github.com/Piero24/TSP_Optimization">Traveler Salesman Problem Optimization</a></th>
+        <th></th> 
+    </tr>
+    </table>
 
-
+</p>
 <p align="right"><a href="#top">⇧</a></p>
 
 
 <h3 id="third-party-licenses"><br/>📌  Third Party Licenses</h3>
-
-In the event that the software uses third-party components for its operation, 
-<br/>
-the individual licenses are indicated in the following section.
-<br/>
-<br/>
-<strong>Software list:</strong>
 <br/>
 <table>
   <tr  align="center">
@@ -307,10 +284,17 @@ the individual licenses are indicated in the following section.
     <th>Note</th>
   </tr>
   <tr  align="center">
-    <td>None</td>
-    <td></td> 
+    <td>IBM CPLEX Optimization Studio</td>
+    <td>IBM</td> 
+    <td> - </td>
+    <td><a href="https://www.ibm.com/products/ilog-cplex-optimization-studio">Link</a></td>
     <td></td>
-    <td></td>
+  </tr>
+  <tr  align="center">
+  <td>Perfprof</td>
+    <td>Proessor D. Salvagnin</td> 
+    <td>Not Specified</td>
+    <td><a href="https://www.dei.unipd.it/~fisch/ricop/OR2/PerfProf/read_me.txt" >link</a></td>
     <td></td>
   </tr>
 </table>
