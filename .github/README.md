@@ -243,11 +243,7 @@ Di seguto è possibile vedere un esempio dell'output ottenuto a termminale. Dove
 ```
 
 
-<img src="https://raw.githubusercontent.com/Piero24/TSP_Optimization/main/Archive/Image/Nearest%20Neighbor/NN.png" alt="Web Page">
-
-
-
-
+<img src="https://raw.githubusercontent.com/Piero24/TSP_Optimization/main/.github/output_tm.png" alt="Web Page">
 
 
 
