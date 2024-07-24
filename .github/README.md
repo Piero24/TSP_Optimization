@@ -2,7 +2,6 @@
 <br/>
 <br/>
 
-
 <p align="center">
   <img src="https://github.com/Piero24/TSP_Optimization/blob/main/.github/path.png?raw=true" width="150" height="150">
 </p>
@@ -36,11 +35,11 @@
 <p align="center">
     A list of Heuristics, Metaheuristics and Matheuristic algorithms for solve the TSP.
     <br/>
-    <a href="#index"><strong>Read the paper »</strong></a>
+    <a href="https://github.com/Piero24/TSP_Optimization/blob/main/Thesis.pdf"><strong>Read the paper »</strong></a>
     <br/>
     <br/>
-    <a href="https://github.com/Piero24/TSP_Optimization">View Demo</a>
-    •
+    <!--<a href="https://github.com/Piero24/TSP_Optimization">View Demo</a>
+    • -->
     <a href="https://github.com/Piero24/TSP_Optimization/issues">Report Bug</a>
     •
     <a href="https://github.com/Piero24/TSP_Optimization/issues">Request Feature</a>
@@ -322,12 +321,12 @@ You can also launch it manually on `.csv` file with the following command:
     <tr  align="center">
         <th>🌐</th>
         <th><a href="https://www.pietrobonandrea.com">pietrobonandrea.com</a></th>
-        <th><a href="https://www.pietrobonandrea.com">pietrobonandrea.com</a></th> 
+        <th><a href="#">--</a></th> 
     </tr>
     <tr  align="center">
         <th><img src="https://assets.stickpng.com/thumbs/580b57fcd9996e24bc43c53e.png" width="30" height="30" align="center"></th>
         <th><a href="https://twitter.com/pietrobonandrea">@PietrobonAndrea</a></th> 
-        <th><a href="https://twitter.com/pietrobonandrea">@PietrobonAndrea</a></th> 
+        <th><a href="#">--</a></th> 
     </tr>
     <tr  align="center">
         <th>🗄</th>
