@@ -145,10 +145,10 @@ The program also includes a version of `Performance profiler` developed in pytho
   </li>
 </ul>
 <p>
-    For a more complete explanation of how the algorithms work, please refer to the <a href="https://shields.io/">Paper »</a>
+    For a more complete explanation of how the algorithms work, please refer to the <a href="https://github.com/Piero24/TSP_Optimization/blob/main/Thesis.pdf">Paper »</a>
 </p>
 <p>
-    There are different parameters and different ways to start the program. More details are available at the following link: <a href="https://shields.io/">Documentation »</a>
+    There are different parameters and different ways to start the program. More details are available at the following link: <a href="https://github.com/Piero24/TSP_Optimization/blob/main/.github/parameters.md">Documentation »</a>
 </p>
 
 <p align="right"><a href="#top">⇧</a></p>
@@ -156,7 +156,7 @@ The program also includes a version of `Performance profiler` developed in pytho
 
 <h2 id="prerequisites"><br/>🧰  Prerequisites</h2>
 <p>
-    To use the actual algorithms, a CPLEX license is required. If you have a license, you can download the software from IBM's official website. An installation guide for MacOS is available at the following link: <a href="https://shields.io/">Installazione CPLEX su MacOS »</a>. Currently, there is no installation guide available for Windows or Linux.
+    To use the actual algorithms, a CPLEX license is required. If you have a license, you can download the software from IBM's official website. An installation guide for MacOS is available at the following link: <a href="https://www.ibm.com/products/ilog-cplex-optimization-studio">Installazione CPLEX su MacOS »</a>. Currently, there is no installation guide available for Windows or Linux.
 </p>
 
 NOTE: You also need to install `cmake` and `gnuplot` to compile the code.
