@@ -2,8 +2,6 @@
 <br/>
 <br/>
 
-
-
 <p align="center">
   <img src="https://github.com/Piero24/TSP_Optimization/blob/main/.github/path.png?raw=true" width="150" height="150">
 </p>
@@ -237,12 +235,15 @@ You can also launch it manually on `.csv` file with the following command:
     python3 src/Comparator/perfprof.py -D , -T 3600 -S 2 -M 20 CSV_PATH OUTPUT_PATH/OUTPUT_FILE_NAME.pdf -P 'Performance Profile'
 ```
 
+Di seguto è possibile vedere un esempio dell'output ottenuto a termminale. Dove la prima parte contine i parametri utilizzati, la seconda parte i risultati ottenuti come il costo ed i tempi.
+**NOTE:** Per visionare gli output dei risultati e necessario settare il `verbose` ad un valore maggiore di 0 come riportato nell'immagine.
+
+```sh
+    make -C build && clear && ./TSP_Optimization -g 100 -model 2 -opt 1 -s 1 -tl 120 -v 1
+```
 
 
-
-
-
-
+<img src="https://raw.githubusercontent.com/Piero24/TSP_Optimization/main/Archive/Image/Nearest%20Neighbor/NN.png" alt="Web Page">
 
 
 
