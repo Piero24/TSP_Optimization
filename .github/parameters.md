@@ -112,10 +112,9 @@ An example of its use is the following:
 ./TSP_Optimization -g 100 -model 1 -r 52
 ```
 
-
 ## Verbose
 #### Commands: `-verbose`, `-v`
-The verbose allows you to view the details of the algorithm's execution. By default it is set to `0` and does not show any details. Increasing the seed value 10 at a time from `0` to `100` allows you to view the execution details. The higher the verbose value, the more details will be shown.
+The verbose allows you to view the details of the algorithm execution. By default it is set to `0` and does not show any details. Not even the results obtained. If you only want to view the results you can do so by setting the verbose to `1`. Instead, increasing the value by `10` at a time (from `10` to `100`) allows you to view the execution details. The higher the detailed value, the more detail is displayed.
 
 An example of its use is the following:
 ```sh
@@ -188,10 +187,11 @@ An example of its use is the following:
 
 ## Plot Cost
 #### Commands: `-showCost`, `-plotCost`, `-sC`
+Used to print a graph containing the cost - time relationship of the Tabu Search and VNS methods.
 
 An example of its use is the following:
 ```sh
-./TSP_Optimization -file Resource/pr45.tsp -model 2 -opt 2 -s 2
+./TSP_Optimization -file Resource/pr45.tsp -model 2 -opt 2 -sC 1
 ```
 
 - **-help** or **--help** or **-h**: Help

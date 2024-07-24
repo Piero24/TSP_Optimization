@@ -125,6 +125,11 @@ The program also includes a version of `Performance profiler` developed in pytho
     <ul>
       <li><strong>Benders' Loop</strong>: This algorithm solves complex problems by dividing them into a main problem and various subproblems. The iterative process alternates between solving the main problem and the subproblems, progressively refining the overall solution.</li>
       <li><strong>Glued Benders' Loop</strong>: Similar to Benders' Loop, this method addresses the main problem and subproblems iteratively but with the integration of techniques that improve convergence and process efficiency.</li>
+      <li><strong>Mipstart</strong>: Custom function applied to the relaxed solution of the problem
+      <li><strong>Callback Base</strong>: It's a callback function that can be used when CPLEX finds an integer solution so we can check the number of components and add the SECs if needed.
+      <li><strong>Callback Relax</strong>: It's a callback function that can be used when CPLEX finds a relaxed (not integer) solution so we can check the number of components and add the SECs if there is more than one, or a min cut otherwise.
+      <li><strong>Posting Base</strong>: It's a method implemented in the Callback Base that performs the gluing operation on the candidate solution and posts it on the CPLEX environment.
+      <li><strong>Posting Relax</strong>: It's a method implemented in the Callback Relax that use an heuristic method on the relaxed solution to get a feasible solution and posts it on the CPLEX environment.
     </ul>
   </li>
   <li><strong>Matheuristics</strong>
@@ -322,17 +327,16 @@ Di seguto è possibile vedere un esempio dell'output ottenuto a termminale. Dove
     <tr  align="center">
         <th>🌐</th>
         <th><a href="https://www.pietrobonandrea.com">pietrobonandrea.com</a></th>
-        <th><a href="#">--</a></th> 
+        <th><a href="https://andreafelline.altervista.org/">andreafelline.altervista.org</a></th> 
     </tr>
     <tr  align="center">
         <th><img src="https://assets.stickpng.com/thumbs/580b57fcd9996e24bc43c53e.png" width="30" height="30" align="center"></th>
         <th><a href="https://twitter.com/pietrobonandrea">@PietrobonAndrea</a></th> 
-        <th><a href="#">--</a></th> 
+        <th><a href="#"></a></th> 
     </tr>
-    <tr  align="center">
+    <tr align="center">
         <th>🗄</th>
-        <th align="center"><a href="https://github.com/Piero24/TSP_Optimization">Traveler Salesman Problem Optimization</a></th>
-        <th></th> 
+        <th align="center" colspan="2"><a href="https://github.com/Piero24/TSP_Optimization">Traveler Salesman Problem Optimization</a></th>
     </tr>
     </table>
 
