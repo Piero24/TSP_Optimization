@@ -72,24 +72,37 @@
 <br/>
 <table  align="center">
   <tr  align="center">
+    <th><strong>Neirest Neighbor</strong></th>
     <th><strong>Neirest Neighbor + 2-Opt</strong></th>
-    <th><strong>Neirest Neighbor + VNS</strong></th>
   </tr>
   <tr  align="center">
-    <th><img src="Localhost.png" alt="Web Page"></th>
-    <th><img src="example_img.jpeg" alt="Example Image"></th> 
+    <th><img src="https://raw.githubusercontent.com/Piero24/TSP_Optimization/main/Archive/Image/Nearest%20Neighbor/NN.png" alt="Web Page"></th>
+    <th><img src="https://raw.githubusercontent.com/Piero24/TSP_Optimization/main/Archive/Image/Nearest%20Neighbor/NN%2B2opt.png" alt="Example Image"></th> 
   </tr>
   <tr  align="center">
     <th><strong>Benders' Loop</strong></th>
     <th><strong>Local Branching</strong></th> 
   </tr>
   <tr  align="center">
-    <th><img src="Localhost.png" alt="Web Page"></th>
-    <th><img src="example_img.jpeg" alt="Example Image"></th> 
+    <th><img src="https://raw.githubusercontent.com/Piero24/TSP_Optimization/main/Archive/Image/Benders'%20Loop/pr1000-96224627-2024-07-21_24-07-22.png" alt="Web Page"></th>
+    <th><img src="https://raw.githubusercontent.com/Piero24/TSP_Optimization/main/Archive/Image/Glued%20Benders'%20Loop/pr700-100728864-2024-07-22_24-07-22.png" alt="Example Image"></th> 
   </tr>
 </table>
 <br/>
 <br/>
+
+Il programma comprende anche una versione di `Performance profiler` sviluppata in python dal `Professor Salvagnin` per analizzare le prestazioni degli algoritmi implementati. Questo strumento consente di confrontare le prestazioni di diversi algoritmi e di valutare la qualità delle soluzioni ottenute. Questi sono alcuni esempi dei risultati:
+
+<table  align="center">
+  <tr  align="center">
+    <th><strong>Neirest Neighbor</strong></th>
+    <th><strong>Neirest Neighbor + 2-Opt</strong></th>
+  </tr>
+  <tr  align="center">
+    <th><img src="https://raw.githubusercontent.com/Piero24/TSP_Optimization/main/Archive/Image/Nearest%20Neighbor/NN.png" alt="Web Page"></th>
+    <th><img src="https://raw.githubusercontent.com/Piero24/TSP_Optimization/main/Archive/Image/Nearest%20Neighbor/NN%2B2opt.png" alt="Example Image"></th> 
+  </tr>
+</table>
 
 > [!IMPORTANT]  
 > 1. To run this program you need to have a valid CPLEX license. You can download the CPLEX solver from the IBM website.
