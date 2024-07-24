@@ -2,11 +2,7 @@
 <br/>
 <br/>
 
-##Plot Cost Nei parametri da completare
-##Add the algo for the exact not present
 
-##Launcher example
-##Add example of output
 
 <p align="center">
   <img src="https://github.com/Piero24/TSP_Optimization/blob/main/.github/path.png?raw=true" width="150" height="150">
@@ -221,7 +217,7 @@ Windows
     .\TSP_Optimization -launcher Resource/Launcher/launcher.txt
 ```
 
-An example of the launcher file can be found at the following link: <a href="https://github.com/Piero24/TSP_Optimization/blob/main/.github/parameters.md">Laucher Example »</a>
+An example of the launcher file can be found at the following link: <a href="https://github.com/Piero24/TSP_Optimization/blob/main/Resource/Launcher/launcher%20example.txt">Laucher Example »</a>
 
 We remind you that a list of available parameters is present at the following link: <a href="https://github.com/Piero24/TSP_Optimization/blob/main/.github/parameters.md">Available Parameters »</a>
 
