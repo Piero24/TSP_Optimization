@@ -65,6 +65,18 @@ int file_menu(char *file_name, int *n);
 int algorithm_menu(char *algorithm_name);
 
 /**
+ * @brief Manages the CPLEX options selection menu.
+ * 
+ * This function presents a menu for selecting the CPLEX
+ * options to be applied to the CPLEX algorithmm.
+ * 
+ * @param inst A pointer to the tsp instance.
+ * 
+ * @return Returns 0 upon successful execution.
+ */
+int CPLEX_options_menu(instance *inst);
+
+/**
  * @brief Manages the optimization method selection menu.
  * 
  * This function presents a menu for selecting the optimizer 

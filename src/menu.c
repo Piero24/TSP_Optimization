@@ -14,6 +14,17 @@ int manageMenu(instance *inst)
     algorithm_menu(inst->algorithm_name);
     clearScreen();
 
+    if(strcmp(inst->algorithm_name, "CPLEX")==0){
+        inst->mipstart = false;
+        inst->callback_base = false;
+        inst->callback_relax = false;
+        inst->posting_base = false;
+        inst->posting_relax = false;
+
+        while(CPLEX_options_menu(inst) == 1);
+        clearScreen();
+    }
+
     optimization_menu(inst->opt_name);
     clearScreen();
 
@@ -128,6 +139,10 @@ int algorithm_menu(char *algorithm_name)
         printf("1 - Random\n");
         printf("2 - Nearest Neighbor\n");
         printf("3 - Cplex\n");
+        printf("4 - Benders' Loop\n");
+        printf("5 - Glued Benders' Loop\n");
+        printf("6 - Diving\n");
+        printf("7 - Local Branching\n");
         printf("\n9 - Show help menu\n");
         printf("0 - Exit\n");
         
@@ -170,6 +185,14 @@ int algorithm_menu(char *algorithm_name)
             case 5:
                 strcpy(algorithm_name, "Glued Benders' Loop");
                 return 0;
+            
+            case 6:
+                strcpy(algorithm_name, "Diving");
+                return 0;
+
+            case 7:
+                strcpy(algorithm_name, "Local Branching");
+                return 0;
 
             case 9:
                 while (getchar() != '\n'); 
@@ -185,6 +208,84 @@ int algorithm_menu(char *algorithm_name)
         }
     }
     return 0;
+}
+
+int CPLEX_options_menu(instance *inst)
+{
+    int err_flag = 0;
+    
+    while (1) 
+    {
+        clearScreen();
+        welcomeMessage();
+        printf("\nCHOOSE THE CPLEX OPTIONS\n");
+        printf("Select the OPTIONS you want to apply to the CPLEX algorithm.\n\n");
+        printf("1 - None (end CPLEX option choice)\n");
+        printf("2 - mipstart\n");
+        printf("3 - callback base\n");
+        printf("4 - callback relax\n");
+        printf("5 - posting base\n");
+        printf("6 - posting relax\n");
+        printf("\n9 - Show help menu\n");
+        printf("0 - Exit\n");
+
+        if (err_flag)
+        {
+            printf("\n");
+            char error_info[] = "ERROR: Invalid input. Add a valid input.";
+            printCentered(error_info, ' ');
+            printf("\n");
+            err_flag = 0;
+        }
+
+        printf("\nEnter your choice: ");
+        
+        int choice;
+        if (scanf("%d", &choice) != 1)
+        {
+            while (getchar() != '\n'); // Clear input buffer
+            err_flag = 1;
+        }
+
+        switch (choice)
+        {
+            case 1:
+                return 0;
+
+            case 2:
+                inst->mipstart = true;
+                return 1;
+
+            case 3:
+                inst->callback_base = true;
+                return 1;
+            
+            case 4:
+                inst->callback_relax = true;
+                return 1;
+            
+            case 5:
+                inst->posting_base = true;
+                return 1;
+            
+            case 6:
+                inst->posting_relax = true;
+                return 1;
+
+            case 9:
+                while (getchar() != '\n'); 
+                showHelpMenu(3);
+                break;
+
+            case 0:
+                quitMessage();
+                break;
+
+            default:
+                err_flag = 1;
+        }
+    }
+    return -1;
 }
 
 int optimization_menu(char *opt_name)
