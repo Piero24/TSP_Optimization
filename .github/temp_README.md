@@ -70,7 +70,7 @@
         <li><strong>Exact Models:</strong> Robust formulations that guarantee optimal solutions using the CPLEX solver from IBM, ensuring precision and thoroughness in solving TSP instances.</li>
     </ul>
 <br/>
-<table>
+<table  align="center">
   <tr  align="center">
     <th><strong>Neirest Neighbor + 2-Opt</strong></th>
     <th><strong>Neirest Neighbor + VNS</strong></th>
@@ -154,29 +154,68 @@
 
 <h2 id="how-to-start"><br/>⚙️  How to Start</h2>
 <p>
-    Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services.
+    Come menzionato in precedenza ci sono differenti opzioni.
+    Comando singolo: Lancia na sola esecuzione con i parametri a riga di comando
+    Menu: Lancia una singola esecuzione con i parametri scelti da un menu
+    Launcher: Lancia uno o più esecuzioni con i parametri presenti in un file di testo
 </p>
 <br/>
+<h4><strong>Comando singolo</strong></h4>
+<p>
+    Scelti i parametri, e posizionandosi sulla cartella contenente il codice è possibile lanciare il programma con i seguenti comandi:
+</p>
 
-
-1. Get a free API Key  <a href="https://example.com">here</a>
-2. Clone the repo
-  
+MacOS
 ```sh
-git clone https://github.com/your_username_/Project-Name.git
+    mkdir build && cmake -S . -DCPLEXDIR="/Applications/CPLEX_Studio2211/cplex" -B build
+    make -C build && ./TSP_Optimization -g 100 -model 2 -opt 1
 ```
 
-3. Install NPM packages
-  
+Windows
 ```sh
-npm install
+    cmake . -B build --fresh && cmake --build build --clean-first
+    .\TSP_Optimization -f Resource/a280.tsp -model 2 -v 60
 ```
 
-4. Enter your API in `config.js`
-  
-```js
-const API_KEY = 'ENTER YOUR API';
+Linux
+```sh
+    mkdir build && cmake -S . -DCPLEXDIR="C:/Program Files/IBM/ILOG/CPLEX_Studio_Community2211/cplex/" -B build
+    make -C build && ./TSP_Optimization -g 300 -model 3 -opt 12 -s 1 -v 60 -tl 120
 ```
+
+<h4><strong>Menu</strong></h4>
+
+Nel caso si voglia utilizzare il menu dopo aver compilato il codice come in precedenza con `cmake`, è possibile lanciare il programma con il seguente comando:
+
+MacOS/Linux
+```sh
+    make -C build && ./TSP_Optimization
+```
+
+Windows
+```sh
+    .\TSP_Optimization -g 300 -model 2 -v 10 -tl 60
+```
+
+<h4><strong>Launcher</strong></h4>
+
+Nel caso si voglia utilizzare il Launcher dopo aver compilato il codice come in precedenza con `cmake`, è possibile lanciare il programma con il seguente comando:
+
+MacOS/Linux
+```sh
+    make -C build && clear && ./TSP_Optimization -launcher Resource/Launcher/launcher.txt
+```
+
+Windows
+```sh
+    .\TSP_Optimization -launcher Resource/Launcher/launcher.txt
+```
+
+Ricordiamo che una lista dei parametri disponibili è presente al seguente link: <a href="https://shields.io/">Parametri disponibili »</a>
+
+Una volta lanciato il programma eseguirà l'algoritmo scelto monstrando i risultati a schermo con GNUPlot (Se selezionato come parametro). Inoltre, verranno salvati i file generati tramite il comando `-g` con le coordinate dei punti. In output verrà salvata anche una immagine `.svg` e `.png`con il percorso ottimo trovato.
+
+<strong>Nota:</strong> Se si utilizza il loucher in output verrà generato un file `.csv` con i risultati ottenuti.così da poter utilizzare il `performance profiler`.
 
 <p align="right"><a href="#top">⇧</a></p>
 
@@ -246,7 +285,7 @@ const API_KEY = 'ENTER YOUR API';
 <h3 id="authors-and-copyright"><br/>✏️  Authors and Copyright</h3>
 <br/>
 <p>
-    <table>
+    <table  align="center">
     <tr  align="center">
         <th><strong>👨🏽‍💻</strong></th>
         <th><strong>Andrea Pietrobon</strong></th>
@@ -275,7 +314,7 @@ const API_KEY = 'ENTER YOUR API';
 
 <h3 id="third-party-licenses"><br/>📌  Third Party Licenses</h3>
 <br/>
-<table>
+<table  align="center">
   <tr  align="center">
     <th>Software</th>
     <th>License owner</th> 
