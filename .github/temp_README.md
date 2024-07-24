@@ -101,9 +101,9 @@ The program also includes a version of `Performance profiler` developed in pytho
 </table>
 <br/>
 <br/>
-> [!IMPORTANT]  
+
+> [!IMPORTANT]
 > 1. To run this program you need to have a valid CPLEX license. You can download the CPLEX solver from the IBM website.
-> 2. 
 
 
 <h2 id="made-in"><br/>🛠  Built in</h2>
@@ -111,13 +111,13 @@ The program also includes a version of `Performance profiler` developed in pytho
     The entire program is developed using the following major frameworks and libraries. Leave any add-ons / plug-ins for the thanks section.
 </p>
 <br/>
-<a href="https://www.cprogramming.com/">C Programming Language</a> • <a href="https://cmake.org/">CMake</a> • <a href="https://www.ibm.com/products/ilog-cplex-optimization-studio">IBM CPLEX Optimization Studio</a>
+<a href="https://www.cprogramming.com/">C Programming Language</a> • <a href="https://cmake.org/">CMake</a> • <a href="https://www.ibm.com/products/ilog-cplex-optimization-studio">IBM CPLEX Optimization Studio</a> • <a href="http://www.gnuplot.info">GNUPlot</a>
 
 <p align="right"><a href="#top">⇧</a></p>
 
 <h2 id="documentation"><br/><br/>📚  Documentation</h2>
 <ul>
-  <li><strong>Random</strong>: 
+  <li><strong>Random</strong>: A simple algorithm that generates random solutions to the TSP, providing a baseline for comparison with more sophisticated methods.
   </li>
   <li><strong>Heuristics</strong>
     <ul>
@@ -159,7 +159,7 @@ The program also includes a version of `Performance profiler` developed in pytho
     To use the actual algorithms, a CPLEX license is required. If you have a license, you can download the software from IBM's official website. An installation guide for MacOS is available at the following link: <a href="https://shields.io/">Installazione CPLEX su MacOS »</a>. Currently, there is no installation guide available for Windows or Linux.
 </p>
 
-NOTE: You also need to install `cmake` to compile the code.
+NOTE: You also need to install `cmake` and `gnuplot` to compile the code.
 
 
 <p align="right"><a href="#top">⇧</a></p>
@@ -225,12 +225,23 @@ Windows
     .\TSP_Optimization -launcher Resource/Launcher/launcher.txt
 ```
 
-We remind you that a list of available parameters is present at the following link: <a href="https://shields.io/">Parametri disponibili »</a>
+We remind you that a list of available parameters is present at the following link: <a href="https://shields.io/">Available Parameters »</a>
 
-Una volta lanciato il programma eseguirà l'algoritmo scelto monstrando i risultati a schermo con GNUPlot (Se selezionato come parametro). Inoltre, verranno salvati i file generati tramite il comando `-g` con le coordinate dei punti. In output verrà salvata anche una immagine `.svg` e `.png`con il percorso ottimo trovato.
+Once launched, the program will execute the chosen algorithm, displaying the results on the screen with `GNUPlot` (if selected as a parameter). Additionally, the files generated through the `-g` command with the coordinates of the points will be saved. An `.svg` and `.png` image of the optimal path found will also be saved as output.
 
-<strong>Nota:</strong> Se si utilizza il loucher in output verrà generato un file `.csv` con i risultati ottenuti.così da poter utilizzare il `performance profiler`.
+<strong>Note:</strong> If the launcher is used, a `.csv` file with the obtained results will be generated in the output, so that you can use the `performance profiler`. To use it automatically, it is also necessary to install `python3` and `matplotlib` by following these steps:
 
+```sh
+    python3 -m venv env
+    pip3 install matplotlib
+    . env/bin/activate
+```
+
+You can also launch it manually on `.csv` file with the following command:
+
+```sh
+    python3 src/Comparator/perfprof.py -D , -T 3600 -S 2 -M 20 CSV_PATH OUTPUT_PATH/OUTPUT_FILE_NAME.pdf -P 'Performance Profile'
+```
 
 
 
@@ -362,6 +373,13 @@ Una volta lanciato il programma eseguirà l'algoritmo scelto monstrando i risult
     <td>Proessor D. Salvagnin</td> 
     <td>Not Specified</td>
     <td><a href="https://www.dei.unipd.it/~fisch/ricop/OR2/PerfProf/read_me.txt" >link</a></td>
+    <td></td>
+  </tr>
+  <tr  align="center">
+    <td>GNUPlot</td>
+    <td>Thomas Williams, Colin Kelley</td> 
+    <td><a href="https://sourceforge.net/p/gnuplot/gnuplot-main/ci/master/tree/Copyright" >Copyright</a></td>
+    <td><a href="http://www.gnuplot.info" >link</a></td>
     <td></td>
   </tr>
 </table>
