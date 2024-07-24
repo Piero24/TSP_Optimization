@@ -50,7 +50,7 @@
 
 
 <br/><br/>
-<h2 id="itroduction">📔  Itroduction</h2>
+<h2 id="introduction">📔  Introduction</h2>
 <p> This project encompasses a comprehensive suite of algorithms designed to tackle the classic TSP, providing solutions via various heuristics, matheuristics, and exact optimization models. Leveraging the power of IBM’s CPLEX solver, our exact models deliver high-quality solutions with mathematical rigor and efficiency. </p>
 <h4>Overview</h4>
 <p>The TSP Solver offers a versatile and powerful framework to approach the Traveling Salesman Problem, which seeks the shortest possible route that visits each city once and returns to the origin city. Our solver is equipped with:</p>

@@ -104,12 +104,14 @@ int localBranching(instance* inst)
 			int error2 = addCPLEXMipStart(inst, env, lp, xstar);
 			assert(error2 == 0);
 		}
+		else
+		{
+			// increase number of free edges
+			k = k + 10;
+		}
 
 		// if cplex exited with an error or by time limit, end the algorithm
 		if(error != 0) break;
-
-		// increase number of free edges
-		k = k + 10;
 
 		// remove old constraint
 		int rowindex = -1;
