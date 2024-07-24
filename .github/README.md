@@ -2,6 +2,12 @@
 <br/>
 <br/>
 
+##Plot Cost Nei parametri da completare
+##Add the algo for the exact not present
+
+##Launcher example
+##Add example of output
+
 <p align="center">
   <img src="https://github.com/Piero24/TSP_Optimization/blob/main/.github/path.png?raw=true" width="150" height="150">
 </p>
@@ -75,7 +81,7 @@
   </tr>
   <tr  align="center">
     <th><img src="https://raw.githubusercontent.com/Piero24/TSP_Optimization/main/Archive/Image/Benders'%20Loop/pr1000-96224627-2024-07-21_24-07-22.png" alt="Web Page"></th>
-    <th><img src="https://raw.githubusercontent.com/Piero24/TSP_Optimization/main/Archive/Image/Glued%20Benders'%20Loop/pr700-100728864-2024-07-22_24-07-22.png" alt="Example Image"></th> 
+    <th><img src="https://raw.githubusercontent.com/Piero24/TSP_Optimization/main/Archive/Image/Local%20Branching/LocalBr.png" alt="Example Image"></th> 
   </tr>
 </table>
 <br/>
@@ -214,6 +220,8 @@ Windows
 ```sh
     .\TSP_Optimization -launcher Resource/Launcher/launcher.txt
 ```
+
+An example of the launcher file can be found at the following link: <a href="https://github.com/Piero24/TSP_Optimization/blob/main/.github/parameters.md">Laucher Example »</a>
 
 We remind you that a list of available parameters is present at the following link: <a href="https://github.com/Piero24/TSP_Optimization/blob/main/.github/parameters.md">Available Parameters »</a>
 

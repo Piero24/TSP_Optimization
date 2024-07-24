@@ -1,14 +1,14 @@
 
 # Available Parameters:
 
-Qusta è una lista dei parametri che si possono utilizzare per eseguire il programma.
-Per una più completa visione sul loro funzionamento compreso lo pseudocodice e le varie performance che si possono ottenere si può consultare il [» paper »](https://github.com/Piero24/TSP_Optimization/blob/main/Thesis.pdf) .
+This is a list of parameters that can be used to run the program.
+For a more complete view of their operation, including the pseudocode and the various performances that can be obtained, you can consult the [» paper »](https://github.com/Piero24/TSP_Optimization/blob/main/Thesis.pdf) .
 
 ## Input File
 #### Commands: `-file`, `-input`, `-f`
-Se è gia disponibile un file `.tsp` contenete i punti per i quali si vogliono usare gli algoritmi e possibile utilizzarlo specificando la il percorso del file con il parametro.
+If a `.tsp` file is already available containing the points for which you want to use the algorithms and you can use it by specifying the file path with the parameter.
 
-Un esempio del suo utilizzo è il seguente:
+An example of its use is the following:
 ```sh
 ./TSP_Optimization -file Resource/pr10v1.tsp -model 2
 ```
@@ -16,9 +16,9 @@ Un esempio del suo utilizzo è il seguente:
 
 ## Time Limit
 #### Commands: `-time_limit`, `-tl`, `-t`
-Alcuni algoritmi come Tabu Search continuano a cercare la soluzione migliore all'infinito. Per questo motivo è presente un limite di tempo per l'esecuzione dell'algoritmo. Questo parametro permette di specificare il tempo massimo di esecuzione in secondi.
+Some algorithms like Tabu Search keep searching for the best solution endlessly. For this reason there is a time limit for the execution of the algorithm. This parameter allows you to specify the maximum execution time in seconds.
 
-Un esempio del suo utilizzo è il seguente:
+An example of its use is the following:
 ```sh
 ./TSP_Optimization -file Resource/pr240.tsp -model 2 -opt 2 -tl 120
 ```
@@ -26,7 +26,7 @@ Un esempio del suo utilizzo è il seguente:
 
 ## Algorithm
 #### Commands: `-model_type`, `-model`, `-alg`
-Questo parametro permette di specificare l'algoritmo che si vuole utilizzare per risolvere il problema. I valori possibili sono:
+This parameter allows you to specify the algorithm you want to use to solve the problem. Possible values ​​are:
 
 <table>
     <tr  align="center">
@@ -63,7 +63,7 @@ Questo parametro permette di specificare l'algoritmo che si vuole utilizzare per
     </tr>
 </table>
 
-Un esempio del suo utilizzo è il seguente:
+An example of its use is the following:
 ```sh
 ./TSP_Optimization -file Resource/pr50.tsp -model 6 -tl 300 -r 200 -s 1
 ```
@@ -71,7 +71,7 @@ Un esempio del suo utilizzo è il seguente:
 
 ## Optimizer
 #### Commands: `-opt`, `-2opt`, `-optimization`
-Questo parametro permette di specificare l'ottimizzatore che si vuole utilizzare per migliorare la soluzione trovata dall'algoritmo. Per esempio si puù applicare 2-opt per migliorare le prestazioni ottenute da Neirest Neighbor. I valori possibili sono:
+This parameter allows you to specify the optimizer you want to use to improve the solution found by the algorithm. For example, you can apply 2-opt to improve the performance obtained from Neirest Neighbor. Possible values ​​are:
 
 <table>
     <tr  align="center">
@@ -96,7 +96,7 @@ Questo parametro permette di specificare l'ottimizzatore che si vuole utilizzare
     </tr>
 </table>
 
-Un esempio del suo utilizzo è il seguente:
+An example of its use is the following:
 ```sh
 ./TSP_Optimization -g 100 -model 2 -opt 2 -tl 300 -r 52
 ```
@@ -104,10 +104,10 @@ Un esempio del suo utilizzo è il seguente:
 
 ## Seed
 #### Commands: `-seed`, `-r`
-Il seed permette di ricreare i file generati in modo casuale in modo che siano sempre i medesimi. Così da comparare i risultati ottenuti dai differenti algoritmi sugli stessi dati.
-Di default è impostato il seed `93846529`.
+The seed allows you to recreate the randomly generated files so that they are always the same. So as to compare the results obtained by different algorithms on the same data.
+By default the seed is set to `93846529`.
 
-Un esempio del suo utilizzo è il seguente:
+An example of its use is the following:
 ```sh
 ./TSP_Optimization -g 100 -model 1 -r 52
 ```
@@ -115,9 +115,9 @@ Un esempio del suo utilizzo è il seguente:
 
 ## Verbose
 #### Commands: `-verbose`, `-v`
-Il verbose permette di visualizzare i dettagli dell'esecuzione dell'algoritmo. Di default è impostato a `0` e non mostra nessun dettaglio. Incrementando il valore del seed di 10 alla volta da `0` a `100` si possono visualizzare i dettagli dell'esecuzione. Più il valore del verbose è alto più dettagli verranno mostrati.
+The verbose allows you to view the details of the algorithm's execution. By default it is set to `0` and does not show any details. Increasing the seed value 10 at a time from `0` to `100` allows you to view the execution details. The higher the verbose value, the more details will be shown.
 
-Un esempio del suo utilizzo è il seguente:
+An example of its use is the following:
 ```sh
 ./TSP_Optimization -g 100 -model 2 -v 60
 ```
@@ -125,9 +125,9 @@ Un esempio del suo utilizzo è il seguente:
 
 ## File Generator
 #### Commands: `-generate`, `-g`
-Questo parametro permette di generare un file `.tsp` con un numero di punti specificato.
+This parameter allows you to generate a `.tsp` file with a specified number of points.
 
-Un esempio del suo utilizzo è il seguente:
+An example of its use is the following:
 ```sh
 ./TSP_Optimization -g 345 -model 3
 ```
@@ -135,7 +135,7 @@ Un esempio del suo utilizzo è il seguente:
 
 ## CPLEX Optimization
 #### Commands: `-cplexOpt`, `-c`
-Questo parametro permette di specificare il tipo di ottimizzazione che si vuole fare con CPLEX. I valori possibili sono:
+This parameter allows you to specify the type of optimization you want to do with CPLEX. Possible values ​​are:
 
 <table>
     <tr  align="center">
@@ -144,31 +144,43 @@ Questo parametro permette di specificare il tipo di ottimizzazione che si vuole 
     </tr>
     <tr  align="center">
         <th><strong>1</strong></th>
-        <th>CPLEX</th>
+        <th>Mipstart</th>
     </tr>
     <tr  align="center">
         <th><strong>2</strong></th>
-        <th>CPLEX with 2-Opt</th>
+        <th>Callback Base</th>
     </tr>
     <tr  align="center">
         <th><strong>3</strong></th>
-        <th>CPLEX with Tabu Search</th>
+        <th>Callback Relax</th>
     </tr>
     <tr  align="center">
         <th><strong>4</strong></th>
-        <th>CPLEX with VNS</th>
+        <th>Posting Base</th>
+    </tr>
+    <tr  align="center">
+        <th><strong>5</strong></th>
+        <th>Posting Relax</th>
     </tr>
 </table>
 
-Un esempio del suo utilizzo è il seguente:
+An example of its use is the following:
 ```sh
 ./TSP_Optimization -file Resource/pr222.tsp -model 3 -c 1
+```
+
+**NOTE:** These parameters can also be used simultaneously. Here are some examples:
+```sh
+./TSP_Optimization -file Resource/pr567.tsp -model 3 -c 124
+./TSP_Optimization -g 379 -model 3 -c 25 -opt 2
 ```
 
 
 ## Show Plot
 #### Commands: `-show`, `-plot`, `-gnuplot`, `-s`
-Questo parametro permette di visualizzare in tempo reale l'algoritmo nella ricerca della soluzione migliore. Di default è nullo e non verrà mostrato nessun plot (verranno solamente salvati nell'archivio in formato `.png` e `.svg`). Impostando il valore a `0` sarà possibile avere l'output finale con la soluzione migliore trovata. Aumentando il valore si potrà vedere l'evoluzione dell'algoritmo. **ATTENZIONE:** Ogni unità corrisponde a un secondo di tempo di esecuzione. Quindi impostando il valore ad 10 per esempio si vedrà una modifica ogni 10 secondi. Si consiglia pertanto di utilizzare solo valori molto bassi come 3, 2 o 1 e di utilizzarlo per file molto piccoli.
+This parameter allows you to view the algorithm in real time in the search for the best solution. By default it is null and no plots will be shown (they will only be saved in the archive in `.png` and `.svg` format). By setting the value to `0` it will be possible to have the final output with the best solution found. By increasing the value you will be able to see the evolution of the algorithm. **WARNING:** Each unit corresponds to one second of execution time. So by setting the value to 10 for example you will see a change every 10 seconds. It is therefore recommended to only use very low values ​​such as 3, 2 or 1 and to use it for very small files.
+
+An example of its use is the following:
 ```sh
 ./TSP_Optimization -file Resource/pr45.tsp -model 2 -opt 2 -s 2
 ```
@@ -177,6 +189,7 @@ Questo parametro permette di visualizzare in tempo reale l'algoritmo nella ricer
 ## Plot Cost
 #### Commands: `-showCost`, `-plotCost`, `-sC`
 
+An example of its use is the following:
 ```sh
 ./TSP_Optimization -file Resource/pr45.tsp -model 2 -opt 2 -s 2
 ```
@@ -186,8 +199,9 @@ Questo parametro permette di visualizzare in tempo reale l'algoritmo nella ricer
 
 ## Help
 #### Commands: `-help`, `--help`, `-h` (Not completed yet)
-Per visualizzare l'help con tutti i parametri disponibili è possibile utilizzare il seguente comando:
+To view the help with all the available parameters you can use the following command:
 
+An example of its use is the following:
 ```sh
 ./TSP_Optimization -help
 ```

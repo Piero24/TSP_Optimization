@@ -1,0 +1,33 @@
+// This is a comment. Comments are not read by the parser and can be used to draft parts of algorithms
+
+
+// --> FILES <--
+// The files on which you want to launch the various algorithms must be inserted one per line with the seed next to them.
+// If the seed is not present the default one will be used.
+
+-file Resource/pr10v1.tsp
+-g 200 -r 987
+-g 300 -r 987
+-g 400 -r 987
+-g 200 -r 2345678
+-g 300 -r 2345678
+-g 900 -r 2378098
+
+// --> ALGORITMS <--
+// Each algorithm and its parameters such as -opt and -c must be entered one per line.
+
+-model 4
+-model 5
+-model 3 -c 2
+-model 3 -c 23
+-model 3 -c 24
+-model 3 -c 1234
+// -model 2
+
+
+// --> PARAMETERS <--
+// The parameters must all be entered on the same line and only one type can be present at a time.
+// It is not possible as before to use different parameters on each line.
+
+// -tl 35 -s 2
+-v 10 -tl 60 -s 0
