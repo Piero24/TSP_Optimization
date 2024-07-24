@@ -1,0 +1,95 @@
+% le caratteristiche richieste dall'università sono elencate qui: https://stem.elearning.unipd.it/mod/book/view.php?id=234&chapterid=46#modalita
+% 12pt: font richiesto dall'università
+% twoside: i margini interni ed esterni sono scambiati per le pagine "a sinistra" e "a destra"
+% openright: i capitoli cominciano in pagine dispari ("a destra")
+% extreport: supporta 12pt
+\documentclass[12pt,a4paper,twoside,openright]{extreport}
+
+\usepackage{amsmath}                            % per avere più controllo sulle equazioni 
+\usepackage{amssymb}                            % For mathematical symbols and environments
+\usepackage{csquotes}                           % per le citazioni
+\usepackage{enumitem}                           % per avere più controllo sulle enumerazioni
+%\usepackage{algorithm}
+%\usepackage{algpseudocode}
+\usepackage{algorithm2e}
+%https://texdoc.org/serve/algorithm2e/0
+\RestyleAlgo{ruled}
+
+%% This declares a command \Comment
+%% The argument will be surrounded by /* ... */
+\SetKwComment{Comment}{/* }{ */}
+
+\usepackage{hyperref}
+
+\usepackage[
+    a4paper,
+    top=2cm,bottom=2cm,
+    outer=2cm,inner=3cm,
+    includeheadfoot
+]{geometry}                                     % margini richiesti dall'università
+\usepackage{graphicx}                           % per le immagini
+\usepackage{icomma}                             % per separare le cifre decimali con una virgola
+\usepackage{minted}                             % per il codice con la colorazione della sintassi
+\usepackage[a-1a]{pdfx}                         % formato richiesto dall'università
+\usepackage[output-decimal-marker={,}]{siunitx} % per le unità di misura
+\usepackage{subcaption}                         % per le sottodidascalie
+\usepackage{svg}                                % per inserire file SVG
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx, animate}
+\usepackage{svg}
+
+%\usepackage[italian]{babel}
+%\selectlanguage{italian}
+\usepackage[english]{babel}
+\selectlanguage{english}
+
+\usepackage[backend=bibtex,style=ieee]{biblatex}
+\bibliography{bibliografia}
+
+\usepackage{fontspec}
+\setmainfont{Times New Roman} % carattere richiesto dall'università
+
+\usepackage{setspace}
+\onehalfspacing % interlinea richiesta dall'università
+
+\sloppy % per evitare che il testo in \verb finisca oltre i margini
+
+% questi valori vengono usati nella composizione del frontespizio
+\title{A Comparative Study of Optimization Techniques for the Traveling Salesman Problem}
+\date{2023-2024}
+\newcommand{\supervisor}{Fischetti Matteo}
+\newcommand{\firstauthor}{Felline Andrea - 2090597}
+\newcommand{\secondauthor}{Pietrobon Andrea  - 2087639}
+%\newcommand{\assistantsupervisor}{Cognome Nome}
+
+\begin{document}
+    \pagenumbering{roman}
+    \pagestyle{empty} % per le prime pagine, non mostrare il numero di pagina
+
+    \input{Capitoli/frontespizio}
+    \cleardoublepage
+
+    \pagestyle{plain} % comincia a mostrare il numero di pagina
+
+    % NOTA: l'ambiente \abstract rimuove il numero della pagina e resetta il contatore delle pagine. 
+    %\chapter*{Sommario}
+    %Descrizione dell'obiettivo della tesi.
+    %\cleardoublepage
+
+    \tableofcontents
+    \cleardoublepage % per assicurarsi che la numerazione araba cominci col primo capitolo
+    
+    \pagenumbering{arabic}
+
+    \input{Capitoli/Introduction}
+    \input{Capitoli/Heuristics}
+    \input{Capitoli/Metaheuristics}
+    \input{Capitoli/ExactModels}
+    \input{Capitoli/Matheuristics}
+    \input{Capitoli/Conclusions}
+
+    \clearpage
+
+    \printbibliography[heading=bibintoc]
+\end{document}

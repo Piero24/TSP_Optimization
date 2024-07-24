@@ -149,20 +149,24 @@
     To use the actual algorithms, a CPLEX license is required. If you have a license, you can download the software from IBM's official website. An installation guide for MacOS is available at the following link: <a href="https://shields.io/">Installazione CPLEX su MacOS »</a>. Currently, there is no installation guide available for Windows or Linux.
 </p>
 
+NOTE: You also need to install `cmake` to compile the code.
+
+
 <p align="right"><a href="#top">⇧</a></p>
 
 
 <h2 id="how-to-start"><br/>⚙️  How to Start</h2>
 <p>
-    Come menzionato in precedenza ci sono differenti opzioni.
-    Comando singolo: Lancia na sola esecuzione con i parametri a riga di comando
-    Menu: Lancia una singola esecuzione con i parametri scelti da un menu
-    Launcher: Lancia uno o più esecuzioni con i parametri presenti in un file di testo
+   As mentioned earlier, there are different options:
+    <ul>
+    <li><strong>Single Command</strong>: Launch a single execution with command line parameters</li>
+    <li><strong>Menu</strong>: Launch a single execution with parameters chosen from a menu</li>
+    <li><strong>Launcher</strong>: Launch one or more executions with parameters present in a text file</li>
+    </ul>
 </p>
-<br/>
-<h4><strong>Comando singolo</strong></h4>
+<h4><strong>Single Command</strong></h4>
 <p>
-    Scelti i parametri, e posizionandosi sulla cartella contenente il codice è possibile lanciare il programma con i seguenti comandi:
+    Once you have chosen the parameters and positioned yourself on the folder containing the code, you can launch the program with the following commands:
 </p>
 
 MacOS
@@ -185,7 +189,7 @@ Linux
 
 <h4><strong>Menu</strong></h4>
 
-Nel caso si voglia utilizzare il menu dopo aver compilato il codice come in precedenza con `cmake`, è possibile lanciare il programma con il seguente comando:
+If you want to use the menu after compiling the code as previously with `cmake`, you can launch the program with the following command:
 
 MacOS/Linux
 ```sh
@@ -199,7 +203,7 @@ Windows
 
 <h4><strong>Launcher</strong></h4>
 
-Nel caso si voglia utilizzare il Launcher dopo aver compilato il codice come in precedenza con `cmake`, è possibile lanciare il programma con il seguente comando:
+If you want to use the Launcher after compiling the code as previously with `cmake`, you can launch the program with the following command:
 
 MacOS/Linux
 ```sh
@@ -211,11 +215,25 @@ Windows
     .\TSP_Optimization -launcher Resource/Launcher/launcher.txt
 ```
 
-Ricordiamo che una lista dei parametri disponibili è presente al seguente link: <a href="https://shields.io/">Parametri disponibili »</a>
+We remind you that a list of available parameters is present at the following link: <a href="https://shields.io/">Parametri disponibili »</a>
 
 Una volta lanciato il programma eseguirà l'algoritmo scelto monstrando i risultati a schermo con GNUPlot (Se selezionato come parametro). Inoltre, verranno salvati i file generati tramite il comando `-g` con le coordinate dei punti. In output verrà salvata anche una immagine `.svg` e `.png`con il percorso ottimo trovato.
 
 <strong>Nota:</strong> Se si utilizza il loucher in output verrà generato un file `.csv` con i risultati ottenuti.così da poter utilizzare il `performance profiler`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <p align="right"><a href="#top">⇧</a></p>
 

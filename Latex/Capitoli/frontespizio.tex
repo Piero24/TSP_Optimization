@@ -1,0 +1,67 @@
+% In your document body
+\begin{titlepage}
+    % solo il frontespizio deve essere simmetrico rispetto ai margini interno ed esterno
+    \newgeometry{hmargin=2.5cm,vmargin=2cm}
+        \begin{figure}
+            \centering
+            \begin{subfigure}[b]{0.4\textwidth}
+                \includegraphics[width=\textwidth]{Immagini/logo_unipd}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}[b]{0.3\textwidth}
+                \includegraphics[width=\textwidth]{Immagini/logo_dei}
+            \end{subfigure}
+        \end{figure}
+    
+        \vspace*{\stretch{0.5}}
+    
+        \begin{center}
+            \makeatletter % serve per poter usare \@...
+
+            % NOTA: il Times New Roman non supporta il maiuscoletto.
+            \textsc{\large University of Padua - Department of Information Engineering}\\
+            \vspace*{\stretch{0.1}}
+            \textsc{\large Master Degree in Computer Engineering}
+    
+            \vspace*{\stretch{0.5}}
+            \LARGE
+            \textbf{\@title}
+            
+            \vspace*{\stretch{3}}
+            \begin{figure}[htbp]
+                \centering
+                \begin{subfigure}[b]{0.48\textwidth}
+                    \centering
+                    \includegraphics[width=\textwidth]{Immagini/Felline.jpg}
+                    %\caption{Before}
+                    \label{fig:Felline}
+                \end{subfigure}
+                \hfill
+                \begin{subfigure}[b]{0.48\textwidth}
+                    \centering
+                    \includegraphics[width=\textwidth]{Immagini/Pietrobon.jpg}
+                    %\caption{After}
+                    \label{fig:Pietrobon}
+                \end{subfigure}
+                %\caption{2-opt before and after}
+                \label{fig:Authors}
+            \end{figure}
+    
+            \vspace*{\stretch{3}}
+            \normalsize
+            \begin{tabular*}{\textwidth}{l @{\extracolsep{\fill}} r}
+                \textbf{Professor} & \textbf{Students}  \\
+                \supervisor        & \firstauthor           \\
+                                   & \secondauthor           \\
+            \end{tabular*}
+    
+            \vspace*{\stretch{2}}
+            \textsc{ACCADEMIC YEAR 2023-2024} \\
+            \vspace*{\stretch{0.1}}
+            %Data di laurea \@date
+            \textbf{Operations Research 2}
+        
+            \makeatother % serve dopo \makeatletter
+        \end{center}
+    \restoregeometry
+\end{titlepage}
