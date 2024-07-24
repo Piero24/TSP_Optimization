@@ -1,13 +1,4 @@
-<!--**RELEASED-DATA**-->
-
 <div id="top"></div>
-
-<!-- Working ✅ Work in progress ⚠️ ~~Deprecate~~ ⛔️ -->
-**Project Status:** Work in progress ⚠️ <a href="#maintenance">⇩</a>
-<br/>
-**Percentage Completely:** 40% 🔋 <a href="#roadmap">⇩</a>
-<br/>
-<br/>
 <br/>
 <br/>
 
@@ -386,4 +377,4 @@ You can also launch it manually on `.csv` file with the following command:
 
 
 ---
-> *<p align="center"> Copyrright (C) by Pietrobon Andrea <br/> Released date: **RELEASED-DATA***
+> *<p align="center"> Copyrright (C) by Pietrobon Andrea <br/> Released date: 24-07-2024*
