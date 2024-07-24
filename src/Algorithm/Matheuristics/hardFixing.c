@@ -86,7 +86,7 @@ int diving(instance* inst)
 
 				double rand = randomDouble(0, 1);
 			
-				if(rand < freeEdgesProb){
+				if(rand > freeEdgesProb){
 					sprintf(cname[0], "diving(%d, %d)", a, b); 
 					index[0] = xpos(a, b, inst);
 
