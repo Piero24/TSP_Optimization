@@ -38,8 +38,8 @@
     <a href="https://github.com/Piero24/TSP_Optimization/blob/main/Thesis.pdf"><strong>Read the paper »</strong></a>
     <br/>
     <br/>
-    <!--<a href="https://github.com/Piero24/TSP_Optimization">View Demo</a>
-    • -->
+    <a href="https://github.com/Piero24/TSP_Optimization/tree/main/Results">View Results</a>
+    • 
     <a href="https://github.com/Piero24/TSP_Optimization/issues">Report Bug</a>
     •
     <a href="https://github.com/Piero24/TSP_Optimization/issues">Request Feature</a>
